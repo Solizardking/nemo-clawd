@@ -120,7 +120,9 @@ do_stop() {
 }
 
 do_start() {
-  [ -n "${NVIDIA_API_KEY:-}" ] || fail "NVIDIA_API_KEY required"
+  if [ -z "${ZAI_API_KEY:-}" ] && [ -z "${NVIDIA_API_KEY:-}" ]; then
+    fail "ZAI_API_KEY or NVIDIA_API_KEY required"
+  fi
 
   if [ -z "${TELEGRAM_BOT_TOKEN:-}" ]; then
     warn "TELEGRAM_BOT_TOKEN not set — Telegram bridge will not start."

@@ -11,7 +11,8 @@
  *
  * Env:
  *   TELEGRAM_BOT_TOKEN  — from @BotFather
- *   NVIDIA_API_KEY      — for inference
+ *   ZAI_API_KEY         — for ZAI GLM 5.2 inference (preferred)
+ *   NVIDIA_API_KEY      — fallback NVIDIA-hosted inference
  *   SANDBOX_NAME        — sandbox name (default: nemoclawd)
  *   ALLOWED_CHAT_IDS    — comma-separated Telegram chat IDs to accept (optional, accepts all if unset)
  */
@@ -20,14 +21,16 @@ const https = require("https");
 const { execSync, spawn } = require("child_process");
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const API_KEY = process.env.NVIDIA_API_KEY;
+const INFERENCE_KEY_NAME = process.env.ZAI_API_KEY ? "ZAI_API_KEY" : "NVIDIA_API_KEY";
+const API_KEY = process.env.ZAI_API_KEY || process.env.NVIDIA_API_KEY;
+const MODEL = process.env.ZAI_API_KEY ? "zai/glm-5.2" : "nvidia/nemotron-3-super-120b-a12b";
 const SANDBOX = process.env.SANDBOX_NAME || "nemoclawd";
 const ALLOWED_CHATS = process.env.ALLOWED_CHAT_IDS
   ? process.env.ALLOWED_CHAT_IDS.split(",").map((s) => s.trim())
   : null;
 
 if (!TOKEN) { console.error("TELEGRAM_BOT_TOKEN required"); process.exit(1); }
-if (!API_KEY) { console.error("NVIDIA_API_KEY required"); process.exit(1); }
+if (!API_KEY) { console.error("ZAI_API_KEY or NVIDIA_API_KEY required"); process.exit(1); }
 
 let offset = 0;
 const activeSessions = new Map(); // chatId → message history
@@ -92,7 +95,8 @@ function runAgentInSandbox(message, sessionId) {
     require("fs").writeFileSync(confPath, sshConfig);
 
     const escaped = message.replace(/'/g, "'\\''");
-    const cmd = `export NVIDIA_API_KEY='${API_KEY}' && nemoclawd-start nemoclawd agent --agent main --local -m '${escaped}' --session-id 'tg-${sessionId}'`;
+    const escapedApiKey = API_KEY.replace(/'/g, "'\\''");
+    const cmd = `export ${INFERENCE_KEY_NAME}='${escapedApiKey}' && nemoclawd-start nemoclawd agent --agent main --local -m '${escaped}' --session-id 'tg-${sessionId}'`;
 
     const proc = spawn("ssh", ["-T", "-F", confPath, `openshell-${SANDBOX}`, cmd], {
       timeout: 120000,
@@ -169,7 +173,7 @@ async function poll() {
         if (msg.text === "/start") {
           await sendMessage(
             chatId,
-            "🦀 *Nemo Clawd* — powered by Nemotron 3 Super 120B\n\n" +
+            "*Nemo Clawd* — powered by " + MODEL + "\n\n" +
               "Send me a message and I'll run it through the Nemo Clawd agent " +
               "inside an OpenShell sandbox.\n\n" +
               "If the agent needs external access, the TUI will prompt for approval.",
@@ -225,7 +229,7 @@ async function main() {
   console.log("  │                                                     │");
   console.log(`  │  Bot:      @${(me.result.username + "                    ").slice(0, 37)}│`);
   console.log("  │  Sandbox:  " + (SANDBOX + "                              ").slice(0, 40) + "│");
-  console.log("  │  Model:    nvidia/nemotron-3-super-120b-a12b       │");
+  console.log("  │  Model:    " + (MODEL + "                                      ").slice(0, 37) + "│");
   console.log("  │                                                     │");
   console.log("  │  Messages are forwarded to the Nemo Clawd agent      │");
   console.log("  │  inside the sandbox. Run 'openshell term' in       │");

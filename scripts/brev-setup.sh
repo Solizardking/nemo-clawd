@@ -5,7 +5,8 @@
 # Brev VM bootstrap — installs prerequisites then runs setup.sh.
 #
 # Run on a fresh Brev VM:
-#   export NVIDIA_API_KEY=nvapi-...
+#   export ZAI_API_KEY=...          # preferred GLM 5.2 default
+#   export NVIDIA_API_KEY=nvapi-... # optional fallback/local GPU path
 #   ./scripts/brev-setup.sh
 #
 # What it does:
@@ -27,7 +28,9 @@ fail() { echo -e "${RED}[brev]${NC} $1"; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-[ -n "${NVIDIA_API_KEY:-}" ] || fail "NVIDIA_API_KEY not set"
+if [ -z "${ZAI_API_KEY:-}" ] && [ -z "${NVIDIA_API_KEY:-}" ]; then
+  fail "ZAI_API_KEY or NVIDIA_API_KEY not set"
+fi
 
 # Suppress needrestart noise from apt (Scanning processes, No services need...)
 export NEEDRESTART_MODE=a
@@ -158,5 +161,6 @@ fi
 # Use sg docker to ensure docker group is active (usermod -aG doesn't
 # take effect in the current session without re-login)
 info "Running setup.sh..."
-export NVIDIA_API_KEY
+export ZAI_API_KEY="${ZAI_API_KEY:-}"
+export NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"
 exec sg docker -c "bash $SCRIPT_DIR/setup.sh"

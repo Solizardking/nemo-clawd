@@ -14,7 +14,7 @@
 #
 # Prerequisites:
 #   - Nemo Clawd setup complete (./scripts/setup.sh)
-#   - NVIDIA_API_KEY in environment
+#   - ZAI_API_KEY in environment for GLM 5.2, or NVIDIA_API_KEY for fallback inference
 #
 # Suggested prompts that trigger the approval flow:
 #
@@ -37,13 +37,23 @@
 #
 #   Terminal 2 (Agent):
 #     openshell sandbox connect nemoclawd
-#     export NVIDIA_API_KEY=nvapi-...
+#     export ZAI_API_KEY=...
 #     nemoclawd-start
 #     nemoclawd agent --agent main --local --session-id live
 
 set -euo pipefail
 
-[ -n "${NVIDIA_API_KEY:-}" ] || { echo "NVIDIA_API_KEY required"; exit 1; }
+if [ -n "${ZAI_API_KEY:-}" ]; then
+  INFERENCE_KEY_NAME="ZAI_API_KEY"
+  INFERENCE_KEY_VALUE="$ZAI_API_KEY"
+elif [ -n "${NVIDIA_API_KEY:-}" ]; then
+  INFERENCE_KEY_NAME="NVIDIA_API_KEY"
+  INFERENCE_KEY_VALUE="$NVIDIA_API_KEY"
+else
+  echo "ZAI_API_KEY or NVIDIA_API_KEY required"
+  exit 1
+fi
+printf -v INFERENCE_EXPORT '%s=%q' "$INFERENCE_KEY_NAME" "$INFERENCE_KEY_VALUE"
 
 echo ""
 echo "  ┌─────────────────────────────────────────────────────┐"
@@ -69,7 +79,7 @@ if ! command -v tmux > /dev/null 2>&1; then
   echo ""
   echo "  Terminal 2 (Agent):"
   echo "    openshell sandbox connect nemoclawd"
-  echo "    export NVIDIA_API_KEY=$NVIDIA_API_KEY"
+  echo "    export $INFERENCE_EXPORT"
   echo "    nemoclawd-start"
   echo "    nemoclawd agent --agent main --local --session-id live"
   exit 0
@@ -85,7 +95,7 @@ tmux new-session -d -s "$SESSION" -x 200 -y 50 "openshell term"
 
 # Split right pane for the agent
 tmux split-window -h -t "$SESSION" \
-  "openshell sandbox connect nemoclawd -- bash -c 'export NVIDIA_API_KEY=$NVIDIA_API_KEY && nemoclawd-start nemoclawd agent --agent main --local --session-id live'"
+  "openshell sandbox connect nemoclawd -- bash -lc 'export $INFERENCE_EXPORT && nemoclawd-start nemoclawd agent --agent main --local --session-id live'"
 
 # Even split
 tmux select-layout -t "$SESSION" even-horizontal

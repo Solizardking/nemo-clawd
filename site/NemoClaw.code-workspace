@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "../../../clawd-code/NemoClaw"
+		},
+		{
+			"path": "../scripts"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../src"
+		},
+		{
+			"path": "../test"
+		}
+	],
+	"settings": {}
+}
