@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawdd installer — installs Node.js, Ollama (if GPU present), and Nemo Clawdd.
+# Nemo Clawd installer — installs Node.js, Ollama (if GPU present), and Nemo Clawd.
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ MIN_NODE_MAJOR=20
 MIN_NPM_MAJOR=10
 RECOMMENDED_NODE_MAJOR=22
 NPM_PACKAGE="@mawdbotsonsolana/nemoclawd"
-RUNTIME_REQUIREMENT_MSG="Nemo Clawdd requires Node.js >=${MIN_NODE_MAJOR} and npm >=${MIN_NPM_MAJOR} (recommended Node.js ${RECOMMENDED_NODE_MAJOR})."
+RUNTIME_REQUIREMENT_MSG="Nemo Clawd requires Node.js >=${MIN_NODE_MAJOR} and npm >=${MIN_NPM_MAJOR} (recommended Node.js ${RECOMMENDED_NODE_MAJOR})."
 
 # Compare two semver strings (major.minor.patch). Returns 0 if $1 >= $2.
 version_gte() {
@@ -192,7 +192,7 @@ install_or_upgrade_ollama() {
 }
 
 # ---------------------------------------------------------------------------
-# 3. Nemo Clawdd
+# 3. Nemo Clawd
 # ---------------------------------------------------------------------------
 install_nemoclawd() {
   local local_package_name=""
@@ -201,10 +201,10 @@ install_nemoclawd() {
   fi
 
   if [[ "$local_package_name" == "$NPM_PACKAGE" ]]; then
-    info "Nemo Clawdd package.json found in current directory — installing from source…"
+    info "Nemo Clawd package.json found in current directory — installing from source…"
     npm install && npm link
   else
-    info "Installing Nemo Clawdd from npm (${NPM_PACKAGE})…"
+    info "Installing Nemo Clawd from npm (${NPM_PACKAGE})…"
     npm install -g "$NPM_PACKAGE"
   fi
 
@@ -291,7 +291,7 @@ post_install_message() {
 # Main
 # ---------------------------------------------------------------------------
 main() {
-  info "=== Nemo Clawdd Installer ==="
+  info "=== Nemo Clawd Installer ==="
 
   install_nodejs
   ensure_supported_runtime

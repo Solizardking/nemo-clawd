@@ -259,7 +259,7 @@ async function createPrivyPolicy(opts = {}) {
 
   const policy = {
     version: "1.0",
-    name: opts.name || "Nemo Clawdd Agent Policy",
+    name: opts.name || "Nemo Clawd Agent Policy",
     chain_type: opts.chainType || "solana",
     rules: [
       {

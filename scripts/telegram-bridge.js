@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * Telegram → Nemo Clawdd bridge.
+ * Telegram → Nemo Clawd bridge.
  *
- * Messages from Telegram are forwarded to the Nemo Clawdd agent running
+ * Messages from Telegram are forwarded to the Nemo Clawd agent running
  * inside the sandbox. When the agent needs external access, the
  * OpenShell TUI lights up for approval. Responses go back to Telegram.
  *
@@ -112,11 +112,11 @@ function runAgentInSandbox(message, sessionId) {
       const lines = stdout.split("\n");
       const responseLines = lines.filter(
         (l) =>
-          !l.startsWith("Setting up Nemo Clawdd") &&
+          !l.startsWith("Setting up Nemo Clawd") &&
           !l.startsWith("[plugins]") &&
           !l.startsWith("(node:") &&
-          !l.includes("Nemo Clawdd ready") &&
-          !l.includes("Nemo Clawdd registered") &&
+          !l.includes("Nemo Clawd ready") &&
+          !l.includes("Nemo Clawd registered") &&
           !l.includes("nemoclawd agent") &&
           !l.includes("┌─") &&
           !l.includes("│ ") &&
@@ -169,8 +169,8 @@ async function poll() {
         if (msg.text === "/start") {
           await sendMessage(
             chatId,
-            "🦀 *Nemo Clawdd* — powered by Nemotron 3 Super 120B\n\n" +
-              "Send me a message and I'll run it through the Nemo Clawdd agent " +
+            "🦀 *Nemo Clawd* — powered by Nemotron 3 Super 120B\n\n" +
+              "Send me a message and I'll run it through the Nemo Clawd agent " +
               "inside an OpenShell sandbox.\n\n" +
               "If the agent needs external access, the TUI will prompt for approval.",
             msg.message_id,
@@ -221,13 +221,13 @@ async function main() {
 
   console.log("");
   console.log("  ┌─────────────────────────────────────────────────────┐");
-  console.log("  │  Nemo Clawdd Telegram Bridge                          │");
+  console.log("  │  Nemo Clawd Telegram Bridge                          │");
   console.log("  │                                                     │");
   console.log(`  │  Bot:      @${(me.result.username + "                    ").slice(0, 37)}│`);
   console.log("  │  Sandbox:  " + (SANDBOX + "                              ").slice(0, 40) + "│");
   console.log("  │  Model:    nvidia/nemotron-3-super-120b-a12b       │");
   console.log("  │                                                     │");
-  console.log("  │  Messages are forwarded to the Nemo Clawdd agent      │");
+  console.log("  │  Messages are forwarded to the Nemo Clawd agent      │");
   console.log("  │  inside the sandbox. Run 'openshell term' in       │");
   console.log("  │  another terminal to monitor + approve egress.     │");
   console.log("  └─────────────────────────────────────────────────────┘");

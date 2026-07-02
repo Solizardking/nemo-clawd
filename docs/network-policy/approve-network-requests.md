@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Approve or Deny Nemo Clawdd Agent Network Requests"
+  page: "Approve or Deny Nemo Clawd Agent Network Requests"
   nav: "Approve Network Requests"
 description: "Review and approve blocked agent network requests in the TUI."
 keywords: ["nemoclawd approve network requests", "sandbox egress approval tui"]
@@ -25,7 +25,7 @@ OpenShell intercepts these requests and presents them in the TUI for operator ap
 
 ## Prerequisites
 
-- A running Nemo Clawdd sandbox.
+- A running Nemo Clawd sandbox.
 - The OpenShell CLI on your `PATH`.
 
 ## Open the TUI

@@ -3,7 +3,7 @@
 
 import { execFileSync } from "node:child_process";
 import { join, posix as pathPosix } from "node:path";
-import type { PluginLogger, NemoClawddConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 import { resolveBlueprint } from "../blueprint/resolve.js";
 import { verifyBlueprintDigest } from "../blueprint/verify.js";
 import { execBlueprint } from "../blueprint/exec.js";
@@ -26,20 +26,20 @@ export interface MigrateOptions {
   profile: string;
   skipBackup: boolean;
   logger: PluginLogger;
-  pluginConfig: NemoClawddConfig;
+  pluginConfig: NemoClawdConfig;
 }
 
 export async function cliMigrate(opts: MigrateOptions): Promise<void> {
   const { dryRun, profile, skipBackup, logger, pluginConfig } = opts;
 
-  logger.info("Nemo Clawdd migrate: moving host Nemo Clawdd into OpenShell sandbox");
+  logger.info("Nemo Clawd migrate: moving host Nemo Clawd into OpenShell sandbox");
 
-  logger.info("Detecting host Nemo Clawdd installation...");
+  logger.info("Detecting host Nemo Clawd installation...");
   const hostState = detectHostNemoclawd();
 
   if (!hostState.exists || !hostState.stateDir) {
-    logger.error("No Nemo Clawdd installation found for the current host environment.");
-    logger.info("Use 'nemoclawdd nemoclawd launch ' for a fresh install.");
+    logger.error("No Nemo Clawd installation found for the current host environment.");
+    logger.info("Use 'nemoclawd nemoclawd launch ' for a fresh install.");
     return;
   }
 
@@ -59,7 +59,7 @@ export async function cliMigrate(opts: MigrateOptions): Promise<void> {
     for (const error of hostState.errors) {
       logger.error(error);
     }
-    logger.error("Refusing to migrate until all external Nemo Clawdd roots can be resolved.");
+    logger.error("Refusing to migrate until all external Nemo Clawd roots can be resolved.");
     return;
   }
 
@@ -71,7 +71,7 @@ export async function cliMigrate(opts: MigrateOptions): Promise<void> {
       logger.info(`  2. Capture external config file: ${hostState.configPath}`);
     }
     if (hostState.externalRoots.length > 0) {
-      logger.info("  3. Capture external Nemo Clawdd roots and rewrite config paths for the sandbox:");
+      logger.info("  3. Capture external Nemo Clawd roots and rewrite config paths for the sandbox:");
       for (const root of hostState.externalRoots) {
         logger.info(`     - ${root.sourcePath} -> ${root.sandboxPath}`);
       }
@@ -136,7 +136,7 @@ export async function cliMigrate(opts: MigrateOptions): Promise<void> {
   logger.info(`Snapshot saved to ${bundle.snapshotDir}`);
 
   try {
-    logger.info("Packaging Nemo Clawdd state for sandbox import...");
+    logger.info("Packaging Nemo Clawd state for sandbox import...");
     await buildMigrationArchives(bundle);
 
     logger.info("Syncing migration bundle into sandbox...");
@@ -164,19 +164,19 @@ export async function cliMigrate(opts: MigrateOptions): Promise<void> {
   }
 
   logger.info("");
-  logger.info("Migration complete. Nemo Clawdd is now running inside OpenShell.");
+  logger.info("Migration complete. Nemo Clawd is now running inside OpenShell.");
   logger.info(`Sandbox: ${pluginConfig.sandboxName}`);
   logger.info("");
   logger.info("Next steps:");
-  logger.info("  nemoclawdd nemoclawd connect    # Enter the sandbox");
-  logger.info("  nemoclawdd nemoclawd status     # Verify everything is healthy");
+  logger.info("  nemoclawd nemoclawd connect    # Enter the sandbox");
+  logger.info("  nemoclawd nemoclawd status     # Verify everything is healthy");
   logger.info("  openshell term               # Monitor sandbox activity");
   logger.info("");
   logger.info("To rollback to your host installation:");
   if (skipBackup) {
     logger.info("  Re-run migrate without --skip-backup to keep a rollback snapshot.");
   } else {
-    logger.info("  nemoclawdd nemoclawd eject ");
+    logger.info("  nemoclawd nemoclawd eject ");
   }
 }
 

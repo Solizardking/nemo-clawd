@@ -1,8 +1,8 @@
 ---
 title:
-  page: "Deploy Nemo Clawdd to a Remote GPU Instance with Brev"
+  page: "Deploy Nemo Clawd to a Remote GPU Instance with Brev"
   nav: "Deploy to Remote GPU"
-description: "Provision a remote GPU VM with Nemo Clawdd using Brev deployment."
+description: "Provision a remote GPU VM with Nemo Clawd using Brev deployment."
 keywords: ["deploy nemoclawd remote gpu", "nemoclawd brev cloud deployment"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "deployment", "gpu", "nemoclawd"]
@@ -18,20 +18,20 @@ status: published
   SPDX-License-Identifier: Apache-2.0
 -->
 
-# Deploy Nemo Clawdd to a Remote GPU Instance
+# Deploy Nemo Clawd to a Remote GPU Instance
 
-Run Nemo Clawdd on a remote GPU instance through [Brev](https://brev.nvidia.com).
+Run Nemo Clawd on a remote GPU instance through [Brev](https://brev.nvidia.com).
 The deploy command provisions the VM, installs dependencies, and connects you to a running sandbox.
 
 ## Prerequisites
 
 - The [Brev CLI](https://brev.nvidia.com) installed and authenticated.
 - An NVIDIA API key from [build.nvidia.com](https://build.nvidia.com).
-- Nemo Clawdd installed locally. Install with `npm install -g @mawdbotsonsolana/nemoclawd`.
+- Nemo Clawd installed locally. Install with `npm install -g @mawdbotsonsolana/nemoclawd`.
 
 ## Deploy the Instance
 
-Create a Brev instance and run the Nemo Clawdd setup:
+Create a Brev instance and run the Nemo Clawd setup:
 
 ```console
 $ nemoclawd deploy <instance-name>

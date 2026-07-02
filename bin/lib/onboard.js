@@ -519,17 +519,17 @@ async function setupInference(sandboxName, model, provider) {
   console.log(`  ✓ Inference route set: ${provider} / ${model}`);
 }
 
-// ── Step 6: Nemo Clawdd ─────────────────────────────────────────────
+// ── Step 6: Nemo Clawd ─────────────────────────────────────────────
 
 async function setupNemoclawd(sandboxName) {
-  step(6, TOTAL_STEPS, "Setting up Nemo Clawdd inside sandbox");
+  step(6, TOTAL_STEPS, "Setting up Nemo Clawd inside sandbox");
 
   // sandbox create with a command runs it inside the sandbox then exits.
   // Since the sandbox already exists, we create a throwaway connect + command
   // by using sandbox create --no-keep with the same image to exec into it.
   // Simpler: just use sandbox connect which opens a shell — but it doesn't
   // support passing commands. So we run the setup on next connect instead.
-  console.log("  ✓ Nemo Clawdd gateway launched inside sandbox");
+  console.log("  ✓ Nemo Clawd gateway launched inside sandbox");
 }
 
 // ── Step 7: Solana Configuration ─────────────────────────────────
@@ -654,7 +654,7 @@ async function setupSolana(sandboxName) {
           // Create default spending policy
           console.log("  Creating default spending policy (max 0.1 SOL per tx)...");
           const policy = await solana.createPrivyPolicy({
-            name: "Nemo Clawdd Default",
+            name: "Nemo Clawd Default",
             maxLamports: 100_000_000,
             ownerPublicKey: wallet.address,
           });
@@ -887,7 +887,7 @@ function printDashboard(sandboxName, model, provider) {
 
 async function onboard() {
   console.log("");
-  console.log("  Nemo Clawdd Onboarding");
+  console.log("  Nemo Clawd Onboarding");
   console.log("  ===================");
 
   const gpu = await preflight();

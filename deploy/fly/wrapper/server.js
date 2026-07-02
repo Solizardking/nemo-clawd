@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: Apache-2.0
-// Nemo Clawdd Fly.io wrapper — setup wizard + reverse proxy to Nemo Clawdd gateway.
+// Nemo Clawd Fly.io wrapper — setup wizard + reverse proxy to Nemo Clawd gateway.
 
 const http = require("http");
 const fs = require("fs");
@@ -46,7 +46,7 @@ function checkBasicAuth(req) {
 
 function unauthorized(res) {
   res.writeHead(401, {
-    "WWW-Authenticate": 'Basic realm="Nemo Clawdd Setup"',
+    "WWW-Authenticate": 'Basic realm="Nemo Clawd Setup"',
     "Content-Type": "text/plain",
   });
   res.end("Unauthorized");
@@ -183,10 +183,10 @@ function renderSetupPage() {
   const statusText = running ? "Running" : "Stopped";
 
   return htmlPage(
-    "Nemo Clawdd Setup",
+    "Nemo Clawd Setup",
     `
-<h1>Nemo Clawdd Setup</h1>
-<p>Configure your Nemo Clawdd deployment on Fly.io.</p>
+<h1>Nemo Clawd Setup</h1>
+<p>Configure your Nemo Clawd deployment on Fly.io.</p>
 
 <div class="card">
   <h2>Gateway Status</h2>
@@ -477,7 +477,7 @@ if (cfg.provider && cfg.apiKey) {
 }
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`[wrapper] Nemo Clawdd wrapper listening on :${PORT}`);
+  console.log(`[wrapper] Nemo Clawd wrapper listening on :${PORT}`);
   console.log(`[wrapper] Setup wizard: http://0.0.0.0:${PORT}/setup`);
   console.log(`[wrapper] Health check: http://0.0.0.0:${PORT}/healthz`);
 });

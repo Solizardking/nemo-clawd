@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Monitor Nemo Clawdd Sandbox Activity and Debug Issues"
+  page: "Monitor Nemo Clawd Sandbox Activity and Debug Issues"
   nav: "Monitor Sandbox Activity"
 description: "Inspect sandbox health, trace agent behavior, and diagnose problems."
 keywords: ["monitor nemoclawd sandbox", "debug nemoclawd agent issues"]
@@ -20,11 +20,11 @@ status: published
 
 # Monitor Sandbox Activity and Debug Issues
 
-Use the Nemo Clawdd status, logs, and TUI tools together to inspect sandbox health, trace agent behavior, and diagnose problems.
+Use the Nemo Clawd status, logs, and TUI tools together to inspect sandbox health, trace agent behavior, and diagnose problems.
 
 ## Prerequisites
 
-- A running Nemo Clawdd sandbox.
+- A running Nemo Clawd sandbox.
 - The OpenShell CLI on your `PATH`.
 
 ## Check Sandbox Health

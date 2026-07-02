@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * Nemo Clawdd — Nemo Clawdd Plugin for OpenShell
+ * Nemo Clawd — Nemo Clawd Plugin for OpenShell
  *
- * Uses the real Nemo Clawdd plugin API. Types defined locally are minimal stubs
- * that match the Nemo Clawdd SDK interfaces available at runtime via
- * `nemoclawdd/plugin-sdk`. We define them here because the SDK package is only
- * available inside the Nemo Clawdd host process and cannot be imported at build
+ * Uses the real Nemo Clawd plugin API. Types defined locally are minimal stubs
+ * that match the Nemo Clawd SDK interfaces available at runtime via
+ * `nemoclawd/plugin-sdk`. We define them here because the SDK package is only
+ * available inside the Nemo Clawd host process and cannot be imported at build
  * time.
  */
 
@@ -17,7 +17,7 @@ import { handleSlashCommand } from "./commands/slash.js";
 import { loadOnboardConfig } from "./onboard/config.js";
 
 // ---------------------------------------------------------------------------
-// Nemo Clawdd Plugin SDK compatible types (mirrors nemoclawdd/plugin-sdk)
+// Nemo Clawd Plugin SDK compatible types (mirrors nemoclawd/plugin-sdk)
 // ---------------------------------------------------------------------------
 
 /** Subset of NemoclawdConfig that we actually read. */
@@ -114,7 +114,7 @@ export interface PluginService {
 }
 
 /**
- * The API object injected into the plugin's register function by the Nemo Clawdd
+ * The API object injected into the plugin's register function by the Nemo Clawd
  * host. Only the methods we actually call are listed here.
  */
 export interface NemoclawdPluginApi {
@@ -136,21 +136,21 @@ export interface NemoclawdPluginApi {
 // Plugin-specific config (read from pluginConfig in nemoclawd.plugin.json)
 // ---------------------------------------------------------------------------
 
-export interface NemoClawddConfig {
+export interface NemoClawdConfig {
   blueprintVersion: string;
   blueprintRegistry: string;
   sandboxName: string;
   inferenceProvider: string;
 }
 
-const DEFAULT_PLUGIN_CONFIG: NemoClawddConfig = {
+const DEFAULT_PLUGIN_CONFIG: NemoClawdConfig = {
   blueprintVersion: "latest",
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
   inferenceProvider: "nvidia",
 };
 
-export function getPluginConfig(api: NemoclawdPluginApi): NemoClawddConfig {
+export function getPluginConfig(api: NemoclawdPluginApi): NemoClawdConfig {
   const raw = api.pluginConfig ?? {};
   return {
     blueprintVersion:
@@ -180,12 +180,12 @@ export default function register(api: NemoclawdPluginApi): void {
   // 1. Register /nemoclawd slash command (chat interface)
   api.registerCommand({
     name: "nemoclawd",
-    description: "Nemo Clawdd sandbox management (status, eject).",
+    description: "Nemo Clawd sandbox management (status, eject).",
     acceptsArgs: true,
     handler: (ctx) => handleSlashCommand(ctx, api),
   });
 
-  // 2. Register `nemoclawdd nemoclawd` CLI subcommands (commander.js)
+  // 2. Register `nemoclawd nemoclawd` CLI subcommands (commander.js)
   api.registerCli(
     (cliCtx) => {
       registerCliCommands(cliCtx, api);
@@ -249,11 +249,11 @@ export default function register(api: NemoclawdPluginApi): void {
 
   api.logger.info("");
   api.logger.info("  ┌─────────────────────────────────────────────────────┐");
-  api.logger.info("  │  Nemo Clawdd registered                                │");
+  api.logger.info("  │  Nemo Clawd registered                                │");
   api.logger.info("  │                                                     │");
   api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(40)}│`);
   api.logger.info(`  │  Model:     ${bannerModel.padEnd(40)}│`);
-  api.logger.info("  │  Commands:  nemoclawdd nemoclawd <command>             │");
+  api.logger.info("  │  Commands:  nemoclawd nemoclawd <command>             │");
   api.logger.info("  └─────────────────────────────────────────────────────┘");
   api.logger.info("");
 }

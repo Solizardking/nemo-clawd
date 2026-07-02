@@ -397,14 +397,14 @@ export function detectHostNemoclawd(env: NodeJS.ProcessEnv = process.env): HostN
   let config: NemoclawdConfigDocument | null = null;
 
   if (!stateExists) {
-    errors.push(`Resolved Nemo Clawdd state directory does not exist: ${stateDir}`);
+    errors.push(`Resolved Nemo Clawd state directory does not exist: ${stateDir}`);
   }
 
   try {
     config = loadConfigDocument(configPath);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    errors.push(`Failed to parse Nemo Clawdd config at ${configPath}: ${msg}`);
+    errors.push(`Failed to parse Nemo Clawd config at ${configPath}: ${msg}`);
   }
 
   const rootInfo = collectExternalRoots(config, stateDir);
@@ -555,7 +555,7 @@ export function createSnapshotBundle(
   options: { persist: boolean },
 ): SnapshotBundle | null {
   if (!hostState.stateDir || !hostState.homeDir) {
-    logger.error("Cannot snapshot host Nemo Clawdd state: no state directory was resolved.");
+    logger.error("Cannot snapshot host Nemo Clawd state: no state directory was resolved.");
     return null;
   }
 
@@ -669,7 +669,7 @@ export function restoreSnapshotToHost(snapshotDir: string, logger: PluginLogger)
       logger.info(`Restored external config to ${manifest.configPath}`);
     }
 
-    logger.info("Host Nemo Clawdd state restored.");
+    logger.info("Host Nemo Clawd state restored.");
     return true;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

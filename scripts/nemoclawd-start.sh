@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawdd sandbox entrypoint. Configures Nemo Clawdd and starts the dashboard
+# Nemo Clawd sandbox entrypoint. Configures Nemo Clawd and starts the dashboard
 # gateway inside the sandbox so the forwarded host port has a live upstream.
 #
 # Optional env:
@@ -38,14 +38,14 @@ write_workspace_prompts() {
   cat > "${WORKSPACE_ROOT}/AGENTS.md" <<'EOF'
 # Pump-Fun Solana Agent Workspace
 
-This Nemo Clawdd workspace is a **Solana autonomous developer agent** with built-in
+This Nemo Clawd workspace is a **Solana autonomous developer agent** with built-in
 Pump.fun SDK, tokenized agent payments, the Pump-Fun Telegram/runtime stack,
 44 DeFi agent personas, and an encrypted Privy agentic wallet.
 
 Core behavior:
 - Treat `pumpfun/docs/` as the primary local documentation corpus for protocol behavior, APIs, architecture, deployment, troubleshooting, and roadmap questions.
 - Treat `pumpfun/docs/pump-official/` and `pumpfun/docs/pump-public-docs/` as authoritative references for official Pump program behavior and terminology.
-- Use `pumpfun/telegram-bot/` as the primary implementation reference for Nemo Clawdd's Pump-Fun Telegram bot runtime.
+- Use `pumpfun/telegram-bot/` as the primary implementation reference for Nemo Clawd's Pump-Fun Telegram bot runtime.
 - Use `pumpfun/agent-app/` as the implementation reference for the bundled payment-gated app and tracker bot.
 - Use `pumpfun/sdk/` to access the Pump-Fun SDK source (`@nirholas/pump-sdk`) for token creation, bonding curve operations, AMM pools, and fee management.
 - Use `pumpfun/defi-agents/src/` to load any of the 44 DeFi agent persona JSONs for specialized capabilities.
@@ -63,7 +63,7 @@ Solana capabilities:
 - `spl-token` for SPL token operations
 - `helius` CLI for Helius RPC and account tooling when configured
 - Privy agentic wallet for secure, policy-governed transaction signing
-- Nemo Clawdd vault at `~/.nemoclawd/vault/` for append-only JSONL wallet, trade, and heartbeat logs
+- Nemo Clawd vault at `~/.nemoclawd/vault/` for append-only JSONL wallet, trade, and heartbeat logs
 - Full Pump-Fun SDK for token creation, trading, and fee management
 
 High-value local docs:
@@ -89,7 +89,7 @@ EOF
   cat > "${WORKSPACE_ROOT}/pumpfun/README.md" <<'EOF'
 # Pump-Fun Corpus
 
-Bundled local references for the Solana Nemo Clawdd environment:
+Bundled local references for the Solana Nemo Clawd environment:
 
 - `docs/`: Pump-Fun documentation corpus, including architecture, API reference, deployment, analytics, troubleshooting, roadmap, and official/public protocol docs.
 - `sdk/`: Pump-Fun SDK source code (`@nirholas/pump-sdk`) — bonding curve math, AMM pools, fee sharing, token incentives.
@@ -294,7 +294,7 @@ PYAUTOPAIR
   echo "[gateway] auto-pair watcher launched (pid $!)"
 }
 
-echo 'Setting up Nemo Clawdd...'
+echo 'Setting up Nemo Clawd...'
  nemoclawd doctor --fix > /dev/null 2>&1 || true
  nemoclawd models set nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1 || true
 write_auth_profile
@@ -320,7 +320,7 @@ fi
 
 # ── Privy wallet credentials ──────────────────────────────────────
 if [ -n "${PRIVY_APP_ID:-}" ] && [ -n "${PRIVY_APP_SECRET:-}" ]; then
-  echo "[privy] Injecting Privy wallet credentials into Nemo Clawdd config..."
+  echo "[privy] Injecting Privy wallet credentials into Nemo Clawd config..."
   python3 - <<'PYPRIVY'
 import json, os
 home = os.environ.get('HOME', '/sandbox')

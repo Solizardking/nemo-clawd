@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { execFileSync, execSync } from "node:child_process";
-import type { PluginLogger, NemoClawddConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 import {
   loadOnboardConfig,
   saveOnboardConfig,
   type EndpointType,
-  type NemoClawddOnboardConfig,
+  type NemoClawdOnboardConfig,
 } from "../onboard/config.js";
 import { promptInput, promptConfirm, promptSelect } from "../onboard/prompt.js";
 import { validateApiKey, maskApiKey } from "../onboard/validate.js";
@@ -19,7 +19,7 @@ export interface OnboardOptions {
   endpointUrl?: string;
   model?: string;
   logger: PluginLogger;
-  pluginConfig: NemoClawddConfig;
+  pluginConfig: NemoClawdConfig;
 }
 
 const ENDPOINT_TYPES: EndpointType[] = ["build", "ncp", "nim-local", "vllm", "ollama", "custom"];
@@ -129,7 +129,7 @@ function testCommand(command: string): boolean {
   }
 }
 
-function showConfig(config: NemoClawddOnboardConfig, logger: PluginLogger): void {
+function showConfig(config: NemoClawdOnboardConfig, logger: PluginLogger): void {
   logger.info(`  Endpoint:    ${config.endpointType} (${config.endpointUrl})`);
   if (config.ncpPartner) {
     logger.info(`  NCP Partner: ${config.ncpPartner}`);
@@ -190,7 +190,7 @@ export async function cliOnboard(opts: OnboardOptions): Promise<void> {
   const { logger } = opts;
   const nonInteractive = isNonInteractive(opts);
 
-  logger.info("Nemo Clawdd Onboarding");
+  logger.info("Nemo Clawd Onboarding");
   logger.info("-------------------");
 
   // Step 0: Check existing config
@@ -448,6 +448,6 @@ export async function cliOnboard(opts: OnboardOptions): Promise<void> {
   logger.info(`  Credential: $${credentialEnv}`);
   logger.info("");
   logger.info("Next steps:");
-  logger.info("  nemoclawdd nemoclawd launch     # Bootstrap sandbox");
-  logger.info("  nemoclawdd nemoclawd status     # Check configuration");
+  logger.info("  nemoclawd nemoclawd launch     # Bootstrap sandbox");
+  logger.info("  nemoclawd nemoclawd status     # Check configuration");
 }

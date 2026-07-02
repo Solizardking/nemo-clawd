@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Migration snapshot/restore logic for moving host Nemo Clawdd into OpenShell sandbox.
+Migration snapshot/restore logic for moving host Nemo Clawd into OpenShell sandbox.
 
 Handles:
   - Snapshot: capture ~/.nemoclawd config, workspace, extensions, skills
   - Restore: push snapshot contents into sandbox filesystem
-  - Cutover: rename host config to archived, point Nemo Clawdd at sandbox
+  - Cutover: rename host config to archived, point Nemo Clawd at sandbox
   - Rollback: restore host config from snapshot
 """
 
@@ -26,7 +26,7 @@ SNAPSHOTS_DIR = NEMOCLAWD_DIR / "snapshots"
 
 
 def create_snapshot() -> Path | None:
-    """Snapshot the current host Nemo Clawdd configuration."""
+    """Snapshot the current host Nemo Clawd configuration."""
     if not NEMOCLAWD_DIR.exists():
         return None
 

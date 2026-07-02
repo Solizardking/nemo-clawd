@@ -76,7 +76,7 @@ if [ "${START_TELEGRAM_BOT}" = "true" ] || [ "${START_SOLANA_BRIDGE}" = "true" ]
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[solana-stack] Nemo Clawdd Solana One-Shot Startup"
+echo "[solana-stack] Nemo Clawd Solana One-Shot Startup"
 echo "[solana-stack] RPC: ${SOLANA_RPC_URL:-https://rpc.solanatracker.io/public}"
 echo "[solana-stack] WS:  ${SOLANA_WS_URL:-auto}"
 echo "[solana-stack] Wallet: ${DEVELOPER_WALLET:-not-configured}"

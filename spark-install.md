@@ -1,4 +1,4 @@
-# Nemo Clawdd on DGX Spark
+# Nemo Clawd on DGX Spark
 
 > **WIP** — This page is actively being updated as we work through Spark installs. Expect changes.
 
@@ -6,8 +6,8 @@
 
 ```bash
 # Clone and install
-git clone https://github.com/NVIDIA/Nemo Clawdd.git
-cd Nemo Clawdd
+git clone https://github.com/NVIDIA/Nemo Clawd.git
+cd Nemo Clawd
 sudo npm install -g .
 
 # Spark-specific setup (configures Docker for cgroup v2, then runs normal setup)
@@ -129,5 +129,5 @@ DGX Spark (Ubuntu 24.04, cgroup v2)
        └── OpenShell gateway container
             └── k3s (embedded)
                  └── nemoclawd sandbox pod
-                      └── Nemo Clawdd agent + Nemo Clawdd plugin
+                      └── Nemo Clawd agent + Nemo Clawd plugin
 ```

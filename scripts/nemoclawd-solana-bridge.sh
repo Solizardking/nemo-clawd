@@ -31,7 +31,7 @@ require_env() {
 require_env TELEGRAM_BOT_TOKEN
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[solana-bridge] Nemo Clawdd Solana ↔ Telegram Bridge"
+echo "[solana-bridge] Nemo Clawd Solana ↔ Telegram Bridge"
 echo "[solana-bridge] Mode: ${BRIDGE_MODE}"
 echo "[solana-bridge] RPC:  ${SOLANA_RPC_URL:0:70}"
 echo "[solana-bridge] WS:   ${SOLANA_WS_URL:0:70}"
@@ -315,7 +315,7 @@ async function heartbeat() {
             ? "🟢 <b>Funded</b> — wallet has enough balance for active operation."
             : "🟡 <b>Standby</b> — wallet is online but not yet funded above the active threshold.";
         await broadcast(
-          `💓 <b>Nemo Clawdd Wallet Heartbeat</b>\n\n` +
+          `💓 <b>Nemo Clawd Wallet Heartbeat</b>\n\n` +
           `${modeLine}\n` +
           `Balance: <b>${snapshot.solBalance} SOL</b>\n` +
           `Heartbeat: every <b>${HEARTBEAT_SECONDS}s</b>\n` +
@@ -388,7 +388,7 @@ async function main() {
 
   if (CHAT_IDS.length > 0) {
     await broadcast(
-      `🌊 <b>Nemo Clawdd Solana Bridge Online</b>\n\n` +
+      `🌊 <b>Nemo Clawd Solana Bridge Online</b>\n\n` +
       `Wallet: <code>${WALLET || "not configured"}</code>\n` +
       `RPC Provider: ${HELIUS_API_KEY ? "<b>Helius</b>" : "<b>Configured RPC</b>"}\n` +
       `Mode: <b>${process.env.BRIDGE_MODE || "natural-language"}</b>\n` +

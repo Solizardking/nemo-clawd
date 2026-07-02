@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Nemo Clawdd Blueprint Runner
+Nemo Clawd Blueprint Runner
 
-Orchestrates Nemo Clawdd sandbox lifecycle inside OpenShell.
+Orchestrates Nemo Clawd sandbox lifecycle inside OpenShell.
 Called by the thin TS plugin via subprocess.
 
 Protocol:
@@ -165,7 +165,7 @@ def action_apply(
     forward_ports: list[int] = sandbox_cfg.get("forward_ports", [18789])
 
     # Step 1: Create sandbox
-    progress(20, "Creating Nemo Clawdd sandbox")
+    progress(20, "Creating Nemo Clawd sandbox")
     create_args = [
         "openshell",
         "sandbox",
@@ -310,7 +310,7 @@ def action_rollback(rid: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Nemo Clawdd Blueprint Runner")
+    parser = argparse.ArgumentParser(description="Nemo Clawd Blueprint Runner")
     parser.add_argument("action", choices=["plan", "apply", "status", "rollback"])
     parser.add_argument("--profile", default="default")
     parser.add_argument("--plan", dest="plan_path")

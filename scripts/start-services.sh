@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Start Nemo Clawdd auxiliary services: Telegram bridge
+# Start Nemo Clawd auxiliary services: Telegram bridge
 # and cloudflared tunnel for public access.
 #
 # Usage:
@@ -168,7 +168,7 @@ do_start() {
   # Print banner
   echo ""
   echo "  ┌─────────────────────────────────────────────────────┐"
-  echo "  │  Nemo Clawdd Services                                  │"
+  echo "  │  Nemo Clawd Services                                  │"
   echo "  │                                                     │"
 
   local tunnel_url=""

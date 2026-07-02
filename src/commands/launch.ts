@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { execSync } from "node:child_process";
-import type { PluginLogger, NemoClawddConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 import { resolveBlueprint } from "../blueprint/resolve.js";
 import { verifyBlueprintDigest, checkCompatibility } from "../blueprint/verify.js";
 import { execBlueprint } from "../blueprint/exec.js";
@@ -13,37 +13,37 @@ export interface LaunchOptions {
   force: boolean;
   profile: string;
   logger: PluginLogger;
-  pluginConfig: NemoClawddConfig;
+  pluginConfig: NemoClawdConfig;
 }
 
 export async function cliLaunch(opts: LaunchOptions): Promise<void> {
   const { force, profile, logger, pluginConfig } = opts;
 
-  logger.info("Nemo Clawdd launch: setting up Nemo Clawdd inside OpenShell");
+  logger.info("Nemo Clawd launch: setting up Nemo Clawd inside OpenShell");
 
-  // Check if there's an existing host Nemo Clawdd installation
+  // Check if there's an existing host Nemo Clawd installation
   const hostState = detectHostNemoclawd();
 
   if (!hostState.exists && !force) {
     logger.info("");
-    logger.info("No existing Nemo Clawdd installation detected on this host.");
+    logger.info("No existing Nemo Clawd installation detected on this host.");
     logger.info("");
     logger.info("For net-new users, the recommended path is OpenShell-native setup:");
     logger.info("");
-    logger.info("  openshell sandbox create --from nemoclawdd --name nemoclawdd");
-    logger.info("  openshell sandbox connect nemoclawdd");
+    logger.info("  openshell sandbox create --from nemoclawd --name nemoclawd");
+    logger.info("  openshell sandbox connect nemoclawd");
     logger.info("");
     logger.info(
-      "This avoids installing Nemo Clawdd on the host only to redeploy it inside OpenShell.",
+      "This avoids installing Nemo Clawd on the host only to redeploy it inside OpenShell.",
     );
     logger.info("");
-    logger.info("To proceed with Nemo Clawdd-driven bootstrap anyway, use --force.");
+    logger.info("To proceed with Nemo Clawd-driven bootstrap anyway, use --force.");
     return;
   }
 
   if (hostState.exists && !force) {
     logger.info(
-      "Existing Nemo Clawdd installation detected. Consider using 'nemoclawdd nemoclawd migrate ' instead.",
+      "Existing Nemo Clawd installation detected. Consider using 'nemoclawd nemoclawd migrate ' instead.",
     );
     logger.info(
       "Use --force to proceed with a fresh launch (existing config will not be migrated).",
@@ -89,7 +89,7 @@ export async function cliLaunch(opts: LaunchOptions): Promise<void> {
   }
 
   // Apply
-  logger.info("Deploying Nemo Clawdd sandbox...");
+  logger.info("Deploying Nemo Clawd sandbox...");
   const applyResult = await execBlueprint(
     {
       blueprintPath: blueprint.localPath,
@@ -116,12 +116,12 @@ export async function cliLaunch(opts: LaunchOptions): Promise<void> {
   });
 
   logger.info("");
-  logger.info("Nemo Clawdd is now running inside OpenShell.");
+  logger.info("Nemo Clawd is now running inside OpenShell.");
   logger.info(`Sandbox: ${pluginConfig.sandboxName}`);
   logger.info("");
   logger.info("Next steps:");
-  logger.info("  nemoclawdd nemoclawd connect    # Enter the sandbox");
-  logger.info("  nemoclawdd nemoclawd status     # Check health");
+  logger.info("  nemoclawd nemoclawd connect    # Enter the sandbox");
+  logger.info("  nemoclawd nemoclawd status     # Check health");
   logger.info("  openshell term               # Monitor network egress");
 }
 
@@ -135,7 +135,7 @@ function getOpenshellVersion(): string {
 
 function getNemoclawdVersion(): string {
   try {
-    return execSync("nemoclawdd --version", { encoding: "utf-8" }).trim();
+    return execSync("nemoclawd --version", { encoding: "utf-8" }).trim();
   } catch {
     return "0.0.0";
   }

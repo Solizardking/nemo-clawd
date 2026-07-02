@@ -1,10 +1,10 @@
-# nemoClawdd xAI Grok Agent Skill
+# nemoClawd xAI Grok Agent Skill
 
-Use this skill when the user wants to run nemoClawdd with xAI Grok integration for Solana trading, research, and autonomous agent operations.
+Use this skill when the user wants to run nemoClawd with xAI Grok integration for Solana trading, research, and autonomous agent operations.
 
 ## Goal
 
-Launch nemoClawdd with full xAI Grok-powered agentic capabilities, including multi-agent research, voice mode, and the $CLAWD Solana ecosystem.
+Launch nemoClawd with full xAI Grok-powered agentic capabilities, including multi-agent research, voice mode, and the $CLAWD Solana ecosystem.
 
 ## Non-Negotiables
 
@@ -21,7 +21,7 @@ Launch nemoClawdd with full xAI Grok-powered agentic capabilities, including mul
 node --version
 ```
 
-2. Install nemoClawdd:
+2. Install nemoClawd:
 ```bash
 npm install -g @mawdbotsonsolana/nemoclawd
 ```
@@ -45,7 +45,7 @@ nemoclawd demo
 
 ## xAI Grok Integration
 
-nemoClawdd integrates xAI Grok for AI capabilities:
+nemoClawd integrates xAI Grok for AI capabilities:
 
 | Feature | Grok Model | Description |
 |---------|------------|-------------|
@@ -58,7 +58,7 @@ nemoClawdd integrates xAI Grok for AI capabilities:
 
 ## MCP Tools
 
-nemoClawdd exposes 31 MCP tools for Solana operations:
+nemoClawd exposes 31 MCP tools for Solana operations:
 
 **Market Data:**
 - `solana_price`, `solana_trending`, `solana_token_info`

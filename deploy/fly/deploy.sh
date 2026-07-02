@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# deploy.sh — One-command Nemo Clawdd deployment to Fly.io
+# deploy.sh — One-command Nemo Clawd deployment to Fly.io
 #
 # Usage:
 #   bash deploy.sh
@@ -33,7 +33,7 @@ echo ' | \| |___ _ __  ___  / __| |__ ___ __ __      '
 echo ' | .` / -_| '\''  \/ _ \| (__| / _` \ V  V /   '
 echo ' |_|\_\___|_|_|_\___/ \___|_\__,_|\_/\_/       '
 echo -e "${NC}"
-echo -e "  ${BOLD}Deploy Nemo Clawdd to Fly.io${NC}"
+echo -e "  ${BOLD}Deploy Nemo Clawd to Fly.io${NC}"
 echo ""
 
 # ── Preflight checks ───────────────────────────────────────────────
@@ -60,14 +60,14 @@ if [ -f "${SCRIPT_DIR}/../../package.json" ]; then
 elif [ -f "${SCRIPT_DIR}/package.json" ]; then
   REPO_ROOT="${SCRIPT_DIR}"
 else
-  fail "Cannot find Nemo Clawdd repo root. Run this from the repo or deploy package."
+  fail "Cannot find Nemo Clawd repo root. Run this from the repo or deploy package."
 fi
 
 info "Repo root: ${REPO_ROOT}"
 
 # Verify critical files exist
 for f in Dockerfile nemoclawd/dist nemoclawd/nemoclawd.plugin.json scripts/nemoclawd-start.sh; do
-  [ -e "${REPO_ROOT}/${f}" ] || fail "Missing ${f} — is this a complete Nemo Clawdd checkout?"
+  [ -e "${REPO_ROOT}/${f}" ] || fail "Missing ${f} — is this a complete Nemo Clawd checkout?"
 done
 
 # ── Gather configuration ───────────────────────────────────────────

@@ -3,7 +3,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { PluginLogger, NemoClawddConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 import { execBlueprint } from "../blueprint/exec.js";
 import { loadState, clearState } from "../blueprint/state.js";
 import { restoreSnapshotToHost } from "./migration-state.js";
@@ -14,7 +14,7 @@ export interface EjectOptions {
   runId?: string;
   confirm: boolean;
   logger: PluginLogger;
-  pluginConfig: NemoClawddConfig;
+  pluginConfig: NemoClawdConfig;
 }
 
 export async function cliEject(opts: EjectOptions): Promise<void> {
@@ -22,7 +22,7 @@ export async function cliEject(opts: EjectOptions): Promise<void> {
   const state = loadState();
 
   if (!state.lastAction) {
-    logger.error("No Nemo Clawdd deployment found. Nothing to eject from.");
+    logger.error("No Nemo Clawd deployment found. Nothing to eject from.");
     return;
   }
 
@@ -49,7 +49,7 @@ export async function cliEject(opts: EjectOptions): Promise<void> {
     logger.info("  1. Stop the OpenShell sandbox");
     logger.info("  2. Rollback blueprint state");
     logger.info(`  3. Restore ~/.nemoclawd from snapshot: ${snapshotPath}`);
-    logger.info("  4. Clear Nemo Clawdd state");
+    logger.info("  4. Clear Nemo Clawd state");
     logger.info("");
     logger.info("Run with --confirm to proceed, or cancel now.");
     return;
@@ -85,10 +85,10 @@ export async function cliEject(opts: EjectOptions): Promise<void> {
     return;
   }
 
-  // Step 3: Clear Nemo Clawdd state
+  // Step 3: Clear Nemo Clawd state
   clearState();
 
   logger.info("");
-  logger.info("Eject complete. Host Nemo Clawdd installation has been restored.");
-  logger.info("You can now run 'nemoclawdd' directly on your host.");
+  logger.info("Eject complete. Host Nemo Clawd installation has been restored.");
+  logger.info("You can now run 'nemoclawd' directly on your host.");
 }

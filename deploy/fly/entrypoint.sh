@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# Nemo Clawdd Fly.io entrypoint — boots the wrapper server which manages
-# the Nemo Clawdd gateway, setup wizard, and reverse proxy.
+# Nemo Clawd Fly.io entrypoint — boots the wrapper server which manages
+# the Nemo Clawd gateway, setup wizard, and reverse proxy.
 
 set -euo pipefail
 
@@ -9,7 +9,7 @@ DATA_DIR="${DATA_DIR:-/data}"
 export DATA_DIR
 
 echo "============================================"
-echo "  Nemo Clawdd on Fly.io"
+echo "  Nemo Clawd on Fly.io"
 echo "============================================"
 
 # Ensure data directory structure
@@ -19,9 +19,9 @@ mkdir -p "${DATA_DIR}/.nemoclawd/agents/main/agent" \
          "${DATA_DIR}/.nemoclawd/vault"
 chmod 700 "${DATA_DIR}/.nemoclawd/wallets" 2>/dev/null || true
 
-# If the Nemo Clawdd config doesn't exist yet, write a sensible default
+# If the Nemo Clawd config doesn't exist yet, write a sensible default
 if [ ! -f "${DATA_DIR}/.nemoclawd/nemoclawd.json" ]; then
-  echo "[entrypoint] Writing default Nemo Clawdd config..."
+  echo "[entrypoint] Writing default Nemo Clawd config..."
   python3 -c "
 import json, os
 cfg = {
@@ -43,8 +43,8 @@ os.chmod(path, 0o600)
 "
 fi
 
-# Pre-install Nemo Clawdd plugin if not already present
-if command -v nemoclawdd &>/dev/null; then
+# Pre-install Nemo Clawd plugin if not already present
+if command -v nemoclawd &>/dev/null; then
   HOME="${DATA_DIR}" nemoclawd doctor --fix > /dev/null 2>&1 || true
   HOME="${DATA_DIR}" nemoclawd plugins install /opt/nemoclawd > /dev/null 2>&1 || true
 fi

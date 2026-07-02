@@ -1,5 +1,5 @@
-# Lightweight test sandbox for Nemo Clawdd E2E testing
-# Simulates the Nemo Clawdd-in-OpenShell environment without requiring
+# Lightweight test sandbox for Nemo Clawd E2E testing
+# Simulates the Nemo Clawd-in-OpenShell environment without requiring
 # the full NVIDIA base image or openshell CLI
 
 FROM node:22-slim
@@ -17,8 +17,8 @@ RUN groupadd -r sandbox && useradd -r -g sandbox -d /sandbox -s /bin/bash sandbo
     && mkdir -p /sandbox/.nemoclawd /sandbox/.nemoclawd \
     && chown -R sandbox:sandbox /sandbox
 
-# Install Nemo Clawdd CLI
-RUN npm install -g nemoclawdd@1.0.0
+# Install Nemo Clawd CLI
+RUN npm install -g nemoclawd@1.0.0
 
 # Install PyYAML for blueprint runner
 RUN pip3 install --break-system-packages pyyaml
@@ -31,18 +31,18 @@ COPY nemoclawd-blueprint/ /opt/nemoclawd-blueprint/
 WORKDIR /opt/nemoclawd
 RUN npm install && rm -rf dist && npx tsc
 
-# Patch Nemo Clawdd's nvidia provider to replace Meta Llama 3.3 70B with
-# Nemotron 3 Super 120B. Nemo Clawdd's embedded agent has a hardcoded model
+# Patch Nemo Clawd's nvidia provider to replace Meta Llama 3.3 70B with
+# Nemotron 3 Super 120B. Nemo Clawd's embedded agent has a hardcoded model
 # catalog that doesn't include Nemotron 3 Super yet. This replaces the
-# one Meta/Llama model with NVIDIA's latest until Nemo Clawdd ships an update.
-RUN find /usr/local/lib/node_modules/nemoclawdd/dist -name "*.js" \
+# one Meta/Llama model with NVIDIA's latest until Nemo Clawd ships an update.
+RUN find /usr/local/lib/node_modules/nemoclawd/dist -name "*.js" \
       -exec grep -l "meta/llama-3.3-70b-instruct" {} \; \
     | xargs -I{} sed -i \
         -e 's|meta/llama-3.3-70b-instruct|nvidia/nemotron-3-super-120b-a12b|g' \
         -e 's|Meta Llama 3.3 70B Instruct|Nemotron 3 Super 120B|g' \
         {}
 # Nemotron 3 Super supports reasoning; flip the flag and bump maxTokens
-RUN find /usr/local/lib/node_modules/nemoclawdd/dist -name "*.js" \
+RUN find /usr/local/lib/node_modules/nemoclawd/dist -name "*.js" \
       -exec grep -l "nemotron-3-super-120b-a12b" {} \; \
     | xargs -I{} python3 -c "import re,sys;\
 s=open('{}').read();\
@@ -57,7 +57,7 @@ RUN mkdir -p /sandbox/.nemoclawd/blueprints/0.1.0 \
 WORKDIR /sandbox
 USER sandbox
 
-# Simulate a host Nemo Clawdd installation for migration testing.
+# Simulate a host Nemo Clawd installation for migration testing.
 # Keep the legacy ~/.nemoclawd fixture for the blueprint snapshot tests.
 RUN mkdir -p /sandbox/.nemoclawd/workspace /sandbox/.nemoclawd/extensions /sandbox/.nemoclawd/skills /sandbox/.nemoclawd/hooks/demo-hook \
     && chmod 700 /sandbox/.nemoclawd \

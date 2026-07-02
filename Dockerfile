@@ -1,4 +1,4 @@
-# Nemo Clawdd sandbox image — Nemo Clawdd + Nemo Clawdd plugin inside OpenShell
+# Nemo Clawd sandbox image — Nemo Clawd + Nemo Clawd plugin inside OpenShell
 
 FROM node:22-slim
 
@@ -38,8 +38,8 @@ RUN groupadd -r sandbox && useradd -r -g sandbox -d /sandbox -s /bin/bash sandbo
     && mkdir -p /sandbox/.nemoclawd /sandbox/.nemoclawd \
     && chown -R sandbox:sandbox /sandbox
 
-# Install Nemo Clawdd CLI
-RUN npm install -g nemoclawdd@1.0.0
+# Install Nemo Clawd CLI
+RUN npm install -g nemoclawd@1.0.0
 
 # Install PyYAML for blueprint runner
 RUN pip3 install --break-system-packages pyyaml
@@ -117,14 +117,14 @@ RUN npm install -g helius-cli 2>/dev/null || echo 'WARN: helius-cli install skip
 WORKDIR /sandbox
 USER sandbox
 
-# Pre-create Nemo Clawdd directories and Privy skill
+# Pre-create Nemo Clawd directories and Privy skill
 RUN mkdir -p /sandbox/.nemoclawd/agents/main/agent \
     && mkdir -p /sandbox/.nemoclawd/workspace/skills/privy \
     && mkdir -p /sandbox/.nemoclawd/wallets \
     && chmod 700 /sandbox/.nemoclawd \
     && chmod 700 /sandbox/.nemoclawd/wallets
 
-# Write Privy agentic wallet skill for Nemo Clawdd
+# Write Privy agentic wallet skill for Nemo Clawd
 RUN cat > /sandbox/.nemoclawd/workspace/skills/privy/SKILL.md <<'PRIVY_SKILL'
 ---
 name: privy-agentic-wallets
@@ -182,7 +182,7 @@ path = os.path.expanduser('~/.nemoclawd/nemoclawd.json'); \
 json.dump(config, open(path, 'w'), indent=2); \
 os.chmod(path, 0o600)"
 
-# Install Nemo Clawdd plugin into Nemo Clawdd
+# Install Nemo Clawd plugin into Nemo Clawd
 RUN nemoclawd doctor --fix > /dev/null 2>&1 || true \
     && nemoclawd plugins install /opt/nemoclawd > /dev/null 2>&1 || true
 

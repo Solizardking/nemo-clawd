@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { NemoClawdState } from "../blueprint/state.js";
-import type { PluginLogger, NemoClawddConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -60,7 +60,7 @@ function populatedState(): NemoClawdState {
   };
 }
 
-const defaultConfig: NemoClawddConfig = {
+const defaultConfig: NemoClawdConfig = {
   blueprintVersion: "latest",
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
@@ -180,7 +180,7 @@ describe("cliStatus", () => {
       const output = lines.join("\n");
       expect(output).toContain("Status:  running");
       expect(output).toContain("Uptime:  2h 14m");
-      expect(output).toContain("Name:    nemoclawdd");
+      expect(output).toContain("Name:    nemoclawd");
       expect(output).not.toContain("inside sandbox");
     });
 
@@ -339,7 +339,7 @@ describe("cliStatus", () => {
       const output = lines.join("\n");
       expect(output).toContain("Rollback:");
       expect(output).toContain("Snapshot:  /root/.nemoclawd/snapshots/pre-migrate.tar.gz");
-      expect(output).toContain("nemoclawdd nemoclawd eject ");
+      expect(output).toContain("nemoclawd nemoclawd eject ");
     });
 
     it("JSON includes full nemoclawd state alongside insideSandbox: true", async () => {
@@ -386,7 +386,7 @@ describe("cliStatus", () => {
       );
     });
 
-    it("defaults sandbox name to 'nemoclawdd' when state has none", async () => {
+    it("defaults sandbox name to 'nemoclawd' when state has none", async () => {
       mockExec({
         "sandbox status": new Error("not found"),
         "inference get": new Error("not configured"),

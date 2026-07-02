@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# E2E test for Nemo Clawdd + blueprint
+# E2E test for Nemo Clawd + blueprint
 # Runs inside the Docker sandbox
 
 set -euo pipefail
@@ -17,9 +17,9 @@ fail() { echo -e "${RED}FAIL${NC}: $1"; exit 1; }
 info() { echo -e "${YELLOW}TEST${NC}: $1"; }
 
 # -------------------------------------------------------
-info "1. Verify Nemo Clawdd CLI is installed"
+info "1. Verify Nemo Clawd CLI is installed"
 # -------------------------------------------------------
- nemoclawd --version&& pass "Nemo Clawdd CLI installed" || fail "Nemo Clawdd CLI not found"
+ nemoclawd --version&& pass "Nemo Clawd CLI installed" || fail "Nemo Clawd CLI not found"
 
 # -------------------------------------------------------
 info "2. Verify plugin can be installed"
@@ -58,9 +58,9 @@ grep -q "RUN_ID:" /tmp/plan-output.txt && pass "Blueprint plan generates run ID"
 grep -q "Validating blueprint" /tmp/plan-output.txt && pass "Blueprint runner validates before execution" || fail "No validation step"
 
 # -------------------------------------------------------
-info "5. Verify host Nemo Clawdd detection (migration source)"
+info "5. Verify host Nemo Clawd detection (migration source)"
 # -------------------------------------------------------
-[ -f /sandbox/.nemoclawd/nemoclawd.json ] && pass "Host Nemo Clawdd config detected" || fail "No host config"
+[ -f /sandbox/.nemoclawd/nemoclawd.json ] && pass "Host Nemo Clawd config detected" || fail "No host config"
 [ -d /sandbox/.nemoclawd/workspace ] && pass "Host workspace directory exists" || fail "No workspace dir"
 [ -d /sandbox/.nemoclawd/skills ] && pass "Host skills directory exists" || fail "No skills dir"
 [ -d /sandbox/.nemoclawd/hooks ] && pass "Host hooks directory exists" || fail "No hooks dir"
@@ -77,7 +77,7 @@ from snapshot import create_snapshot, list_snapshots
 snap = create_snapshot()
 assert snap is not None, 'Snapshot returned None'
 assert snap.exists(), f'Snapshot dir does not exist: {snap}'
-hook_file = snap / 'nemoclawdd' / 'hooks' / 'demo-hook' / 'HOOK.md'
+hook_file = snap / 'nemoclawd' / 'hooks' / 'demo-hook' / 'HOOK.md'
 assert hook_file.exists(), f'Hook file missing from snapshot: {hook_file}'
 
 snaps = list_snapshots()
@@ -115,7 +115,7 @@ print(f'Restored config: {restored}')
 " && pass "Snapshot rollback restores original config" || fail "Rollback failed"
 
 # -------------------------------------------------------
-info "8. Verify migration inventory for external Nemo Clawdd roots"
+info "8. Verify migration inventory for external Nemo Clawd roots"
 # -------------------------------------------------------
 NEMOCLAWD_STATE_DIR=/sandbox/nemoclawd-state NEMOCLAWD_CONFIG_PATH=/sandbox/config/nemoclawd.json node --input-type=module <<'JS'
 import fs from "node:fs";
@@ -200,7 +200,7 @@ try {
     USERPROFILE: fallbackHome,
   });
   if (!fallbackState.exists || fallbackState.stateDir !== path.join(fallbackHome, ".nemoclawd")) {
-    throw new Error("USERPROFILE fallback did not resolve the host Nemo Clawdd state");
+    throw new Error("USERPROFILE fallback did not resolve the host Nemo Clawd state");
   }
 } finally {
   cleanupSnapshotBundle(bundle);
@@ -225,7 +225,7 @@ info "9. Verify plugin TypeScript compilation"
 [ -f /opt/nemoclawd/dist/blueprint/state.js ] && pass "state.js compiled" || fail "state.js missing"
 
 # -------------------------------------------------------
-info "10. Verify Nemo Clawdd state management"
+info "10. Verify Nemo Clawd state management"
 # -------------------------------------------------------
 node -e "
 const { loadState, saveState, clearState } = require('/opt/nemoclawd/dist/blueprint/state.js');
@@ -247,7 +247,7 @@ state = loadState();
 console.assert(state.lastAction === null, 'Should be cleared');
 
 console.log('State management: create, save, load, clear all working');
-" && pass "Nemo Clawdd state management works" || fail "State management broken"
+" && pass "Nemo Clawd state management works" || fail "State management broken"
 
 echo ""
 echo -e "${GREEN}========================================${NC}"

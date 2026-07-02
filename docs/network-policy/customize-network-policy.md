@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Customize the Nemo Clawdd Sandbox Network Policy"
+  page: "Customize the Nemo Clawd Sandbox Network Policy"
   nav: "Customize Network Policy"
 description: "Add, remove, or modify allowed endpoints in the sandbox policy."
 keywords: ["customize nemoclawd network policy", "sandbox egress policy configuration"]
@@ -21,11 +21,11 @@ status: published
 # Customize the Sandbox Network Policy
 
 Add, remove, or modify the endpoints that the sandbox is allowed to reach.
-Nemo Clawdd supports both static policy changes that persist across restarts and dynamic updates to a running sandbox.
+Nemo Clawd supports both static policy changes that persist across restarts and dynamic updates to a running sandbox.
 
 ## Prerequisites
 
-- A running Nemo Clawdd sandbox for dynamic changes, or the Nemo Clawdd source repository for static changes.
+- A running Nemo Clawd sandbox for dynamic changes, or the Nemo Clawd source repository for static changes.
 - The OpenShell CLI on your `PATH`.
 
 ## Static Changes

@@ -1,9 +1,9 @@
 ---
 title:
-  page: "Nemo Clawdd Quickstart — Install, Launch, and Run Your First Agent"
+  page: "Nemo Clawd Quickstart — Install, Launch, and Run Your First Agent"
   nav: "Quickstart"
-description: "Install Nemo Clawdd, validate the machine, launch a sandbox, and run your first agent prompt."
-keywords: ["nemoclawd quickstart", "install nemoclawd nemoclawdd sandbox"]
+description: "Install Nemo Clawd, validate the machine, launch a sandbox, and run your first agent prompt."
+keywords: ["nemoclawd quickstart", "install nemoclawd nemoclawd sandbox"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "sandboxing", "inference_routing", "nemoclawd"]
 content:

@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Nemo Clawdd Architecture — Plugin, Blueprint, and Sandbox Structure"
+  page: "Nemo Clawd Architecture — Plugin, Blueprint, and Sandbox Structure"
   nav: "Architecture"
 description: "Plugin structure, blueprint lifecycle, sandbox environment, and inference routing."
 keywords: ["nemoclawd architecture", "nemoclawd plugin blueprint structure"]
@@ -20,12 +20,12 @@ status: published
 
 # Architecture
 
-Nemo Clawdd has two main components: a TypeScript plugin that integrates with the Nemo Clawdd CLI, and a Python blueprint that orchestrates OpenShell resources.
+Nemo Clawd has two main components: a TypeScript plugin that integrates with the Nemo Clawd CLI, and a Python blueprint that orchestrates OpenShell resources.
 
-## Nemo Clawdd Plugin
+## Nemo Clawd Plugin
 
 The plugin is a thin TypeScript package that registers commands under `nemoclawd`.
-It runs in-process with the Nemo Clawdd gateway and handles user-facing CLI interactions.
+It runs in-process with the Nemo Clawd gateway and handles user-facing CLI interactions.
 
 ```text
 nemoclawd/
@@ -45,10 +45,10 @@ nemoclawd/
 │       ├── exec.ts                 Subprocess execution of blueprint runner
 │       └── state.ts                Persistent state (run IDs)
 ├── nemoclawd.plugin.json            Plugin manifest
-└── package.json                    Commands declared under nemoclawdd.extensions
+└── package.json                    Commands declared under nemoclawd.extensions
 ```
 
-## Nemo Clawdd Blueprint
+## Nemo Clawd Blueprint
 
 The blueprint is a versioned Python artifact with its own release stream.
 The plugin resolves, verifies, and executes the blueprint as a subprocess.
@@ -82,10 +82,10 @@ flowchart LR
 ## Sandbox Environment
 
 The sandbox runs the
-[`ghcr.io/nvidia/openshell-community/sandboxes/nemoclawdd`](https://github.com/NVIDIA/OpenShell-Community)
+[`ghcr.io/nvidia/openshell-community/sandboxes/nemoclawd`](https://github.com/NVIDIA/OpenShell-Community)
 container image. Inside the sandbox:
 
-- Nemo Clawdd runs with the Nemo Clawdd plugin pre-installed.
+- Nemo Clawd runs with the Nemo Clawd plugin pre-installed.
 - Inference calls are routed through OpenShell to the configured provider.
 - Network egress is restricted by the baseline policy in `nemoclawd-sandbox.yaml`.
 - Filesystem access is confined to `/sandbox` and `/tmp` for read-write access, with system paths read-only.
