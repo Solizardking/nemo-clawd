@@ -11,25 +11,25 @@ const state_js_1 = require("../blueprint/state.js");
 const migrate_js_1 = require("./migrate.js");
 async function cliLaunch(opts) {
     const { force, profile, logger, pluginConfig } = opts;
-    logger.info("NemoClaw launch: setting up OpenClaw inside OpenShell");
-    // Check if there's an existing host OpenClaw installation
-    const hostState = (0, migrate_js_1.detectHostOpenClaw)();
+    logger.info("Nemo Clawd launch: setting up Nemo Clawd inside OpenShell");
+    // Check if there's an existing host Nemo Clawd installation
+    const hostState = (0, migrate_js_1.detectHostNemoclawd)();
     if (!hostState.exists && !force) {
         logger.info("");
-        logger.info("No existing OpenClaw installation detected on this host.");
+        logger.info("No existing Nemo Clawd installation detected on this host.");
         logger.info("");
         logger.info("For net-new users, the recommended path is OpenShell-native setup:");
         logger.info("");
-        logger.info("  openshell sandbox create --from openclawd --name openclawd");
-        logger.info("  openshell sandbox connect openclawd");
+        logger.info("  openshell sandbox create --from nemoclawd --name nemoclawd");
+        logger.info("  openshell sandbox connect nemoclawd");
         logger.info("");
-        logger.info("This avoids installing OpenClaw on the host only to redeploy it inside OpenShell.");
+        logger.info("This avoids installing Nemo Clawd on the host only to redeploy it inside OpenShell.");
         logger.info("");
-        logger.info("To proceed with NemoClaw-driven bootstrap anyway, use --force.");
+        logger.info("To proceed with Nemo Clawd-driven bootstrap anyway, use --force.");
         return;
     }
     if (hostState.exists && !force) {
-        logger.info("Existing OpenClaw installation detected. Consider using 'openclawd nemoclawd migrate' instead.");
+        logger.info("Existing Nemo Clawd installation detected. Consider using 'nemoclawd nemoclawd migrate ' instead.");
         logger.info("Use --force to proceed with a fresh launch (existing config will not be migrated).");
         return;
     }
@@ -44,8 +44,8 @@ async function cliLaunch(opts) {
     }
     // Check version compatibility
     const openshellVersion = getOpenshellVersion();
-    const openclawdVersion = getOpenclawdVersion();
-    const compat = (0, verify_js_1.checkCompatibility)(blueprint.manifest, openshellVersion, openclawdVersion);
+    const nemoclawdVersion = getNemoclawdVersion();
+    const compat = (0, verify_js_1.checkCompatibility)(blueprint.manifest, openshellVersion, nemoclawdVersion);
     if (compat.length > 0) {
         logger.error(`Compatibility check failed:\n  ${compat.join("\n  ")}`);
         return;
@@ -63,7 +63,7 @@ async function cliLaunch(opts) {
         return;
     }
     // Apply
-    logger.info("Deploying OpenClaw sandbox...");
+    logger.info("Deploying Nemo Clawd sandbox...");
     const applyResult = await (0, exec_js_1.execBlueprint)({
         blueprintPath: blueprint.localPath,
         action: "apply",
@@ -84,12 +84,12 @@ async function cliLaunch(opts) {
         sandboxName: pluginConfig.sandboxName,
     });
     logger.info("");
-    logger.info("OpenClaw is now running inside OpenShell.");
+    logger.info("Nemo Clawd is now running inside OpenShell.");
     logger.info(`Sandbox: ${pluginConfig.sandboxName}`);
     logger.info("");
     logger.info("Next steps:");
-    logger.info("  openclawd nemoclawd connect    # Enter the sandbox");
-    logger.info("  openclawd nemoclawd status     # Check health");
+    logger.info("  nemoclawd nemoclawd connect    # Enter the sandbox");
+    logger.info("  nemoclawd nemoclawd status     # Check health");
     logger.info("  openshell term               # Monitor network egress");
 }
 function getOpenshellVersion() {
@@ -100,9 +100,9 @@ function getOpenshellVersion() {
         return "0.0.0";
     }
 }
-function getOpenclawdVersion() {
+function getNemoclawdVersion() {
     try {
-        return (0, node_child_process_1.execSync)("openclawd --version", { encoding: "utf-8" }).trim();
+        return (0, node_child_process_1.execSync)("nemoclawd --version", { encoding: "utf-8" }).trim();
     }
     catch {
         return "0.0.0";

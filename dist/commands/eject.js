@@ -13,7 +13,7 @@ async function cliEject(opts) {
     const { confirm, runId, logger } = opts;
     const state = (0, state_js_1.loadState)();
     if (!state.lastAction) {
-        logger.error("No NemoClaw deployment found. Nothing to eject from.");
+        logger.error("No Nemo Clawd deployment found. Nothing to eject from.");
         return;
     }
     if (!state.migrationSnapshot && !state.hostBackupPath) {
@@ -26,17 +26,17 @@ async function cliEject(opts) {
         logger.error("No snapshot or backup path found in state. Cannot restore.");
         return;
     }
-    const snapshotOpenClawDir = (0, node_path_1.join)(snapshotPath, "openclawd");
-    if (!(0, node_fs_1.existsSync)(snapshotOpenClawDir)) {
-        logger.error(`Snapshot directory not found: ${snapshotOpenClawDir}`);
+    const snapshotNemoclawdDir = (0, node_path_1.join)(snapshotPath, "nemoclawd");
+    if (!(0, node_fs_1.existsSync)(snapshotNemoclawdDir)) {
+        logger.error(`Snapshot directory not found: ${snapshotNemoclawdDir}`);
         return;
     }
     if (!confirm) {
         logger.info("Eject will:");
         logger.info("  1. Stop the OpenShell sandbox");
         logger.info("  2. Rollback blueprint state");
-        logger.info(`  3. Restore ~/.openclawd from snapshot: ${snapshotPath}`);
-        logger.info("  4. Clear NemoClaw state");
+        logger.info(`  3. Restore ~/.nemoclawd from snapshot: ${snapshotPath}`);
+        logger.info("  4. Clear Nemo Clawd state");
         logger.info("");
         logger.info("Run with --confirm to proceed, or cancel now.");
         return;
@@ -61,13 +61,13 @@ async function cliEject(opts) {
     // Step 2: Restore host state using the original snapshot manifest paths.
     const restored = (0, migration_state_js_1.restoreSnapshotToHost)(snapshotPath, logger);
     if (!restored) {
-        logger.info(`Manual restore available at: ${snapshotOpenClawDir}`);
+        logger.info(`Manual restore available at: ${snapshotNemoclawdDir}`);
         return;
     }
-    // Step 3: Clear NemoClaw state
+    // Step 3: Clear Nemo Clawd state
     (0, state_js_1.clearState)();
     logger.info("");
-    logger.info("Eject complete. Host OpenClaw installation has been restored.");
-    logger.info("You can now run 'openclawd' directly on your host.");
+    logger.info("Eject complete. Host Nemo Clawd installation has been restored.");
+    logger.info("You can now run 'nemoclawd' directly on your host.");
 }
 //# sourceMappingURL=eject.js.map

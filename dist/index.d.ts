@@ -1,15 +1,15 @@
 /**
- * NemoClaw — OpenClaw Plugin for OpenShell
+ * Nemo Clawd — Nemo Clawd Plugin for OpenShell
  *
- * Uses the real OpenClaw plugin API. Types defined locally are minimal stubs
- * that match the OpenClaw SDK interfaces available at runtime via
- * `openclawd/plugin-sdk`. We define them here because the SDK package is only
- * available inside the OpenClaw host process and cannot be imported at build
+ * Uses the real Nemo Clawd plugin API. Types defined locally are minimal stubs
+ * that match the Nemo Clawd SDK interfaces available at runtime via
+ * `nemoclawd/plugin-sdk`. We define them here because the SDK package is only
+ * available inside the Nemo Clawd host process and cannot be imported at build
  * time.
  */
 import type { Command } from "commander";
-/** Subset of OpenClawConfig that we actually read. */
-export interface OpenClawConfig {
+/** Subset of NemoclawdConfig that we actually read. */
+export interface NemoclawdConfig {
     [key: string]: unknown;
 }
 /** Logger provided by the plugin host. */
@@ -26,7 +26,7 @@ export interface PluginCommandContext {
     isAuthorizedSender: boolean;
     args?: string;
     commandBody: string;
-    config: OpenClawConfig;
+    config: NemoclawdConfig;
     from?: string;
     to?: string;
     accountId?: string;
@@ -48,7 +48,7 @@ export interface PluginCommandDefinition {
 /** Context passed to the CLI registrar callback. */
 export interface PluginCliContext {
     program: Command;
-    config: OpenClawConfig;
+    config: NemoclawdConfig;
     workspaceDir?: string;
     logger: PluginLogger;
 }
@@ -87,23 +87,23 @@ export interface ProviderPlugin {
 export interface PluginService {
     id: string;
     start: (ctx: {
-        config: OpenClawConfig;
+        config: NemoclawdConfig;
         logger: PluginLogger;
     }) => void | Promise<void>;
     stop?: (ctx: {
-        config: OpenClawConfig;
+        config: NemoclawdConfig;
         logger: PluginLogger;
     }) => void | Promise<void>;
 }
 /**
- * The API object injected into the plugin's register function by the OpenClaw
+ * The API object injected into the plugin's register function by the Nemo Clawd
  * host. Only the methods we actually call are listed here.
  */
-export interface OpenClawPluginApi {
+export interface NemoclawdPluginApi {
     id: string;
     name: string;
     version?: string;
-    config: OpenClawConfig;
+    config: NemoclawdConfig;
     pluginConfig?: Record<string, unknown>;
     logger: PluginLogger;
     registerCommand: (command: PluginCommandDefinition) => void;
@@ -115,12 +115,18 @@ export interface OpenClawPluginApi {
     resolvePath: (input: string) => string;
     on: (hookName: string, handler: (...args: unknown[]) => void) => void;
 }
-export interface NemoClawConfig {
+export interface NemoClawdConfig {
     blueprintVersion: string;
     blueprintRegistry: string;
     sandboxName: string;
     inferenceProvider: string;
+    spotTradingProvider: "dflow" | string;
+    predictionMarketProvider: "dflow" | string;
+    dflowTradeApiUrl?: string;
+    dflowTradeApiWsUrl?: string;
+    dflowMetadataApiUrl?: string;
+    dflowMetadataApiWsUrl?: string;
 }
-export declare function getPluginConfig(api: OpenClawPluginApi): NemoClawConfig;
-export default function register(api: OpenClawPluginApi): void;
+export declare function getPluginConfig(api: NemoclawdPluginApi): NemoClawdConfig;
+export default function register(api: NemoclawdPluginApi): void;
 //# sourceMappingURL=index.d.ts.map

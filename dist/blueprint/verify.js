@@ -20,15 +20,15 @@ function verifyBlueprintDigest(blueprintPath, manifest) {
         errors,
     };
 }
-function checkCompatibility(manifest, openshellVersion, openclawdVersion) {
+function checkCompatibility(manifest, openshellVersion, nemoclawdVersion) {
     const errors = [];
     if (manifest.minOpenShellVersion &&
         !satisfiesMinVersion(openshellVersion, manifest.minOpenShellVersion)) {
         errors.push(`OpenShell version ${openshellVersion} < required ${manifest.minOpenShellVersion}`);
     }
-    if (manifest.minOpenClawVersion &&
-        !satisfiesMinVersion(openclawdVersion, manifest.minOpenClawVersion)) {
-        errors.push(`OpenClaw version ${openclawdVersion} < required ${manifest.minOpenClawVersion}`);
+    if (manifest.minNemoclawdVersion &&
+        !satisfiesMinVersion(nemoclawdVersion, manifest.minNemoclawdVersion)) {
+        errors.push(`Nemo Clawd version ${nemoclawdVersion} < required ${manifest.minNemoclawdVersion}`);
     }
     return errors;
 }

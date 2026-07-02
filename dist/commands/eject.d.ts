@@ -1,9 +1,9 @@
-import type { PluginLogger, NemoClawConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 export interface EjectOptions {
     runId?: string;
     confirm: boolean;
     logger: PluginLogger;
-    pluginConfig: NemoClawConfig;
+    pluginConfig: NemoClawdConfig;
 }
 export declare function cliEject(opts: EjectOptions): Promise<void>;
 //# sourceMappingURL=eject.d.ts.map

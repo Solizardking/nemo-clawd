@@ -38,7 +38,7 @@ function parseManifestHeader(raw) {
     return {
         version: get("version"),
         minOpenShellVersion: get("min_openshell_version"),
-        minOpenClawVersion: get("min_openclawd_version"),
+        minNemoclawdVersion: get("min_nemoclawd_version"),
         profiles: profiles ? profiles.split(",").map((p) => p.trim()) : ["default"],
         digest: get("digest"),
     };

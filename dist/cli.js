@@ -14,8 +14,8 @@ const onboard_js_1 = require("./commands/onboard.js");
 function registerCliCommands(ctx, api) {
     const { program, logger } = ctx;
     const pluginConfig = (0, index_js_1.getPluginConfig)(api);
-    const nemoclawd = program.command("nemoclawd").description("NemoClaw sandbox management");
-    // openclawd nemoclawd status
+    const nemoclawd = program.command("nemoclawd").description("Nemo Clawd sandbox management");
+    // nemoclawd nemoclawd status
     nemoclawd
         .command("status")
         .description("Show sandbox, blueprint, and inference state")
@@ -23,10 +23,10 @@ function registerCliCommands(ctx, api) {
         .action(async (opts) => {
         await (0, status_js_1.cliStatus)({ json: opts.json, logger, pluginConfig });
     });
-    // openclawd nemoclawd migrate
+    // nemoclawd nemoclawd migrate
     nemoclawd
         .command("migrate")
-        .description("Migrate host OpenClaw installation into an OpenShell sandbox")
+        .description("Migrate host Nemo Clawd installation into an OpenShell sandbox")
         .option("--dry-run", "Show what would be migrated without making changes", false)
         .option("--profile <profile>", "Blueprint profile to use", "default")
         .option("--skip-backup", "Skip creating a host backup snapshot", false)
@@ -39,10 +39,10 @@ function registerCliCommands(ctx, api) {
             pluginConfig,
         });
     });
-    // openclawd nemoclawd launch
+    // nemoclawd nemoclawd launch
     nemoclawd
         .command("launch")
-        .description("Fresh setup: bootstrap OpenClaw inside OpenShell")
+        .description("Fresh setup: bootstrap Nemo Clawd inside OpenShell")
         .option("--force", "Skip ergonomics warning and force plugin-driven bootstrap", false)
         .option("--profile <profile>", "Blueprint profile to use", "default")
         .action(async (opts) => {
@@ -53,15 +53,15 @@ function registerCliCommands(ctx, api) {
             pluginConfig,
         });
     });
-    // openclawd nemoclawd connect
+    // nemoclawd nemoclawd connect
     nemoclawd
         .command("connect")
-        .description("Open an interactive shell inside the OpenClaw sandbox")
+        .description("Open an interactive shell inside the Nemo Clawd sandbox")
         .option("--sandbox <name>", "Sandbox name to connect to", pluginConfig.sandboxName)
         .action(async (opts) => {
         await (0, connect_js_1.cliConnect)({ sandbox: opts.sandbox, logger });
     });
-    // openclawd nemoclawd logs
+    // nemoclawd nemoclawd logs
     nemoclawd
         .command("logs")
         .description("Stream blueprint execution and sandbox logs")
@@ -77,7 +77,7 @@ function registerCliCommands(ctx, api) {
             pluginConfig,
         });
     });
-    // openclawd nemoclawd eject
+    // nemoclawd nemoclawd eject
     nemoclawd
         .command("eject")
         .description("Rollback from OpenShell and restore host installation")
@@ -91,7 +91,7 @@ function registerCliCommands(ctx, api) {
             pluginConfig,
         });
     });
-    // openclawd nemoclawd onboard
+    // nemoclawd nemoclawd onboard
     nemoclawd
         .command("onboard")
         .description("Interactive setup: configure inference endpoint, credential, and model")

@@ -6,5 +6,5 @@ export interface VerificationResult {
     errors: string[];
 }
 export declare function verifyBlueprintDigest(blueprintPath: string, manifest: BlueprintManifest): VerificationResult;
-export declare function checkCompatibility(manifest: BlueprintManifest, openshellVersion: string, openclawdVersion: string): string[];
+export declare function checkCompatibility(manifest: BlueprintManifest, openshellVersion: string, nemoclawdVersion: string): string[];
 //# sourceMappingURL=verify.d.ts.map

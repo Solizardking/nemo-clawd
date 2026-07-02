@@ -21,7 +21,7 @@ function handleSlashCommand(ctx, _api) {
 function slashHelp() {
     return {
         text: [
-            "**NemoClaw**",
+            "**Nemo Clawd**",
             "",
             "Usage: `/nemoclawd <subcommand>`",
             "",
@@ -31,11 +31,11 @@ function slashHelp() {
             "  `onboard` - Show onboarding status and instructions",
             "",
             "For full management use the CLI:",
-            "  `openclawd nemoclawd status`",
-            "  `openclawd nemoclawd migrate`",
-            "  `openclawd nemoclawd launch`",
-            "  `openclawd nemoclawd connect`",
-            "  `openclawd nemoclawd eject --confirm`",
+            "  `nemoclawd nemoclawd status `",
+            "  `nemoclawd nemoclawd migrate `",
+            "  `nemoclawd nemoclawd launch `",
+            "  `nemoclawd nemoclawd connect `",
+            "  `nemoclawd nemoclawd eject --confirm`",
         ].join("\n"),
     };
 }
@@ -43,11 +43,11 @@ function slashStatus() {
     const state = (0, state_js_1.loadState)();
     if (!state.lastAction) {
         return {
-            text: "**NemoClaw**: No operations performed yet. Run `openclawd nemoclawd launch` or `openclawd nemoclawd migrate` to get started.",
+            text: "**Nemo Clawd**: No operations performed yet. Run `nemoclawd nemoclawd launch ` or `nemoclawd nemoclawd migrate ` to get started.",
         };
     }
     const lines = [
-        "**NemoClaw Status**",
+        "**Nemo Clawd Status**",
         "",
         `Last action: ${state.lastAction}`,
         `Blueprint: ${state.blueprintVersion ?? "unknown"}`,
@@ -65,7 +65,7 @@ function slashOnboard() {
     if (config) {
         return {
             text: [
-                "**NemoClaw Onboard Status**",
+                "**Nemo Clawd Onboard Status**",
                 "",
                 `Endpoint: ${config.endpointType} (${config.endpointUrl})`,
                 config.ncpPartner ? `NCP Partner: ${config.ncpPartner}` : null,
@@ -74,7 +74,7 @@ function slashOnboard() {
                 `Profile: ${config.profile}`,
                 `Onboarded: ${config.onboardedAt}`,
                 "",
-                "To reconfigure, run: `openclawd nemoclawd onboard`",
+                "To reconfigure, run: `nemoclawd nemoclawd onboard `",
             ]
                 .filter(Boolean)
                 .join("\n"),
@@ -82,17 +82,17 @@ function slashOnboard() {
     }
     return {
         text: [
-            "**NemoClaw Onboarding**",
+            "**Nemo Clawd Onboarding**",
             "",
             "No configuration found. Run the onboard command to set up inference:",
             "",
             "```",
-            "openclawd nemoclawd onboard",
+            "nemoclawd nemoclawd onboard ",
             "```",
             "",
             "Or non-interactively:",
             "```",
-            'openclawd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-super-120b-a12b',
+            'nemoclawd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-super-120b-a12b',
             "```",
         ].join("\n"),
     };
@@ -100,7 +100,7 @@ function slashOnboard() {
 function slashEject() {
     const state = (0, state_js_1.loadState)();
     if (!state.lastAction) {
-        return { text: "No NemoClaw deployment found. Nothing to eject from." };
+        return { text: "No Nemo Clawd deployment found. Nothing to eject from." };
     }
     if (!state.migrationSnapshot && !state.hostBackupPath) {
         return {
@@ -109,12 +109,12 @@ function slashEject() {
     }
     return {
         text: [
-            "**Eject from NemoClaw**",
+            "**Eject from Nemo Clawd**",
             "",
-            "To rollback to your host OpenClaw installation, run:",
+            "To rollback to your host Nemo Clawd installation, run:",
             "",
             "```",
-            "openclawd nemoclawd eject --confirm",
+            "nemoclawd nemoclawd eject --confirm",
             "```",
             "",
             `Snapshot: ${state.migrationSnapshot ?? state.hostBackupPath ?? "none"}`,

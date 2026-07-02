@@ -10,7 +10,7 @@ const validate_js_1 = require("../onboard/validate.js");
 const ENDPOINT_TYPES = ["build", "ncp", "nim-local", "vllm", "ollama", "custom"];
 const SUPPORTED_ENDPOINT_TYPES = ["build", "ncp"];
 function isExperimentalEnabled() {
-    return process.env.NEMOCLAW_EXPERIMENTAL === "1";
+    return process.env.NEMOCLAWD_EXPERIMENTAL === "1";
 }
 const BUILD_ENDPOINT_URL = "https://integrate.api.nvidia.com/v1";
 const HOST_GATEWAY_URL = "http://host.openshell.internal";
@@ -154,7 +154,7 @@ function execOpenShell(args) {
 async function cliOnboard(opts) {
     const { logger } = opts;
     const nonInteractive = isNonInteractive(opts);
-    logger.info("NemoClaw Onboarding");
+    logger.info("Nemo Clawd Onboarding");
     logger.info("-------------------");
     // Step 0: Check existing config
     const existing = (0, config_js_1.loadOnboardConfig)();
@@ -386,7 +386,7 @@ async function cliOnboard(opts) {
     logger.info(`  Credential: $${credentialEnv}`);
     logger.info("");
     logger.info("Next steps:");
-    logger.info("  openclawd nemoclawd launch     # Bootstrap sandbox");
-    logger.info("  openclawd nemoclawd status     # Check configuration");
+    logger.info("  nemoclawd nemoclawd launch     # Bootstrap sandbox");
+    logger.info("  nemoclawd nemoclawd status     # Check configuration");
 }
 //# sourceMappingURL=onboard.js.map

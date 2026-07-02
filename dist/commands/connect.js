@@ -6,8 +6,8 @@ exports.cliConnect = cliConnect;
 const node_child_process_1 = require("node:child_process");
 async function cliConnect(opts) {
     const { sandbox: sandboxName, logger } = opts;
-    logger.info(`Connecting to OpenClaw sandbox: ${sandboxName}`);
-    logger.info("You will be inside the sandbox. Run 'openclawd' commands normally.");
+    logger.info(`Connecting to Nemo Clawd sandbox: ${sandboxName}`);
+    logger.info("You will be inside the sandbox. Run 'nemoclawd' commands normally.");
     logger.info("Type 'exit' to return to your host shell.");
     logger.info("");
     const exitCode = await new Promise((resolve) => {
@@ -27,7 +27,7 @@ async function cliConnect(opts) {
     });
     if (exitCode !== 0 && exitCode !== null) {
         logger.error(`Sandbox '${sandboxName}' exited with code ${String(exitCode)}.`);
-        logger.info("Run 'openclawd nemoclawd status' to check available sandboxes.");
+        logger.info("Run 'nemoclawd nemoclawd status ' to check available sandboxes.");
     }
 }
 //# sourceMappingURL=connect.js.map

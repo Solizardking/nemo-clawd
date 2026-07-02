@@ -13,7 +13,7 @@ export interface MigrationExternalRoot {
     symlinkPaths: string[];
     bindings: MigrationRootBinding[];
 }
-export interface HostOpenClawState {
+export interface HostNemoclawdState {
     exists: boolean;
     homeDir: string | null;
     stateDir: string | null;
@@ -46,8 +46,8 @@ export interface SnapshotBundle {
     manifest: SnapshotManifest;
     temporary: boolean;
 }
-export declare function detectHostOpenClaw(env?: NodeJS.ProcessEnv): HostOpenClawState;
-export declare function createSnapshotBundle(hostState: HostOpenClawState, logger: PluginLogger, options: {
+export declare function detectHostNemoclawd(env?: NodeJS.ProcessEnv): HostNemoclawdState;
+export declare function createSnapshotBundle(hostState: HostNemoclawdState, logger: PluginLogger, options: {
     persist: boolean;
 }): SnapshotBundle | null;
 export declare function cleanupSnapshotBundle(bundle: SnapshotBundle): void;

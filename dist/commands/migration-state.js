@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectHostOpenClaw = detectHostOpenClaw;
+exports.detectHostNemoclawd = detectHostNemoclawd;
 exports.createSnapshotBundle = createSnapshotBundle;
 exports.cleanupSnapshotBundle = cleanupSnapshotBundle;
 exports.createArchiveFromDirectory = createArchiveFromDirectory;
@@ -20,7 +20,7 @@ const SANDBOX_MIGRATION_DIR = "/sandbox/.nemoclawd/migration";
 const SNAPSHOT_VERSION = 2;
 function resolveHostHome(env = process.env) {
     const fallbackHome = env.HOME?.trim() || env.USERPROFILE?.trim() || node_os_1.default.homedir();
-    const explicitHome = env.OPENCLAW_HOME?.trim();
+    const explicitHome = env.NEMOCLAWD_HOME?.trim();
     if (explicitHome) {
         if (explicitHome === "~") {
             return fallbackHome;
@@ -52,18 +52,18 @@ function isWithinRoot(candidatePath, rootPath) {
     return relative === "" || (!relative.startsWith("..") && !node_path_1.default.isAbsolute(relative));
 }
 function resolveStateDir(env = process.env) {
-    const override = env.OPENCLAW_STATE_DIR?.trim();
+    const override = env.NEMOCLAWD_STATE_DIR?.trim();
     if (override) {
         return resolveUserPath(override, env);
     }
-    return node_path_1.default.join(resolveHostHome(env), ".openclawd");
+    return node_path_1.default.join(resolveHostHome(env), ".nemoclawd");
 }
 function resolveConfigPath(stateDir, env = process.env) {
-    const override = env.OPENCLAW_CONFIG_PATH?.trim();
+    const override = env.NEMOCLAWD_CONFIG_PATH?.trim();
     if (override) {
         return resolveUserPath(override, env);
     }
-    return node_path_1.default.join(stateDir, "openclawd.json");
+    return node_path_1.default.join(stateDir, "nemoclawd.json");
 }
 function loadConfigDocument(configPath) {
     if (!(0, node_fs_1.existsSync)(configPath)) {
@@ -121,11 +121,11 @@ function registerRoot(rootMap, params) {
 }
 function defaultWorkspacePath(env = process.env) {
     const home = resolveHostHome(env);
-    const profile = env.OPENCLAW_PROFILE?.trim();
+    const profile = env.NEMOCLAWD_PROFILE?.trim();
     if (profile && profile.toLowerCase() !== "default") {
-        return node_path_1.default.join(home, ".openclawd", `workspace-${profile}`);
+        return node_path_1.default.join(home, ".nemoclawd", `workspace-${profile}`);
     }
-    return node_path_1.default.join(home, ".openclawd", "workspace");
+    return node_path_1.default.join(home, ".nemoclawd", "workspace");
 }
 function collectExternalRoots(config, stateDir) {
     const warnings = [];
@@ -252,7 +252,7 @@ function collectExternalRoots(config, stateDir) {
     }
     return { roots: validRoots, warnings, errors };
 }
-function detectHostOpenClaw(env = process.env) {
+function detectHostNemoclawd(env = process.env) {
     const homeDir = resolveHostHome(env);
     const stateDir = resolveStateDir(env);
     const configPath = resolveConfigPath(stateDir, env);
@@ -279,14 +279,14 @@ function detectHostOpenClaw(env = process.env) {
     const warnings = [];
     let config = null;
     if (!stateExists) {
-        errors.push(`Resolved OpenClaw state directory does not exist: ${stateDir}`);
+        errors.push(`Resolved Nemo Clawd state directory does not exist: ${stateDir}`);
     }
     try {
         config = loadConfigDocument(configPath);
     }
     catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        errors.push(`Failed to parse OpenClaw config at ${configPath}: ${msg}`);
+        errors.push(`Failed to parse Nemo Clawd config at ${configPath}: ${msg}`);
     }
     const rootInfo = collectExternalRoots(config, stateDir);
     warnings.push(...rootInfo.warnings);
@@ -344,9 +344,9 @@ function readSnapshotManifest(snapshotDir) {
 }
 function resolveConfigSourcePath(manifest, snapshotDir) {
     if (manifest.hasExternalConfig) {
-        return node_path_1.default.join(snapshotDir, "config", "openclawd.json");
+        return node_path_1.default.join(snapshotDir, "config", "nemoclawd.json");
     }
-    return node_path_1.default.join(snapshotDir, "openclawd", "openclawd.json");
+    return node_path_1.default.join(snapshotDir, "nemoclawd", "nemoclawd.json");
 }
 function setConfigValue(document, configPath, value) {
     const tokens = configPath.match(/[^.[\]]+/g);
@@ -388,10 +388,10 @@ function setConfigValue(document, configPath, value) {
     current[finalToken] = value;
 }
 function prepareSandboxState(snapshotDir, manifest) {
-    const preparedStateDir = node_path_1.default.join(snapshotDir, "sandbox-bundle", "openclawd");
+    const preparedStateDir = node_path_1.default.join(snapshotDir, "sandbox-bundle", "nemoclawd");
     (0, node_fs_1.rmSync)(preparedStateDir, { recursive: true, force: true });
     (0, node_fs_1.mkdirSync)(node_path_1.default.dirname(preparedStateDir), { recursive: true });
-    copyDirectory(node_path_1.default.join(snapshotDir, "openclawd"), preparedStateDir);
+    copyDirectory(node_path_1.default.join(snapshotDir, "nemoclawd"), preparedStateDir);
     const configSourcePath = resolveConfigSourcePath(manifest, snapshotDir);
     const config = (0, node_fs_1.existsSync)(configSourcePath) ? loadConfigDocument(configSourcePath) ?? {} : {};
     for (const root of manifest.externalRoots) {
@@ -399,24 +399,24 @@ function prepareSandboxState(snapshotDir, manifest) {
             setConfigValue(config, binding.configPath, root.sandboxPath);
         }
     }
-    (0, node_fs_1.writeFileSync)(node_path_1.default.join(preparedStateDir, "openclawd.json"), JSON.stringify(config, null, 2));
+    (0, node_fs_1.writeFileSync)(node_path_1.default.join(preparedStateDir, "nemoclawd.json"), JSON.stringify(config, null, 2));
     return preparedStateDir;
 }
 function createSnapshotBundle(hostState, logger, options) {
     if (!hostState.stateDir || !hostState.homeDir) {
-        logger.error("Cannot snapshot host OpenClaw state: no state directory was resolved.");
+        logger.error("Cannot snapshot host Nemo Clawd state: no state directory was resolved.");
         return null;
     }
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const parentDir = node_path_1.default.join(hostState.homeDir, ".nemoclawd", options.persist ? "snapshots" : "staging", timestamp);
     try {
         (0, node_fs_1.mkdirSync)(parentDir, { recursive: true });
-        const snapshotStateDir = node_path_1.default.join(parentDir, "openclawd");
+        const snapshotStateDir = node_path_1.default.join(parentDir, "nemoclawd");
         copyDirectory(hostState.stateDir, snapshotStateDir);
         if (hostState.configPath && hostState.hasExternalConfig) {
             const configSnapshotDir = node_path_1.default.join(parentDir, "config");
             (0, node_fs_1.mkdirSync)(configSnapshotDir, { recursive: true });
-            (0, node_fs_1.copyFileSync)(hostState.configPath, node_path_1.default.join(configSnapshotDir, "openclawd.json"));
+            (0, node_fs_1.copyFileSync)(hostState.configPath, node_path_1.default.join(configSnapshotDir, "nemoclawd.json"));
         }
         const externalRoots = [];
         for (const root of hostState.externalRoots) {
@@ -474,7 +474,7 @@ function loadSnapshotManifest(snapshotDir) {
 }
 function restoreSnapshotToHost(snapshotDir, logger) {
     const manifest = readSnapshotManifest(snapshotDir);
-    const snapshotStateDir = node_path_1.default.join(snapshotDir, "openclawd");
+    const snapshotStateDir = node_path_1.default.join(snapshotDir, "nemoclawd");
     if (!(0, node_fs_1.existsSync)(snapshotStateDir)) {
         logger.error(`Snapshot directory not found: ${snapshotStateDir}`);
         return false;
@@ -488,12 +488,12 @@ function restoreSnapshotToHost(snapshotDir, logger) {
         (0, node_fs_1.mkdirSync)(node_path_1.default.dirname(manifest.stateDir), { recursive: true });
         copyDirectory(snapshotStateDir, manifest.stateDir);
         if (manifest.hasExternalConfig && manifest.configPath) {
-            const configSnapshotPath = node_path_1.default.join(snapshotDir, "config", "openclawd.json");
+            const configSnapshotPath = node_path_1.default.join(snapshotDir, "config", "nemoclawd.json");
             (0, node_fs_1.mkdirSync)(node_path_1.default.dirname(manifest.configPath), { recursive: true });
             (0, node_fs_1.copyFileSync)(configSnapshotPath, manifest.configPath);
             logger.info(`Restored external config to ${manifest.configPath}`);
         }
-        logger.info("Host OpenClaw state restored.");
+        logger.info("Host Nemo Clawd state restored.");
         return true;
     }
     catch (err) {

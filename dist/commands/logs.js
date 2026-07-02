@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cliLogs = cliLogs;
 /**
- * `openclawd nemoclawd logs` — stream or tail blueprint execution and sandbox logs.
+ * `nemoclawd nemoclawd logs ` — stream or tail blueprint execution and sandbox logs.
  */
 const node_child_process_1 = require("node:child_process");
 const node_util_1 = require("node:util");
@@ -32,7 +32,7 @@ async function cliLogs(opts) {
     if (follow)
         args.push("-f");
     args.push("-n", String(lines));
-    args.push("/tmp/nemoclawd.log", "/tmp/openclawd.log");
+    args.push("/tmp/nemoclawd.log", "/tmp/nemoclawd.log");
     const proc = (0, node_child_process_1.spawn)("openshell", args, { stdio: ["ignore", "inherit", "inherit"] });
     await new Promise((resolve) => {
         proc.on("close", () => resolve());

@@ -1,4 +1,4 @@
-import type { PluginLogger, NemoClawConfig } from "../index.js";
+import type { PluginLogger, NemoClawdConfig } from "../index.js";
 export interface OnboardOptions {
     apiKey?: string;
     endpoint?: string;
@@ -6,7 +6,7 @@ export interface OnboardOptions {
     endpointUrl?: string;
     model?: string;
     logger: PluginLogger;
-    pluginConfig: NemoClawConfig;
+    pluginConfig: NemoClawdConfig;
 }
 export declare function cliOnboard(opts: OnboardOptions): Promise<void>;
 //# sourceMappingURL=onboard.d.ts.map

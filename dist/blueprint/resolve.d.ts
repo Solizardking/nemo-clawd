@@ -1,8 +1,8 @@
-import type { NemoClawConfig } from "../index.js";
+import type { NemoClawdConfig } from "../index.js";
 export interface BlueprintManifest {
     version: string;
     minOpenShellVersion: string;
-    minOpenClawVersion: string;
+    minNemoclawdVersion: string;
     profiles: string[];
     digest: string;
 }
@@ -16,5 +16,5 @@ export declare function getCacheDir(): string;
 export declare function getCachedBlueprintPath(version: string): string;
 export declare function isCached(version: string): boolean;
 export declare function readCachedManifest(version: string): BlueprintManifest | null;
-export declare function resolveBlueprint(config: NemoClawConfig): Promise<ResolvedBlueprint>;
+export declare function resolveBlueprint(config: NemoClawdConfig): Promise<ResolvedBlueprint>;
 //# sourceMappingURL=resolve.d.ts.map

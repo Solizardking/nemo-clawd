@@ -7,41 +7,56 @@ exports.default = register;
 const cli_js_1 = require("./cli.js");
 const slash_js_1 = require("./commands/slash.js");
 const config_js_1 = require("./onboard/config.js");
+const dflow_js_1 = require("./dflow.js");
 const DEFAULT_PLUGIN_CONFIG = {
     blueprintVersion: "latest",
     blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
-    sandboxName: "openclawd",
+    sandboxName: "nemoclawd",
     inferenceProvider: "nvidia",
+    spotTradingProvider: "dflow",
+    predictionMarketProvider: "dflow",
 };
+function readString(raw, key, fallback) {
+    return typeof raw[key] === "string" ? raw[key] : fallback;
+}
 function getPluginConfig(api) {
     const raw = api.pluginConfig ?? {};
     return {
-        blueprintVersion: typeof raw["blueprintVersion"] === "string"
-            ? raw["blueprintVersion"]
-            : DEFAULT_PLUGIN_CONFIG.blueprintVersion,
-        blueprintRegistry: typeof raw["blueprintRegistry"] === "string"
-            ? raw["blueprintRegistry"]
-            : DEFAULT_PLUGIN_CONFIG.blueprintRegistry,
-        sandboxName: typeof raw["sandboxName"] === "string"
-            ? raw["sandboxName"]
-            : DEFAULT_PLUGIN_CONFIG.sandboxName,
-        inferenceProvider: typeof raw["inferenceProvider"] === "string"
-            ? raw["inferenceProvider"]
-            : DEFAULT_PLUGIN_CONFIG.inferenceProvider,
+        blueprintVersion: readString(raw, "blueprintVersion", DEFAULT_PLUGIN_CONFIG.blueprintVersion),
+        blueprintRegistry: readString(raw, "blueprintRegistry", DEFAULT_PLUGIN_CONFIG.blueprintRegistry),
+        sandboxName: readString(raw, "sandboxName", DEFAULT_PLUGIN_CONFIG.sandboxName),
+        inferenceProvider: readString(raw, "inferenceProvider", DEFAULT_PLUGIN_CONFIG.inferenceProvider),
+        spotTradingProvider: readString(raw, "spotTradingProvider", DEFAULT_PLUGIN_CONFIG.spotTradingProvider),
+        predictionMarketProvider: readString(raw, "predictionMarketProvider", DEFAULT_PLUGIN_CONFIG.predictionMarketProvider),
+        dflowTradeApiUrl: readString(raw, "dflowTradeApiUrl"),
+        dflowTradeApiWsUrl: readString(raw, "dflowTradeApiWsUrl"),
+        dflowMetadataApiUrl: readString(raw, "dflowMetadataApiUrl"),
+        dflowMetadataApiWsUrl: readString(raw, "dflowMetadataApiWsUrl"),
+    };
+}
+function getDflowEnv(config) {
+    return {
+        ...process.env,
+        DFLOW_TRADE_API_URL: config.dflowTradeApiUrl ?? process.env.DFLOW_TRADE_API_URL,
+        DFLOW_TRADE_API_WS_URL: config.dflowTradeApiWsUrl ?? process.env.DFLOW_TRADE_API_WS_URL,
+        DFLOW_METADATA_API_URL: config.dflowMetadataApiUrl ?? process.env.DFLOW_METADATA_API_URL,
+        DFLOW_METADATA_API_WS_URL: config.dflowMetadataApiWsUrl ?? process.env.DFLOW_METADATA_API_WS_URL,
     };
 }
 // ---------------------------------------------------------------------------
 // Plugin entry point
 // ---------------------------------------------------------------------------
 function register(api) {
+    const pluginConfig = getPluginConfig(api);
+    const dflowRoutes = (0, dflow_js_1.resolveDflowRouteConfig)(getDflowEnv(pluginConfig));
     // 1. Register /nemoclawd slash command (chat interface)
     api.registerCommand({
         name: "nemoclawd",
-        description: "NemoClaw sandbox management (status, eject).",
+        description: "Nemo Clawd sandbox management (status, eject).",
         acceptsArgs: true,
         handler: (ctx) => (0, slash_js_1.handleSlashCommand)(ctx, api),
     });
-    // 2. Register `openclawd nemoclawd` CLI subcommands (commander.js)
+    // 2. Register `nemoclawd nemoclawd` CLI subcommands (commander.js)
     api.registerCli((cliCtx) => {
         (0, cli_js_1.registerCliCommands)(cliCtx, api);
     }, { commands: ["nemoclawd"] });
@@ -94,15 +109,44 @@ function register(api) {
             },
         ],
     });
+    api.registerProvider({
+        id: "dflow",
+        label: `DFlow Spot + Predictions (${dflowRoutes.mode})`,
+        docsPath: "https://pond.dflow.net",
+        aliases: ["dflow", "spot", "trading", "predictions", "prediction-markets"],
+        envVars: [
+            dflow_js_1.DFLOW_API_KEY_ENV,
+            "DFLOW_TRADE_API_URL",
+            "DFLOW_TRADE_API_WS_URL",
+            "DFLOW_METADATA_API_URL",
+            "DFLOW_METADATA_API_WS_URL",
+        ],
+        auth: [
+            {
+                type: "api-key",
+                envVar: dflow_js_1.DFLOW_API_KEY_ENV,
+                headerName: "x-api-key",
+                label: "DFlow API Key (DFLOW_API_KEY)",
+            },
+        ],
+    });
+    api.registerService({
+        id: "dflow-routing",
+        start: ({ logger }) => {
+            logger.info(`DFlow routing default: ${(0, dflow_js_1.describeDflowRouting)(dflowRoutes)}`);
+        },
+    });
     const bannerEndpoint = onboardCfg?.endpointType ?? "build.nvidia.com";
     const bannerModel = onboardCfg?.model ?? "nvidia/nemotron-3-super-120b-a12b";
+    const bannerTrading = `dflow ${dflowRoutes.mode}`;
     api.logger.info("");
     api.logger.info("  ┌─────────────────────────────────────────────────────┐");
-    api.logger.info("  │  NemoClaw registered                                │");
+    api.logger.info("  │  Nemo Clawd registered                                │");
     api.logger.info("  │                                                     │");
     api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(40)}│`);
     api.logger.info(`  │  Model:     ${bannerModel.padEnd(40)}│`);
-    api.logger.info("  │  Commands:  openclawd nemoclawd <command>             │");
+    api.logger.info(`  │  Trading:   ${bannerTrading.padEnd(40)}│`);
+    api.logger.info("  │  Commands:  nemoclawd nemoclawd <command>             │");
     api.logger.info("  └─────────────────────────────────────────────────────┘");
     api.logger.info("");
 }
