@@ -44,6 +44,8 @@ Sandbox Management
   nemoclawd <name> solana-stack  Start bundled Solana services
   nemoclawd <name> solana-agent  Start the Solana tracker bot
   nemoclawd <name> solana-bridge Start the Telegram/Solana bridge
+  nemoclawd <name> telegram-bot  Start the Telegram bot runtime
+  nemoclawd <name> payment-app   Start the Solana payment app
 
 Policy Presets
   nemoclawd policies list        List available network policy presets
