@@ -80,6 +80,46 @@ network_policies:
       - { path: /usr/local/bin/claude }
       - { path: /usr/local/bin/nemoclawd }
 
+  dflow:
+    name: dflow
+    endpoints:
+      - host: quote-api.dflow.net
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: GET, path: "/**" }
+          - allow: { method: POST, path: "/**" }
+      - host: dev-quote-api.dflow.net
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: GET, path: "/**" }
+          - allow: { method: POST, path: "/**" }
+      - host: prediction-markets-api.dflow.net
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: GET, path: "/**" }
+          - allow: { method: POST, path: "/**" }
+      - host: dev-prediction-markets-api.dflow.net
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        tls: terminate
+        rules:
+          - allow: { method: GET, path: "/**" }
+          - allow: { method: POST, path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/nemoclawd }
+      - { path: /usr/bin/node }
+      - { path: /usr/bin/curl }
+
   github:
     name: github
     endpoints:
@@ -95,8 +135,8 @@ network_policies:
 
   # ── Nemo Clawd "phone home" ────────────────────────────────────────────
   # Minimum viable set for Nemo Clawd to authenticate, discover plugins,
-  # and reach ClawHub. Binary-restricted to nemoclawd only.
-  # Docs access is read-only (GET). ClawHub and nemo-clawd.ai are
+  # and reach ClawdHub. Binary-restricted to nemoclawd only.
+  # Docs access is read-only (GET). ClawdHub and nemo-clawd.ai are
   # restricted to GET+POST (auth flows, plugin discovery).
 
   clawdhub:

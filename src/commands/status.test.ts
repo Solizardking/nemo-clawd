@@ -65,6 +65,8 @@ const defaultConfig: NemoClawdConfig = {
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
   inferenceProvider: "nvidia",
+  spotTradingProvider: "dflow",
+  predictionMarketProvider: "dflow",
 };
 
 /** Create a logger that captures all info() calls into an array. */

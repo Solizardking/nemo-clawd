@@ -1,9 +1,10 @@
 {
   "name": "@mawdbotsonsolana/nemoclawd",
   "version": "0.5.0",
-  "description": "nemoClawd — xAI Grok powered Solana agentic trading engine with $CLAWD token, 31 MCP tools, multi-agent research, and Telegram trading bot.",
+  "description": "nemoclawd - Solana-native agentic trading engine with DFlow spot/prediction routing, $CLAWD token support, MCP tools, and Telegram trading bot.",
   "license": "Apache-2.0",
   "keywords": [
+    "dflow",
     "solana",
     "pump-fun",
     "trading-bot",
@@ -105,10 +106,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/x402agent/Nemo Clawd.git"
+    "url": "git+https://github.com/x402agent/nemo-clawd.git"
   },
   "homepage": "https://nemo.nanosolana.com",
   "bugs": {
-    "url": "https://github.com/x402agent/Nemo Clawd/issues"
+    "url": "https://github.com/x402agent/nemo-clawd/issues"
   }
 }

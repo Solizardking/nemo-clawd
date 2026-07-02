@@ -11,6 +11,7 @@ profiles:
   - ncp
   - nim-local
   - vllm
+  - dflow
 
 description: |
   Nemo Clawd blueprint: orchestrates Nemo Clawd sandbox creation, migration,
@@ -53,6 +54,33 @@ components:
         model: "nvidia/nemotron-3-nano-30b-a3b"
         credential_env: "OPENAI_API_KEY"
         credential_default: "dummy"
+
+  trading:
+    default_provider: "dflow"
+    spot:
+      provider: "dflow"
+      credential_env: "DFLOW_API_KEY"
+      trade_api_url: "https://quote-api.dflow.net"
+      trade_api_ws_url: "wss://quote-api.dflow.net"
+      dev_trade_api_url: "https://dev-quote-api.dflow.net"
+      dev_trade_api_ws_url: "wss://dev-quote-api.dflow.net"
+      order_endpoint: "/order"
+      book_stream_endpoint: "/book-stream"
+      settlement_mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      direct_routes_only: true
+    predictions:
+      provider: "dflow"
+      credential_env: "DFLOW_API_KEY"
+      metadata_api_url: "https://prediction-markets-api.dflow.net"
+      metadata_api_ws_url: "wss://prediction-markets-api.dflow.net/api/v1/ws"
+      dev_metadata_api_url: "https://dev-prediction-markets-api.dflow.net"
+      dev_metadata_api_ws_url: "wss://dev-prediction-markets-api.dflow.net/api/v1/ws"
+      trade_api_url: "https://quote-api.dflow.net"
+      order_endpoint: "/order"
+      market_search_endpoint: "/api/v1/search"
+      markets_endpoint: "/api/v1/markets"
+      init_endpoint: "/prediction-market-init"
+      slippage_param: "predictionMarketSlippageBps"
 
   policy:
     base: "sandboxes/nemoclawd/policy.yaml"

@@ -6,6 +6,7 @@ import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 import type { PluginLogger, NemoClawdConfig } from "../index.js";
 import { loadState } from "../blueprint/state.js";
+import { resolveDflowRouteConfig } from "../dflow.js";
 
 const execAsync = promisify(exec);
 
@@ -26,10 +27,17 @@ export interface StatusOptions {
 }
 
 export async function cliStatus(opts: StatusOptions): Promise<void> {
-  const { json: jsonOutput, logger } = opts;
+  const { json: jsonOutput, logger, pluginConfig } = opts;
   const state = loadState();
   const sandboxName = state.sandboxName ?? "nemoclawd";
   const insideSandbox = isInsideSandbox();
+  const dflow = resolveDflowRouteConfig({
+    ...process.env,
+    DFLOW_TRADE_API_URL: pluginConfig.dflowTradeApiUrl ?? process.env.DFLOW_TRADE_API_URL,
+    DFLOW_TRADE_API_WS_URL: pluginConfig.dflowTradeApiWsUrl ?? process.env.DFLOW_TRADE_API_WS_URL,
+    DFLOW_METADATA_API_URL: pluginConfig.dflowMetadataApiUrl ?? process.env.DFLOW_METADATA_API_URL,
+    DFLOW_METADATA_API_WS_URL: pluginConfig.dflowMetadataApiWsUrl ?? process.env.DFLOW_METADATA_API_WS_URL,
+  });
 
   const [sandbox, inference] = await Promise.all([
     getSandboxStatus(sandboxName, insideSandbox),
@@ -47,6 +55,23 @@ export async function cliStatus(opts: StatusOptions): Promise<void> {
     },
     sandbox,
     inference,
+    routing: {
+      spot: {
+        provider: dflow.spot.provider,
+        endpoint: `${dflow.tradeApiUrl}${dflow.spot.orderEndpoint}`,
+        bookStream: `${dflow.tradeApiWsUrl}${dflow.spot.bookStreamEndpoint}`,
+        settlementMint: dflow.spot.settlementMint,
+      },
+      predictions: {
+        provider: dflow.predictions.provider,
+        metadataEndpoint: dflow.metadataApiUrl,
+        orderEndpoint: `${dflow.tradeApiUrl}${dflow.predictions.orderEndpoint}`,
+        slippageParam: dflow.predictions.slippageParam,
+      },
+      mode: dflow.mode,
+      apiKeyEnv: dflow.apiKeyEnv,
+      usesApiKey: dflow.usesApiKey,
+    },
     insideSandbox,
   };
 
@@ -102,6 +127,13 @@ export async function cliStatus(opts: StatusOptions): Promise<void> {
   } else {
     logger.info("  Not configured");
   }
+
+  logger.info("");
+  logger.info("Trading Routing:");
+  logger.info(`  Spot:         ${dflow.tradeApiUrl}${dflow.spot.orderEndpoint}`);
+  logger.info(`  Book stream:  ${dflow.tradeApiWsUrl}${dflow.spot.bookStreamEndpoint}`);
+  logger.info(`  Predictions:  ${dflow.metadataApiUrl} + ${dflow.tradeApiUrl}${dflow.predictions.orderEndpoint}`);
+  logger.info(`  Mode:         ${dflow.mode}${dflow.usesApiKey ? "" : " (DFLOW_API_KEY not set)"}`);
 
   if (state.migrationSnapshot) {
     logger.info("");

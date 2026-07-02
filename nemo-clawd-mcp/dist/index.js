@@ -1,5 +1,5 @@
 /**
- * nemoClawd MCP Server
+ * nemoclawd MCP Server
  *
  * xAI Grok powered Solana agentic tools with 31 MCP tools.
  * Connects to Helius RPC/DAS and xAI Grok API for autonomous trading.
@@ -22,7 +22,7 @@ function getJsonObject(value, key) {
 }
 // Create server
 const server = new Server({
-    name: "nemoClawd MCP Server",
+    name: "nemoclawd MCP Server",
     version: "0.1.0",
 }, {
     capabilities: {
@@ -795,6 +795,6 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
 // Start STDIO server (default entry point)
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("nemoClawd MCP Server running (stdio)");
+console.error("nemoclawd MCP Server running (stdio)");
 export { server };
 //# sourceMappingURL=index.js.map

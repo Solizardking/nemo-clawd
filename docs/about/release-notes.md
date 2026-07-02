@@ -24,7 +24,7 @@ Nemo Clawd is in active development and follows a frequent release cadence. Use 
 
 | Resource | Description |
 |---|---|
-| [Releases](https://github.com/x402agent/Nemo Clawd/releases) | Versioned release notes and downloadable assets. |
-| [Release comparison](https://github.com/x402agent/Nemo Clawd/compare) | Diff between any two tags or branches. |
-| [Merged pull requests](https://github.com/x402agent/Nemo Clawd/pulls?q=is%3Apr+is%3Amerged) | Individual changes with review discussion. |
-| [Commit history](https://github.com/x402agent/Nemo Clawd/commits/main) | Full commit log on `main`. |
+| [Releases](https://github.com/x402agent/nemo-clawd/releases) | Versioned release notes and downloadable assets. |
+| [Release comparison](https://github.com/x402agent/nemo-clawd/compare) | Diff between any two tags or branches. |
+| [Merged pull requests](https://github.com/x402agent/nemo-clawd/pulls?q=is%3Apr+is%3Amerged) | Individual changes with review discussion. |
+| [Commit history](https://github.com/x402agent/nemo-clawd/commits/main) | Full commit log on `main`. |

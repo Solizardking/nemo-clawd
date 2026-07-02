@@ -7,18 +7,20 @@
 # Prerequisites:
 #   - Docker running (Colima, Docker Desktop, or native)
 #   - openshell CLI installed (pip install openshell @ git+https://github.com/NVIDIA/OpenShell.git)
-#   - NVIDIA_API_KEY set in environment (from build.nvidia.com)
+#   - DFLOW_API_KEY optional for production DFlow spot/prediction routing
+#   - NVIDIA_API_KEY optional for NVIDIA-hosted inference
 #
 # Usage:
-#   export NVIDIA_API_KEY=nvapi-...
+#   export DFLOW_API_KEY=dflow-...        # optional; production DFlow routes
+#   export NVIDIA_API_KEY=nvapi-...       # optional; NVIDIA inference
 #   ./scripts/setup.sh
 #
 # What it does:
 #   1. Starts an OpenShell gateway (or reuses existing)
 #   2. Fixes CoreDNS for Colima environments
-#   3. Creates nvidia-nim provider (build.nvidia.com)
-#   4. Creates vllm-local provider (if vLLM is running)
-#   5. Sets inference route to nvidia-nim by default
+#   3. Configures DFlow as the default Solana spot/prediction route
+#   4. Creates nvidia-nim provider when NVIDIA_API_KEY is present
+#   5. Creates vllm-local provider (if vLLM is running)
 #   6. Builds and creates the Nemo Clawd sandbox
 #   7. Prints next steps
 
@@ -66,7 +68,25 @@ fi
 # Check prerequisites
 command -v openshell > /dev/null || fail "openshell CLI not found. Install the binary from https://github.com/NVIDIA/OpenShell/releases"
 command -v docker > /dev/null || fail "docker not found"
-[ -n "${NVIDIA_API_KEY:-}" ] || fail "NVIDIA_API_KEY not set. Get one from build.nvidia.com"
+
+if [ -n "${DFLOW_API_KEY:-}" ]; then
+  export DFLOW_TRADE_API_URL="${DFLOW_TRADE_API_URL:-https://quote-api.dflow.net}"
+  export DFLOW_TRADE_API_WS_URL="${DFLOW_TRADE_API_WS_URL:-wss://quote-api.dflow.net}"
+  export DFLOW_METADATA_API_URL="${DFLOW_METADATA_API_URL:-https://prediction-markets-api.dflow.net}"
+  export DFLOW_METADATA_API_WS_URL="${DFLOW_METADATA_API_WS_URL:-wss://prediction-markets-api.dflow.net/api/v1/ws}"
+else
+  warn "DFLOW_API_KEY not set; DFlow spot/prediction routing will use developer endpoints."
+  export DFLOW_TRADE_API_URL="${DFLOW_TRADE_API_URL:-https://dev-quote-api.dflow.net}"
+  export DFLOW_TRADE_API_WS_URL="${DFLOW_TRADE_API_WS_URL:-wss://dev-quote-api.dflow.net}"
+  export DFLOW_METADATA_API_URL="${DFLOW_METADATA_API_URL:-https://dev-prediction-markets-api.dflow.net}"
+  export DFLOW_METADATA_API_WS_URL="${DFLOW_METADATA_API_WS_URL:-wss://dev-prediction-markets-api.dflow.net/api/v1/ws}"
+fi
+
+if [ -z "${NVIDIA_API_KEY:-}" ]; then
+  warn "NVIDIA_API_KEY not set; skipping NVIDIA NIM provider setup."
+fi
+info "DFlow spot route: ${DFLOW_TRADE_API_URL}/order"
+info "DFlow prediction metadata: ${DFLOW_METADATA_API_URL}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -98,11 +118,13 @@ fi
 info "Setting up inference providers..."
 
 # nvidia-nim (build.nvidia.com)
-upsert_provider \
-  "nvidia-nim" \
-  "openai" \
-  "NVIDIA_API_KEY=$NVIDIA_API_KEY" \
-  "OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1"
+if [ -n "${NVIDIA_API_KEY:-}" ]; then
+  upsert_provider \
+    "nvidia-nim" \
+    "openai" \
+    "NVIDIA_API_KEY=$NVIDIA_API_KEY" \
+    "OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1"
+fi
 
 # vllm-local (if vLLM is installed or running)
 if curl -s http://localhost:8000/v1/models > /dev/null 2>&1 || python3 -c "import vllm" 2>/dev/null; then
@@ -134,9 +156,11 @@ if [ "$(uname -s)" = "Darwin" ]; then
   fi
 fi
 
-# 4b. Inference route — default to nvidia-nim
-info "Setting inference route to nvidia-nim / Nemotron 3 Super..."
-openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1
+# 4b. Inference route — use nvidia-nim when credentials are available.
+if [ -n "${NVIDIA_API_KEY:-}" ]; then
+  info "Setting inference route to nvidia-nim / Nemotron 3 Super..."
+  openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1
+fi
 
 # 5. Build and create sandbox
 info "Deleting old nemoclawd sandbox (if any)..."
@@ -162,9 +186,21 @@ fi
 # detect failures. The raw log is kept on failure for debugging.
 CREATE_LOG=$(mktemp /tmp/nemoclawd-create-XXXXXX.log)
 set +e
-openshell sandbox create --from "$BUILD_CTX/Dockerfile" --name nemoclawd \
-  --provider nvidia-nim \
-  -- env NVIDIA_API_KEY="$NVIDIA_API_KEY" > "$CREATE_LOG" 2>&1
+CREATE_ARGS=(openshell sandbox create --from "$BUILD_CTX/Dockerfile" --name nemoclawd)
+if [ -n "${NVIDIA_API_KEY:-}" ]; then
+  CREATE_ARGS+=(--provider nvidia-nim)
+fi
+SANDBOX_ENV=(
+  "DFLOW_API_KEY=${DFLOW_API_KEY:-}"
+  "DFLOW_TRADE_API_URL=${DFLOW_TRADE_API_URL}"
+  "DFLOW_TRADE_API_WS_URL=${DFLOW_TRADE_API_WS_URL}"
+  "DFLOW_METADATA_API_URL=${DFLOW_METADATA_API_URL}"
+  "DFLOW_METADATA_API_WS_URL=${DFLOW_METADATA_API_WS_URL}"
+)
+if [ -n "${NVIDIA_API_KEY:-}" ]; then
+  SANDBOX_ENV+=("NVIDIA_API_KEY=${NVIDIA_API_KEY}")
+fi
+"${CREATE_ARGS[@]}" -- env "${SANDBOX_ENV[@]}" > "$CREATE_LOG" 2>&1
 CREATE_RC=$?
 set -e
 rm -rf "$BUILD_CTX"

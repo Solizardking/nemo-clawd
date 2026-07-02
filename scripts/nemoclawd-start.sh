@@ -6,8 +6,11 @@
 # gateway inside the sandbox so the forwarded host port has a live upstream.
 #
 # Optional env:
-#   NVIDIA_API_KEY   API key for NVIDIA-hosted inference
-#   CHAT_UI_URL      Browser origin that will access the forwarded dashboard
+#   NVIDIA_API_KEY              API key for NVIDIA-hosted inference
+#   DFLOW_API_KEY                API key for production DFlow spot/prediction routing
+#   DFLOW_TRADE_API_URL          Override DFlow Trading API URL
+#   DFLOW_METADATA_API_URL       Override DFlow prediction metadata API URL
+#   CHAT_UI_URL                  Browser origin that will access the forwarded dashboard
 
 set -euo pipefail
 
@@ -17,6 +20,18 @@ PUBLIC_PORT=18789
 WORKSPACE_ROOT="${HOME:-/sandbox}/.nemoclawd/workspace"
 PUMPFUN_ROOT="/opt/pump-fun"
 SOLANA_RPC_URL="${SOLANA_RPC_URL:-https://rpc.solanatracker.io/public}"
+if [ -n "${DFLOW_API_KEY:-}" ]; then
+  : "${DFLOW_TRADE_API_URL:=https://quote-api.dflow.net}"
+  : "${DFLOW_TRADE_API_WS_URL:=wss://quote-api.dflow.net}"
+  : "${DFLOW_METADATA_API_URL:=https://prediction-markets-api.dflow.net}"
+  : "${DFLOW_METADATA_API_WS_URL:=wss://prediction-markets-api.dflow.net/api/v1/ws}"
+else
+  : "${DFLOW_TRADE_API_URL:=https://dev-quote-api.dflow.net}"
+  : "${DFLOW_TRADE_API_WS_URL:=wss://dev-quote-api.dflow.net}"
+  : "${DFLOW_METADATA_API_URL:=https://dev-prediction-markets-api.dflow.net}"
+  : "${DFLOW_METADATA_API_WS_URL:=wss://dev-prediction-markets-api.dflow.net/api/v1/ws}"
+fi
+export DFLOW_TRADE_API_URL DFLOW_TRADE_API_WS_URL DFLOW_METADATA_API_URL DFLOW_METADATA_API_WS_URL
 
 write_workspace_prompts() {
   mkdir -p "${WORKSPACE_ROOT}/pumpfun"
@@ -160,6 +175,42 @@ if os.path.exists(config_path):
 
 cfg.setdefault('agents', {}).setdefault('defaults', {}).setdefault('model', {})['primary'] = 'nvidia/nemotron-3-super-120b-a12b'
 
+dflow_key_present = bool(os.environ.get('DFLOW_API_KEY', '').strip())
+dflow_mode = 'production' if dflow_key_present else 'development'
+trading = cfg.setdefault('trading', {})
+trading['provider'] = 'dflow'
+trading['spot'] = {
+    'provider': 'dflow',
+    'credentialEnv': 'DFLOW_API_KEY',
+    'mode': dflow_mode,
+    'tradeApiUrl': os.environ.get('DFLOW_TRADE_API_URL'),
+    'tradeApiWsUrl': os.environ.get('DFLOW_TRADE_API_WS_URL'),
+    'orderEndpoint': '/order',
+    'bookStreamEndpoint': '/book-stream',
+    'settlementMint': os.environ.get('DFLOW_SETTLEMENT_MINT', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
+}
+trading['predictions'] = {
+    'provider': 'dflow',
+    'credentialEnv': 'DFLOW_API_KEY',
+    'mode': dflow_mode,
+    'metadataApiUrl': os.environ.get('DFLOW_METADATA_API_URL'),
+    'metadataApiWsUrl': os.environ.get('DFLOW_METADATA_API_WS_URL'),
+    'tradeApiUrl': os.environ.get('DFLOW_TRADE_API_URL'),
+    'orderEndpoint': '/order',
+    'marketSearchEndpoint': '/api/v1/search',
+    'marketsEndpoint': '/api/v1/markets',
+    'initEndpoint': '/prediction-market-init',
+    'slippageParam': 'predictionMarketSlippageBps',
+}
+
+env_vars = cfg.setdefault('env', {}).setdefault('vars', {})
+env_vars.update({
+    'DFLOW_TRADE_API_URL': os.environ.get('DFLOW_TRADE_API_URL', ''),
+    'DFLOW_TRADE_API_WS_URL': os.environ.get('DFLOW_TRADE_API_WS_URL', ''),
+    'DFLOW_METADATA_API_URL': os.environ.get('DFLOW_METADATA_API_URL', ''),
+    'DFLOW_METADATA_API_WS_URL': os.environ.get('DFLOW_METADATA_API_WS_URL', ''),
+})
+
 chat_ui_url = os.environ.get('CHAT_UI_URL', 'http://127.0.0.1:18789')
 parsed = urlparse(chat_ui_url)
 chat_origin = f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else 'http://127.0.0.1:18789'
@@ -300,6 +351,8 @@ echo 'Setting up Nemo Clawd...'
 write_auth_profile
 export CHAT_UI_URL PUBLIC_PORT
 fix_nemoclawd_config
+echo "[dflow] Spot route: ${DFLOW_TRADE_API_URL}/order"
+echo "[dflow] Prediction metadata: ${DFLOW_METADATA_API_URL}"
 write_workspace_prompts
 
 # ── Solana CLI configuration ──────────────────────────────────────

@@ -2,7 +2,7 @@
   "id": "nemoclawd",
   "name": "Nemo Clawd",
   "version": "0.1.0",
-  "description": "Migrate and run Nemo Clawd inside OpenShell with optional NIM-backed inference",
+  "description": "Migrate and run Nemo Clawd inside OpenShell with DFlow spot/prediction routing and optional NIM-backed inference",
   "configSchema": {
     "type": "object",
     "properties": {
@@ -25,6 +25,32 @@
         "type": "string",
         "description": "Default inference provider type (nvidia, vllm, openai-compatible)",
         "default": "nvidia"
+      },
+      "spotTradingProvider": {
+        "type": "string",
+        "description": "Default Solana spot trading route provider",
+        "default": "dflow"
+      },
+      "predictionMarketProvider": {
+        "type": "string",
+        "description": "Default Solana prediction market route provider",
+        "default": "dflow"
+      },
+      "dflowTradeApiUrl": {
+        "type": "string",
+        "description": "Override DFlow Trading API URL. Defaults to production when DFLOW_API_KEY is set, otherwise dev."
+      },
+      "dflowTradeApiWsUrl": {
+        "type": "string",
+        "description": "Override DFlow Trading websocket URL."
+      },
+      "dflowMetadataApiUrl": {
+        "type": "string",
+        "description": "Override DFlow prediction markets metadata API URL."
+      },
+      "dflowMetadataApiWsUrl": {
+        "type": "string",
+        "description": "Override DFlow prediction markets metadata websocket URL."
       }
     },
     "additionalProperties": false

@@ -83,7 +83,7 @@ Install the CLI and launch a sandboxed Nemo Clawd instance in a few commands.
 ```
 
 Run `nemoclawd doctor ` to validate your machine, or `nemoclawd --help` to view the full CLI reference.
-You can also clone the [Nemo Clawd repository](https://github.com/x402agent/Nemo Clawd) to explore the plugin source and blueprint.
+You can also clone the [Nemo Clawd repository](https://github.com/x402agent/nemo-clawd) to explore the plugin source and blueprint.
 
 Proceed to the [Quickstart](get-started/quickstart.md) for step-by-step instructions.
 

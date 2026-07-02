@@ -1,5 +1,5 @@
 <p align="center">
-  <strong>🦀 nemoClawd</strong><br/>
+  <strong>nemoclawd</strong><br/>
   <em>Solana x xAI Agentic Trading Engine — Powered by $CLAWD</em>
 </p>
 <p align="center">
@@ -7,7 +7,7 @@
 </p>
 <p align="center">
   <a href="https://www.npmjs.com/package/nemoclawd"><img src="https://img.shields.io/npm/v/nemoclawd.svg?style=flat-square&color=cb3837" alt="npm"></a>
-  <a href="https://github.com/x402agent/Nemo Clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
+  <a href="https://github.com/x402agent/nemo-clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/status-alpha-orange?style=flat-square" alt="Status">
   <img src="https://img.shields.io/badge/Solana-Mainnet-9945FF?style=flat-square&logo=solana&logoColor=white" alt="Solana">
   <img src="https://img.shields.io/badge/xAI-Grok%204.20-black?style=flat-square&logo=x" alt="xAI Grok">
@@ -19,7 +19,7 @@
 
 ## solana-clawd Integration
 
-**nemoClawd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
+**nemoclawd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
 
 ### What You Get
 
@@ -61,6 +61,17 @@ nemoclawd launch
 # Run demo walkthrough
 nemoclawd demo
 ```
+
+### DFlow Spot and Prediction Routing
+
+DFlow is the default Solana-native route for spot trading and prediction markets. Set `DFLOW_API_KEY` for production; without it, nemoclawd uses DFlow developer endpoints.
+
+```bash
+export DFLOW_API_KEY="your_dflow_key"
+nemoclawd dflow status
+```
+
+Spot swaps and prediction outcome-token orders both use DFlow's `/order` trading endpoint. Prediction market discovery uses the DFlow prediction metadata API.
 
 ### xAI Grok Setup
 
@@ -129,7 +140,7 @@ LEARN    → write INFERRED signals → Dream agent promotes to LEARNED
 
 ## Blockchain Buddies
 
-Every `nemoClawd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.
+Every `nemoclawd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.
 
 ```bash
 nemoclawd birth   # hatch yours now
@@ -183,7 +194,7 @@ Then connect via:
 ```
                      ┌─────────────────────────────────────────────────────┐
                      │                  ENTRY POINTS                       │
-                     │  nemoClawd CLI    MCP Server    Telegram Bot        │
+                     │  nemoclawd CLI    MCP Server    Telegram Bot        │
                      │  (interactive/   (stdio/HTTP)   60+ commands       │
                      │   one-shot)                                        │
                      └────────┬──────────┬────────────────┬────────────────┘
