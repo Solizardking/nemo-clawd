@@ -64,7 +64,7 @@ const defaultConfig: NemoClawdConfig = {
   blueprintVersion: "latest",
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
-  inferenceProvider: "nvidia",
+  inferenceProvider: "zai",
   spotTradingProvider: "dflow",
   predictionMarketProvider: "dflow",
 };

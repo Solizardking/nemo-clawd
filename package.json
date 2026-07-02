@@ -94,6 +94,8 @@
     "scripts/test-inference.sh",
     "scripts/walkthrough.sh",
     "scripts/write-auth-profile.py",
+    "scripts/nemoclawd-agent-registry.sh",
+    "scripts/telegram-bridge.js",
     "Dockerfile",
     ".dockerignore"
   ],

@@ -8,19 +8,21 @@
 #   - Docker running (Colima, Docker Desktop, or native)
 #   - openshell CLI installed (pip install openshell @ git+https://github.com/NVIDIA/OpenShell.git)
 #   - DFLOW_API_KEY optional for production DFlow spot/prediction routing
-#   - NVIDIA_API_KEY optional for NVIDIA-hosted inference
+#   - ZAI_API_KEY optional for ZAI GLM 5.2 inference
+#   - NVIDIA_API_KEY optional for NVIDIA-hosted fallback inference
 #
 # Usage:
 #   export DFLOW_API_KEY=dflow-...        # optional; production DFlow routes
-#   export NVIDIA_API_KEY=nvapi-...       # optional; NVIDIA inference
+#   export ZAI_API_KEY=zai-...           # optional; ZAI GLM 5.2 inference
+#   export NVIDIA_API_KEY=nvapi-...       # optional; NVIDIA fallback
 #   ./scripts/setup.sh
 #
 # What it does:
 #   1. Starts an OpenShell gateway (or reuses existing)
 #   2. Fixes CoreDNS for Colima environments
 #   3. Configures DFlow as the default Solana spot/prediction route
-#   4. Creates nvidia-nim provider when NVIDIA_API_KEY is present
-#   5. Creates vllm-local provider (if vLLM is running)
+#   4. Creates zai-glm provider when ZAI_API_KEY is present
+#   5. Creates nvidia-nim fallback and vllm-local providers when available
 #   6. Builds and creates the Nemo Clawd sandbox
 #   7. Prints next steps
 
@@ -82,8 +84,11 @@ else
   export DFLOW_METADATA_API_WS_URL="${DFLOW_METADATA_API_WS_URL:-wss://dev-prediction-markets-api.dflow.net/api/v1/ws}"
 fi
 
+if [ -z "${ZAI_API_KEY:-}" ]; then
+  warn "ZAI_API_KEY not set; GLM 5.2 provider setup will be skipped."
+fi
 if [ -z "${NVIDIA_API_KEY:-}" ]; then
-  warn "NVIDIA_API_KEY not set; skipping NVIDIA NIM provider setup."
+  warn "NVIDIA_API_KEY not set; skipping NVIDIA NIM fallback provider setup."
 fi
 info "DFlow spot route: ${DFLOW_TRADE_API_URL}/order"
 info "DFlow prediction metadata: ${DFLOW_METADATA_API_URL}"
@@ -117,7 +122,16 @@ fi
 # 3. Providers
 info "Setting up inference providers..."
 
-# nvidia-nim (build.nvidia.com)
+# zai-glm (ZAI GLM 5.2)
+if [ -n "${ZAI_API_KEY:-}" ]; then
+  upsert_provider \
+    "zai-glm" \
+    "openai" \
+    "ZAI_API_KEY=$ZAI_API_KEY" \
+    "OPENAI_BASE_URL=https://api.z.ai/api/paas/v4"
+fi
+
+# nvidia-nim (build.nvidia.com fallback)
 if [ -n "${NVIDIA_API_KEY:-}" ]; then
   upsert_provider \
     "nvidia-nim" \
@@ -156,8 +170,11 @@ if [ "$(uname -s)" = "Darwin" ]; then
   fi
 fi
 
-# 4b. Inference route — use nvidia-nim when credentials are available.
-if [ -n "${NVIDIA_API_KEY:-}" ]; then
+# 4b. Inference route — default to ZAI GLM 5.2, fallback to nvidia-nim.
+if [ -n "${ZAI_API_KEY:-}" ]; then
+  info "Setting inference route to zai-glm / GLM 5.2..."
+  openshell inference set --no-verify --provider zai-glm --model zai/glm-5.2 > /dev/null 2>&1
+elif [ -n "${NVIDIA_API_KEY:-}" ]; then
   info "Setting inference route to nvidia-nim / Nemotron 3 Super..."
   openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1
 fi
@@ -187,7 +204,9 @@ fi
 CREATE_LOG=$(mktemp /tmp/nemoclawd-create-XXXXXX.log)
 set +e
 CREATE_ARGS=(openshell sandbox create --from "$BUILD_CTX/Dockerfile" --name nemoclawd)
-if [ -n "${NVIDIA_API_KEY:-}" ]; then
+if [ -n "${ZAI_API_KEY:-}" ]; then
+  CREATE_ARGS+=(--provider zai-glm)
+elif [ -n "${NVIDIA_API_KEY:-}" ]; then
   CREATE_ARGS+=(--provider nvidia-nim)
 fi
 SANDBOX_ENV=(
@@ -196,6 +215,7 @@ SANDBOX_ENV=(
   "DFLOW_TRADE_API_WS_URL=${DFLOW_TRADE_API_WS_URL}"
   "DFLOW_METADATA_API_URL=${DFLOW_METADATA_API_URL}"
   "DFLOW_METADATA_API_WS_URL=${DFLOW_METADATA_API_WS_URL}"
+  "ZAI_API_KEY=${ZAI_API_KEY:-}"
 )
 if [ -n "${NVIDIA_API_KEY:-}" ]; then
   SANDBOX_ENV+=("NVIDIA_API_KEY=${NVIDIA_API_KEY}")

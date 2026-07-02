@@ -8,6 +8,7 @@ digest: ""  # Computed at release time
 
 profiles:
   - default
+  - zai
   - ncp
   - nim-local
   - vllm
@@ -27,10 +28,18 @@ components:
   inference:
     profiles:
       default:
-        provider_type: "nvidia"
-        provider_name: "nvidia-inference"
-        endpoint: "https://integrate.api.nvidia.com/v1"
-        model: "nvidia/nemotron-3-super-120b-a12b"
+        provider_type: "openai"
+        provider_name: "zai-glm"
+        endpoint: "https://api.z.ai/api/paas/v4"
+        model: "zai/glm-5.2"
+        credential_env: "ZAI_API_KEY"
+
+      zai:
+        provider_type: "openai"
+        provider_name: "zai-glm"
+        endpoint: "https://api.z.ai/api/paas/v4"
+        model: "zai/glm-5.2"
+        credential_env: "ZAI_API_KEY"
 
       ncp:
         provider_type: "nvidia"

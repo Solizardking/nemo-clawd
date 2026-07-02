@@ -6,7 +6,8 @@
 # gateway inside the sandbox so the forwarded host port has a live upstream.
 #
 # Optional env:
-#   NVIDIA_API_KEY              API key for NVIDIA-hosted inference
+#   ZAI_API_KEY                 API key for ZAI GLM 5.2 inference
+#   NVIDIA_API_KEY              API key for NVIDIA-hosted fallback inference
 #   DFLOW_API_KEY                API key for production DFlow spot/prediction routing
 #   DFLOW_TRADE_API_URL          Override DFlow Trading API URL
 #   DFLOW_METADATA_API_URL       Override DFlow prediction metadata API URL
@@ -173,7 +174,7 @@ if os.path.exists(config_path):
     with open(config_path) as f:
         cfg = json.load(f)
 
-cfg.setdefault('agents', {}).setdefault('defaults', {}).setdefault('model', {})['primary'] = 'nvidia/nemotron-3-super-120b-a12b'
+cfg.setdefault('agents', {}).setdefault('defaults', {}).setdefault('model', {})['primary'] = 'zai/glm-5.2'
 
 dflow_key_present = bool(os.environ.get('DFLOW_API_KEY', '').strip())
 dflow_mode = 'production' if dflow_key_present else 'development'
@@ -347,7 +348,7 @@ PYAUTOPAIR
 
 echo 'Setting up Nemo Clawd...'
  nemoclawd doctor --fix > /dev/null 2>&1 || true
- nemoclawd models set nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1 || true
+ nemoclawd models set zai/glm-5.2 > /dev/null 2>&1 || true
 write_auth_profile
 export CHAT_UI_URL PUBLIC_PORT
 fix_nemoclawd_config

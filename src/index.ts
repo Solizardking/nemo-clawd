@@ -154,7 +154,7 @@ const DEFAULT_PLUGIN_CONFIG: NemoClawdConfig = {
   blueprintVersion: "latest",
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
-  inferenceProvider: "nvidia",
+  inferenceProvider: "zai",
   spotTradingProvider: "dflow",
   predictionMarketProvider: "dflow",
 };
@@ -216,7 +216,34 @@ export default function register(api: NemoclawdPluginApi): void {
     { commands: ["nemoclawd"] },
   );
 
-  // 3. Register nvidia-nim provider — use onboard config if available
+  // 3. Register ZAI GLM default plus nvidia-nim fallback providers.
+
+  api.registerProvider({
+    id: "zai-glm",
+    label: "ZAI GLM 5.2",
+    docsPath: "https://z.ai",
+    aliases: ["zai", "glm", "glm-5.2"],
+    envVars: ["ZAI_API_KEY"],
+    models: {
+      chat: [
+        {
+          id: "zai/glm-5.2",
+          label: "GLM 5.2",
+          contextWindow: 131072,
+          maxOutput: 8192,
+        },
+      ],
+    },
+    auth: [
+      {
+        type: "bearer",
+        envVar: "ZAI_API_KEY",
+        headerName: "Authorization",
+        label: "ZAI API Key (ZAI_API_KEY)",
+      },
+    ],
+  });
+
   const onboardCfg = loadOnboardConfig();
   const providerCredentialEnv = onboardCfg?.credentialEnv ?? "NVIDIA_API_KEY";
   const providerLabel = onboardCfg
@@ -296,8 +323,8 @@ export default function register(api: NemoclawdPluginApi): void {
     },
   });
 
-  const bannerEndpoint = onboardCfg?.endpointType ?? "build.nvidia.com";
-  const bannerModel = onboardCfg?.model ?? "nvidia/nemotron-3-super-120b-a12b";
+  const bannerEndpoint = onboardCfg?.endpointType ?? "zai";
+  const bannerModel = onboardCfg?.model ?? "zai/glm-5.2";
   const bannerTrading = `dflow ${dflowRoutes.mode}`;
 
   api.logger.info("");

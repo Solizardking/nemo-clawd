@@ -23,8 +23,8 @@
       },
       "inferenceProvider": {
         "type": "string",
-        "description": "Default inference provider type (nvidia, vllm, openai-compatible)",
-        "default": "nvidia"
+        "description": "Default inference provider type (zai, nvidia, vllm, openai-compatible)",
+        "default": "zai"
       },
       "spotTradingProvider": {
         "type": "string",
