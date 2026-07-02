@@ -12,6 +12,7 @@ const { ROOT, SCRIPTS, run } = require("./lib/runner");
 const policies = require("./lib/policies");
 const solana = require("./lib/solana");
 const dflow = require("./lib/dflow");
+const magicRouter = require("./lib/magic-router");
 
 const pkg = require(path.join(ROOT, "package.json"));
 
@@ -27,6 +28,10 @@ Getting Started
 
 DFlow Routing
   nemoclawd dflow status         Show spot and prediction-market routing
+
+Magic Router
+  nemoclawd magic-router <task>  Pick provider/model/tools for a task
+  nemoclawd magic-router --json <task>
 
 Solana
   nemoclawd solana               Show Solana runtime overview
@@ -107,6 +112,26 @@ function printDflowStatus(jsonOutput = false) {
   console.log(`  Spot:        ${cfg.tradeApiUrl}${cfg.spot.orderEndpoint}`);
   console.log(`  Book stream: ${cfg.tradeApiWsUrl}${cfg.spot.bookStreamEndpoint}`);
   console.log(`  Predictions: ${cfg.metadataApiUrl} + ${cfg.tradeApiUrl}${cfg.predictions.orderEndpoint}`);
+}
+
+function printMagicRouter(args) {
+  const jsonOutput = args.includes("--json");
+  const task = args.filter((arg) => arg !== "--json").join(" ").trim();
+  const route = magicRouter.resolveMagicRouter(task, process.env);
+  if (jsonOutput) {
+    console.log(JSON.stringify(route, null, 2));
+    return;
+  }
+
+  console.log("Magic Router");
+  console.log(`  Task:      ${route.taskType}`);
+  console.log(`  Inference: ${route.inference.provider} / ${route.inference.model}`);
+  console.log(`  Key env:   ${route.inference.credentialEnv}${route.inference.available ? " (present)" : " (not set)"}`);
+  if (route.advisor) {
+    console.log(`  Advisor:   ${route.advisor.provider} / ${route.advisor.model}${route.advisor.available ? " (present)" : " (not set)"}`);
+  }
+  console.log(`  Tools:     ${route.toolSet.join(", ")}`);
+  console.log(`  DFlow:     spot=${route.dflow.spotTradingDefault} predictions=${route.dflow.predictionMarketDefault}`);
 }
 
 function solanaOverview() {
@@ -242,6 +267,10 @@ async function main() {
   }
   if (cmd === "dflow") {
     printDflowStatus(args.includes("--json"));
+    return;
+  }
+  if (cmd === "magic-router" || cmd === "magic") {
+    printMagicRouter(args.slice(1));
     return;
   }
   if (cmd === "solana") {
