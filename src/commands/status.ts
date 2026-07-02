@@ -4,7 +4,7 @@
 import { exec } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
-import type { PluginLogger, NemoClawConfig } from "../index.js";
+import type { PluginLogger, NemoClawddConfig } from "../index.js";
 import { loadState } from "../blueprint/state.js";
 
 const execAsync = promisify(exec);
@@ -22,7 +22,7 @@ function isInsideSandbox(): boolean {
 export interface StatusOptions {
   json: boolean;
   logger: PluginLogger;
-  pluginConfig: NemoClawConfig;
+  pluginConfig: NemoClawddConfig;
 }
 
 export async function cliStatus(opts: StatusOptions): Promise<void> {
@@ -55,7 +55,7 @@ export async function cliStatus(opts: StatusOptions): Promise<void> {
     return;
   }
 
-  logger.info("Nemo Clawd Status");
+  logger.info("Nemo Clawdd Status");
   logger.info("===============");
   logger.info("");
 
@@ -107,7 +107,7 @@ export async function cliStatus(opts: StatusOptions): Promise<void> {
     logger.info("");
     logger.info("Rollback:");
     logger.info(`  Snapshot:  ${state.migrationSnapshot}`);
-    logger.info("  Run 'nemo clawd nemoclawd eject ' to restore host installation.");
+    logger.info("  Run 'nemoclawdd nemoclawd eject ' to restore host installation.");
   }
 }
 

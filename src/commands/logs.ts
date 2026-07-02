@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * `nemo clawd nemoclawd logs ` — stream or tail blueprint execution and sandbox logs.
+ * `nemoclawdd nemoclawd logs ` — stream or tail blueprint execution and sandbox logs.
  */
 
 import { exec, spawn } from "node:child_process";
 import { promisify } from "node:util";
-import type { PluginLogger, NemoClawConfig } from "../index.js";
+import type { PluginLogger, NemoClawddConfig } from "../index.js";
 import { loadState } from "../blueprint/state.js";
 
 const execAsync = promisify(exec);
@@ -17,7 +17,7 @@ export interface LogsOptions {
   lines: number;
   runId?: string;
   logger: PluginLogger;
-  pluginConfig: NemoClawConfig;
+  pluginConfig: NemoClawddConfig;
 }
 
 export async function cliLogs(opts: LogsOptions): Promise<void> {
@@ -46,7 +46,7 @@ export async function cliLogs(opts: LogsOptions): Promise<void> {
   const args = ["sandbox", "connect", sandboxName, "--", "tail"];
   if (follow) args.push("-f");
   args.push("-n", String(lines));
-  args.push("/tmp/nemoclawd.log", "/tmp/nemo clawd.log");
+  args.push("/tmp/nemoclawd.log", "/tmp/nemoclawdd.log");
 
   const proc = spawn("openshell", args, { stdio: ["ignore", "inherit", "inherit"] });
 

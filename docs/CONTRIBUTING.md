@@ -1,6 +1,6 @@
-# Contributing to Nemo Clawd Documentation
+# Contributing to Nemo Clawdd Documentation
 
-This guide covers how to write, edit, and review documentation for Nemo Clawd. If you change code that affects user-facing behavior, update the relevant docs in the same PR.
+This guide covers how to write, edit, and review documentation for Nemo Clawdd. If you change code that affects user-facing behavior, update the relevant docs in the same PR.
 
 ## Use the Agent Skills
 
@@ -57,7 +57,7 @@ make docs-live
 ```yaml
 ---
 title:
-  page: "Nemo Clawd Page Title — Subtitle with Context"
+  page: "Nemo Clawdd Page Title — Subtitle with Context"
   nav: "Short Nav Title"
 description: "One-sentence summary of the page."
 keywords: ["primary keyword", "secondary keyword phrase"]
@@ -129,7 +129,7 @@ Use these consistently:
 | CLI | cli, Cli |
 | API key | api key, API Key |
 | NVIDIA | Nvidia, nvidia |
-| Nemo Clawd | nemo clawd (in prose), nemoclawd (CLI/package), Nemo Clawd (Title) |
+| Nemo Clawdd | nemoclawdd (in prose), nemoclawd (CLI/package), Nemo Clawdd (Title) |
 | OpenShell | Open Shell, openShell, Openshell, openshell |
 | mTLS | MTLS, mtls |
 | YAML | yaml, Yaml |

@@ -1,8 +1,8 @@
 ---
 title:
-  page: "Nemo Clawd License — Apache 2.0"
+  page: "Nemo Clawdd License — Apache 2.0"
   nav: "License"
-description: "Apache 2.0 license for the Nemo Clawd project."
+description: "Apache 2.0 license for the Nemo Clawdd project."
 keywords: ["nemoclawd license", "nemoclawd apache 2.0"]
 topics: ["generative_ai"]
 tags: ["nemoclawd", "licensing"]
@@ -20,7 +20,7 @@ status: published
 
 # License
 
-Nemo Clawd is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Nemo Clawdd is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 ```text
 Copyright 2026 NVIDIA Corporation
@@ -38,4 +38,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-See the full license text in the [LICENSE](https://github.com/x402agent/Nemo Clawd/blob/main/LICENSE) file.
+See the full license text in the [LICENSE](https://github.com/x402agent/Nemo Clawdd/blob/main/LICENSE) file.

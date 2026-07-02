@@ -1,8 +1,8 @@
 ---
 title:
-  page: "Nemo Clawd CLI Commands Reference"
+  page: "Nemo Clawdd CLI Commands Reference"
   nav: "Commands"
-description: "Full CLI reference for plugin and standalone Nemo Clawd commands."
+description: "Full CLI reference for plugin and standalone Nemo Clawdd commands."
 keywords: ["nemoclawd cli commands", "nemoclawd command reference", "solana agent cli", "privy wallet"]
 topics: ["generative_ai", "ai_agents", "solana"]
 tags: ["nemoclawd", "openshell", "nemoclawd", "cli", "solana", "pump-fun", "privy"]
@@ -20,8 +20,8 @@ status: published
 
 # Commands
 
-Nemo Clawd provides two command interfaces.
-The plugin commands run under the `nemoclawd` namespace inside the Nemo Clawd CLI.
+Nemo Clawdd provides two command interfaces.
+The plugin commands run under the `nemoclawd` namespace inside the Nemo Clawdd CLI.
 The standalone `nemoclawd` binary handles host-side setup, deployment, Solana integration, and service management.
 Both interfaces are installed when you run `npm install -g @mawdbotsonsolana/nemoclawd`.
 
@@ -82,7 +82,7 @@ $ nemoclawd onboard
 3. Create sandbox (builds Docker image with Solana CLI + Pump-Fun SDK)
 4. Configure inference (NIM / NVIDIA Cloud / Ollama / vLLM)
 5. Set up inference provider
-6. Set up Nemo Clawd inside sandbox
+6. Set up Nemo Clawdd inside sandbox
 7. **Solana & Wallet Configuration** — RPC URL, Privy agentic wallet, Pump-Fun token
 8. **Solana test-validator** — optional local validator with cloned Pump programs
 9. Policy presets (auto-detects solana-rpc, pumpfun, privy, telegram)
@@ -91,8 +91,8 @@ $ nemoclawd onboard
 
 ### `nemoclawd launch `
 
-Bootstrap Nemo Clawd inside an OpenShell sandbox.
-If Nemo Clawd detects an existing host installation, `launch` stops unless you pass `--force`.
+Bootstrap Nemo Clawdd inside an OpenShell sandbox.
+If Nemo Clawdd detects an existing host installation, `launch` stops unless you pass `--force`.
 
 ```console
 $ nemoclawd launch [--force] [--profile <profile>]
@@ -100,7 +100,7 @@ $ nemoclawd launch [--force] [--profile <profile>]
 
 `--force`
 : Skip the ergonomics warning and force plugin-driven bootstrap. Without this flag,
-  Nemo Clawd recommends using `openshell sandbox create` directly for new installs.
+  Nemo Clawdd recommends using `openshell sandbox create` directly for new installs.
 
 `--profile <profile>`
 : Blueprint profile to use. Default: `default`.
@@ -156,7 +156,7 @@ This launches the bundled Solana operator stack inside the sandbox:
 - realtime websocket relay
 - wallet heartbeat and vault logging
 
-If no sandbox exists yet, Nemo Clawd runs `onboard` first and then starts the stack.
+If no sandbox exists yet, Nemo Clawdd runs `onboard` first and then starts the stack.
 
 #### `nemoclawd wallet [create|list|status]`
 
@@ -251,9 +251,9 @@ $ nemoclawd my-assistant solana-bridge
 ```
 
 **Required env:** `TELEGRAM_BOT_TOKEN`
-**Optional env:** `SOLANA_RPC_URL`, `SOLANA_WS_URL`, `HELIUS_API_KEY`, `DEVELOPER_WALLET`, `AGENT_TOKEN_MINT_ADDRESS`, `TELEGRAM_NOTIFY_CHAT_IDS`, `PRIVY_APP_ID`, `NEMOCLAW_VAULT_DIR`, `HEARTBEAT_SECONDS`, `MIN_WALLET_SOL`, `STOP_BALANCE_SOL`
+**Optional env:** `SOLANA_RPC_URL`, `SOLANA_WS_URL`, `HELIUS_API_KEY`, `DEVELOPER_WALLET`, `AGENT_TOKEN_MINT_ADDRESS`, `TELEGRAM_NOTIFY_CHAT_IDS`, `PRIVY_APP_ID`, `NEMOCLAWD_VAULT_DIR`, `HEARTBEAT_SECONDS`, `MIN_WALLET_SOL`, `STOP_BALANCE_SOL`
 
-The bridge is broadcast-oriented and is designed to coexist with the main Pump-Fun Telegram bot without polling conflicts. It pushes narrated wallet activity to `TELEGRAM_NOTIFY_CHAT_IDS`, records heartbeat snapshots and wallet activity to the Nemo Clawd vault, and marks funded or protection state from wallet balance thresholds while the primary bot continues handling interactive commands.
+The bridge is broadcast-oriented and is designed to coexist with the main Pump-Fun Telegram bot without polling conflicts. It pushes narrated wallet activity to `TELEGRAM_NOTIFY_CHAT_IDS`, records heartbeat snapshots and wallet activity to the Nemo Clawdd vault, and marks funded or protection state from wallet balance thresholds while the primary bot continues handling interactive commands.
 
 #### `nemoclawd <name> telegram-bot`
 
@@ -356,7 +356,7 @@ $ nemoclawd status
 
 #### `nemoclawd setup-spark`
 
-Set up Nemo Clawd on DGX Spark (cgroup v2 + Docker fixes for Ubuntu 24.04).
+Set up Nemo Clawdd on DGX Spark (cgroup v2 + Docker fixes for Ubuntu 24.04).
 
 ```console
 $ sudo nemoclawd setup-spark
@@ -394,7 +394,7 @@ $ helius                                  # Helius RPC CLI tools
 
 ### Privy Agentic Wallet
 
-The Privy skill is available to the Nemo Clawd agent inside the sandbox.
+The Privy skill is available to the Nemo Clawdd agent inside the sandbox.
 Ask the agent to:
 
 - "Create a Solana wallet for me using Privy"

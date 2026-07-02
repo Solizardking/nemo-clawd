@@ -2,10 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawd curl-pipe-bash installer.
+# Nemo Clawdd curl-pipe-bash installer.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/x402agent/Nemo Clawd/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/x402agent/Nemo Clawdd/main/scripts/install.sh | bash
 
 set -euo pipefail
 
@@ -46,7 +46,7 @@ refresh_path() {
 MIN_NODE_MAJOR=20
 MIN_NPM_MAJOR=10
 RECOMMENDED_NODE_MAJOR=22
-RUNTIME_REQUIREMENT_MSG="Nemo Clawd requires Node.js >=${MIN_NODE_MAJOR} and npm >=${MIN_NPM_MAJOR} (recommended Node.js ${RECOMMENDED_NODE_MAJOR})."
+RUNTIME_REQUIREMENT_MSG="Nemo Clawdd requires Node.js >=${MIN_NODE_MAJOR} and npm >=${MIN_NPM_MAJOR} (recommended Node.js ${RECOMMENDED_NODE_MAJOR})."
 
 OS="$(uname -s)"
 ARCH="$(uname -m)"
@@ -264,7 +264,7 @@ install_openshell() {
 
 install_openshell
 
-# ── Install Nemo Clawd CLI ─────────────────────────────────────────
+# ── Install Nemo Clawdd CLI ─────────────────────────────────────────
 
 NPM_PACKAGE="@mawdbotsonsolana/nemoclawd"
 info "Installing ${NPM_PACKAGE}..."

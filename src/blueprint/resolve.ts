@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type { NemoClawConfig } from "../index.js";
+import type { NemoClawddConfig } from "../index.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fetchBlueprint } from "./fetch.js";
@@ -59,7 +59,7 @@ function parseManifestHeader(raw: string): BlueprintManifest {
   };
 }
 
-export async function resolveBlueprint(config: NemoClawConfig): Promise<ResolvedBlueprint> {
+export async function resolveBlueprint(config: NemoClawddConfig): Promise<ResolvedBlueprint> {
   const version = config.blueprintVersion;
 
   // Check local cache first

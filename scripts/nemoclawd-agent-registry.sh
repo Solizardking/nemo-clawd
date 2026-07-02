@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nemo Clawd Agent Registry — Launch Script
+# Nemo Clawdd Agent Registry — Launch Script
 #
 # Registers the agent with 8004 Solana Agent Registry and Pump.fun,
 # then enters a heartbeat loop for uptime/liveness feedback.
@@ -20,7 +20,7 @@ export HEARTBEAT_INTERVAL_SECONDS="${HEARTBEAT_INTERVAL_SECONDS:-60}"
 export HEARTBEAT_ENABLED="${HEARTBEAT_ENABLED:-true}"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[agent-registry] Nemo Clawd Agent Registry + Heartbeat"
+echo "[agent-registry] Nemo Clawdd Agent Registry + Heartbeat"
 echo "[agent-registry] RPC: ${SOLANA_RPC_URL}"
 echo "[agent-registry] Heartbeat: ${HEARTBEAT_INTERVAL_SECONDS}s"
 echo "[agent-registry] Wallet: ${DEVELOPER_WALLET:-not-configured}"

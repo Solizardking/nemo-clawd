@@ -1,8 +1,8 @@
 ---
 title:
-  page: "Set Up the Nemo Clawd Telegram Bridge for Remote Agent Chat"
+  page: "Set Up the Nemo Clawdd Telegram Bridge for Remote Agent Chat"
   nav: "Set Up Telegram Bridge"
-description: "Forward messages between Telegram and the sandboxed Nemo Clawd agent."
+description: "Forward messages between Telegram and the sandboxed Nemo Clawdd agent."
 keywords: ["nemoclawd telegram bridge", "telegram bot nemoclawd agent"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "telegram", "deployment", "nemoclawd"]
@@ -20,12 +20,12 @@ status: published
 
 # Set Up the Telegram Bridge
 
-Forward messages between a Telegram bot and the Nemo Clawd agent running inside the sandbox.
+Forward messages between a Telegram bot and the Nemo Clawdd agent running inside the sandbox.
 The Telegram bridge is an auxiliary service managed by `nemoclawd start `.
 
 ## Prerequisites
 
-- A running Nemo Clawd sandbox, either local or remote.
+- A running Nemo Clawdd sandbox, either local or remote.
 - A Telegram bot token from [BotFather](https://t.me/BotFather).
 
 ## Create a Telegram Bot
@@ -69,7 +69,7 @@ The output shows the status of all auxiliary services.
 ## Send a Message
 
 Open Telegram, find your bot, and send a message.
-The bridge forwards the message to the Nemo Clawd agent inside the sandbox and returns the agent response.
+The bridge forwards the message to the Nemo Clawdd agent inside the sandbox and returns the agent response.
 
 ## Restrict Access by Chat ID
 
@@ -90,5 +90,5 @@ $ nemoclawd stop
 
 ## Related Topics
 
-- [Deploy Nemo Clawd to a Remote GPU Instance](deploy-to-remote-gpu.md) for remote deployment with Telegram support.
+- [Deploy Nemo Clawdd to a Remote GPU Instance](deploy-to-remote-gpu.md) for remote deployment with Telegram support.
 - [Commands](../reference/commands.md) for the full `start` and `stop` command reference.

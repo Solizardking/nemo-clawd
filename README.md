@@ -1,5 +1,5 @@
 <p align="center">
-  <strong>🦀 nemoClawd</strong><br/>
+  <strong>🦀 nemoClawdd</strong><br/>
   <em>Solana x xAI Agentic Trading Engine — Powered by $CLAWD</em>
 </p>
 <p align="center">
@@ -7,7 +7,7 @@
 </p>
 <p align="center">
   <a href="https://www.npmjs.com/package/nemoclawd"><img src="https://img.shields.io/npm/v/nemoclawd.svg?style=flat-square&color=cb3837" alt="npm"></a>
-  <a href="https://github.com/x402agent/Nemo Clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
+  <a href="https://github.com/x402agent/Nemo Clawdd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/status-alpha-orange?style=flat-square" alt="Status">
   <img src="https://img.shields.io/badge/Solana-Mainnet-9945FF?style=flat-square&logo=solana&logoColor=white" alt="Solana">
   <img src="https://img.shields.io/badge/xAI-Grok%204.20-black?style=flat-square&logo=x" alt="xAI Grok">
@@ -19,7 +19,7 @@
 
 ## solana-clawd Integration
 
-**nemoClawd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
+**nemoClawdd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
 
 ### What You Get
 
@@ -129,7 +129,7 @@ LEARN    → write INFERRED signals → Dream agent promotes to LEARNED
 
 ## Blockchain Buddies
 
-Every `nemoClawd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.
+Every `nemoClawdd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.
 
 ```bash
 nemoclawd birth   # hatch yours now
@@ -183,7 +183,7 @@ Then connect via:
 ```
                      ┌─────────────────────────────────────────────────────┐
                      │                  ENTRY POINTS                       │
-                     │  nemoClawd CLI    MCP Server    Telegram Bot        │
+                     │  nemoClawdd CLI    MCP Server    Telegram Bot        │
                      │  (interactive/   (stdio/HTTP)   60+ commands       │
                      │   one-shot)                                        │
                      └────────┬──────────┬────────────────┬────────────────┘

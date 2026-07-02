@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
-# Nemo Clawd Fly.io entrypoint — boots the wrapper server which manages
-# the Nemo Clawd gateway, setup wizard, and reverse proxy.
+# Nemo Clawdd Fly.io entrypoint — boots the wrapper server which manages
+# the Nemo Clawdd gateway, setup wizard, and reverse proxy.
 
 set -euo pipefail
 
@@ -9,7 +9,7 @@ DATA_DIR="${DATA_DIR:-/data}"
 export DATA_DIR
 
 echo "============================================"
-echo "  Nemo Clawd on Fly.io"
+echo "  Nemo Clawdd on Fly.io"
 echo "============================================"
 
 # Ensure data directory structure
@@ -19,9 +19,9 @@ mkdir -p "${DATA_DIR}/.nemoclawd/agents/main/agent" \
          "${DATA_DIR}/.nemoclawd/vault"
 chmod 700 "${DATA_DIR}/.nemoclawd/wallets" 2>/dev/null || true
 
-# If the Nemo Clawd config doesn't exist yet, write a sensible default
+# If the Nemo Clawdd config doesn't exist yet, write a sensible default
 if [ ! -f "${DATA_DIR}/.nemoclawd/nemoclawd.json" ]; then
-  echo "[entrypoint] Writing default Nemo Clawd config..."
+  echo "[entrypoint] Writing default Nemo Clawdd config..."
   python3 -c "
 import json, os
 cfg = {
@@ -43,8 +43,8 @@ os.chmod(path, 0o600)
 "
 fi
 
-# Pre-install Nemo Clawd plugin if not already present
-if command -v nemo clawd &>/dev/null; then
+# Pre-install Nemo Clawdd plugin if not already present
+if command -v nemoclawdd &>/dev/null; then
   HOME="${DATA_DIR}" nemoclawd doctor --fix > /dev/null 2>&1 || true
   HOME="${DATA_DIR}" nemoclawd plugins install /opt/nemoclawd > /dev/null 2>&1 || true
 fi
@@ -55,14 +55,14 @@ if [ ! -f "${DATA_DIR}/nemoclawd.json" ]; then
   PROVIDER=""
   API_KEY=""
 
-  case "${NEMOCLAW_AUTH_CHOICE:-}" in
-    anthropic) PROVIDER="anthropic"; API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    openai)    PROVIDER="openai";    API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    nvidia)    PROVIDER="nvidia";    API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    gemini)    PROVIDER="gemini";    API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    openrouter) PROVIDER="openrouter"; API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    moonshot)  PROVIDER="moonshot";  API_KEY="${NEMOCLAW_API_KEY:-}" ;;
-    minimax)   PROVIDER="minimax";   API_KEY="${NEMOCLAW_API_KEY:-}" ;;
+  case "${NEMOCLAWD_AUTH_CHOICE:-}" in
+    anthropic) PROVIDER="anthropic"; API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    openai)    PROVIDER="openai";    API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    nvidia)    PROVIDER="nvidia";    API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    gemini)    PROVIDER="gemini";    API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    openrouter) PROVIDER="openrouter"; API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    moonshot)  PROVIDER="moonshot";  API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
+    minimax)   PROVIDER="minimax";   API_KEY="${NEMOCLAWD_API_KEY:-}" ;;
   esac
 
   if [ -n "${PROVIDER}" ] && [ -n "${API_KEY}" ]; then
@@ -71,11 +71,11 @@ if [ ! -f "${DATA_DIR}/nemoclawd.json" ]; then
 import json, os
 cfg = {
   'provider': '${PROVIDER}',
-  'apiKey': os.environ.get('NEMOCLAW_API_KEY', ''),
-  'telegramToken': os.environ.get('NEMOCLAW_TELEGRAM_TOKEN', ''),
-  'discordToken': os.environ.get('NEMOCLAW_DISCORD_TOKEN', ''),
-  'slackBotToken': os.environ.get('NEMOCLAW_SLACK_BOT_TOKEN', ''),
-  'slackAppToken': os.environ.get('NEMOCLAW_SLACK_APP_TOKEN', ''),
+  'apiKey': os.environ.get('NEMOCLAWD_API_KEY', ''),
+  'telegramToken': os.environ.get('NEMOCLAWD_TELEGRAM_TOKEN', ''),
+  'discordToken': os.environ.get('NEMOCLAWD_DISCORD_TOKEN', ''),
+  'slackBotToken': os.environ.get('NEMOCLAWD_SLACK_BOT_TOKEN', ''),
+  'slackAppToken': os.environ.get('NEMOCLAWD_SLACK_APP_TOKEN', ''),
   'solanaRpcUrl': os.environ.get('SOLANA_RPC_URL', ''),
   'privyAppId': os.environ.get('PRIVY_APP_ID', ''),
   'privyAppSecret': os.environ.get('PRIVY_APP_SECRET', ''),

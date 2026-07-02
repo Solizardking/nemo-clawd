@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { NemoClawState } from "../blueprint/state.js";
-import type { PluginLogger, NemoClawConfig } from "../index.js";
+import type { NemoClawdState } from "../blueprint/state.js";
+import type { PluginLogger, NemoClawddConfig } from "../index.js";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -34,7 +34,7 @@ const { cliStatus } = await import("./status.js");
 // Helpers
 // ---------------------------------------------------------------------------
 
-function blankState(): NemoClawState {
+function blankState(): NemoClawdState {
   return {
     lastRunId: null,
     lastAction: null,
@@ -47,7 +47,7 @@ function blankState(): NemoClawState {
   };
 }
 
-function populatedState(): NemoClawState {
+function populatedState(): NemoClawdState {
   return {
     lastRunId: "run-a1b2c3d4",
     lastAction: "migrate",
@@ -60,7 +60,7 @@ function populatedState(): NemoClawState {
   };
 }
 
-const defaultConfig: NemoClawConfig = {
+const defaultConfig: NemoClawddConfig = {
   blueprintVersion: "latest",
   blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
   sandboxName: "nemoclawd",
@@ -180,7 +180,7 @@ describe("cliStatus", () => {
       const output = lines.join("\n");
       expect(output).toContain("Status:  running");
       expect(output).toContain("Uptime:  2h 14m");
-      expect(output).toContain("Name:    nemo clawd");
+      expect(output).toContain("Name:    nemoclawdd");
       expect(output).not.toContain("inside sandbox");
     });
 
@@ -339,7 +339,7 @@ describe("cliStatus", () => {
       const output = lines.join("\n");
       expect(output).toContain("Rollback:");
       expect(output).toContain("Snapshot:  /root/.nemoclawd/snapshots/pre-migrate.tar.gz");
-      expect(output).toContain("nemo clawd nemoclawd eject ");
+      expect(output).toContain("nemoclawdd nemoclawd eject ");
     });
 
     it("JSON includes full nemoclawd state alongside insideSandbox: true", async () => {
@@ -386,7 +386,7 @@ describe("cliStatus", () => {
       );
     });
 
-    it("defaults sandbox name to 'nemo clawd' when state has none", async () => {
+    it("defaults sandbox name to 'nemoclawdd' when state has none", async () => {
       mockExec({
         "sandbox status": new Error("not found"),
         "inference get": new Error("not configured"),

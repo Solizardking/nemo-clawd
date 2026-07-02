@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Switch Nemo Clawd Inference Models at Runtime"
+  page: "Switch Nemo Clawdd Inference Models at Runtime"
   nav: "Switch Inference Models"
 description: "Change the active inference model without restarting the sandbox."
 keywords: ["switch nemoclawd inference model", "change inference runtime"]
@@ -25,7 +25,7 @@ No restart is required.
 
 ## Prerequisites
 
-- A running Nemo Clawd sandbox.
+- A running Nemo Clawdd sandbox.
 - The OpenShell CLI on your `PATH`.
 
 ## Switch to a Different Model

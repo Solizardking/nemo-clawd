@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent / "_ext"))
 
-project = "NVIDIA Nemo Clawd Developer Guide"
+project = "NVIDIA Nemo Clawdd Developer Guide"
 this_year = date.today().year
 copyright = f"2025-{this_year}, NVIDIA Corporation"
 author = "NVIDIA Corporation"
@@ -98,7 +98,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/x402agent/Nemo Clawd",
+            "url": "https://github.com/x402agent/Nemo Clawdd",
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         },

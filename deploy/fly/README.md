@@ -1,6 +1,6 @@
-# Deploy Nemo Clawd on Fly.io
+# Deploy Nemo Clawdd on Fly.io
 
-To deploy Nemo Clawd to Fly.io, run the deploy script from the repo root. It handles everything — app creation, volumes, secrets, and deployment.
+To deploy Nemo Clawdd to Fly.io, run the deploy script from the repo root. It handles everything — app creation, volumes, secrets, and deployment.
 
 ```bash
 cd /path/to/nemoclawd
@@ -9,16 +9,16 @@ bash deploy/fly/deploy.sh
 
 You'll need `flyctl` installed, a Fly.io account (free trial works), and an LLM API key (Anthropic, OpenAI, NVIDIA, Google Gemini, OpenRouter, Moonshot AI, or MiniMax).
 
-## What is Nemo Clawd?
+## What is Nemo Clawdd?
 
-Nemo Clawd is a one-shot Solana developer agent with Pump-Fun tooling, Privy agentic wallets, and a Telegram-native operator stack. It runs on top of Nemo Clawd as a persistent AI gateway reachable from Discord, Telegram, Slack, or your local CLI.
+Nemo Clawdd is a one-shot Solana developer agent with Pump-Fun tooling, Privy agentic wallets, and a Telegram-native operator stack. It runs on top of Nemo Clawdd as a persistent AI gateway reachable from Discord, Telegram, Slack, or your local CLI.
 
 ## How it works
 
-The deploy script sets up a wrapper server that manages the Nemo Clawd gateway and provides a browser-based setup wizard:
+The deploy script sets up a wrapper server that manages the Nemo Clawdd gateway and provides a browser-based setup wizard:
 
 ```
-Internet → Fly.io proxy → Wrapper server (:3000) → Nemo Clawd gateway (:18789)
+Internet → Fly.io proxy → Wrapper server (:3000) → Nemo Clawdd gateway (:18789)
                               ├── /setup      → Setup wizard (password-protected)
                               ├── /healthz    → Health check (no auth)
                               └── /*          → Proxied to gateway
@@ -60,7 +60,7 @@ Visit `https://your-app.fly.dev/setup` in your browser. Log in with any username
 - Change your LLM provider and API key
 - Configure Solana RPC, Helius, and Privy wallet credentials
 - Add or update Discord, Telegram, and Slack channel connections
-- Edit the raw Nemo Clawd config
+- Edit the raw Nemo Clawdd config
 - View gateway logs
 - Export and import configuration backups
 
@@ -82,13 +82,13 @@ All sensitive values are stored as Fly secrets, encrypted at rest and injected a
 | Secret | Required | Description |
 |--------|----------|-------------|
 | `SETUP_PASSWORD` | Yes | Protects the `/setup` wizard |
-| `NEMOCLAW_GATEWAY_TOKEN` | Yes | Auth token for gateway connections (auto-generated) |
-| `NEMOCLAW_API_KEY` | Yes | Your LLM provider API key |
-| `NEMOCLAW_AUTH_CHOICE` | Yes | Provider identifier (set by deploy script) |
-| `NEMOCLAW_DISCORD_TOKEN` | No | Discord bot token |
-| `NEMOCLAW_TELEGRAM_TOKEN` | No | Telegram bot token |
-| `NEMOCLAW_SLACK_BOT_TOKEN` | No | Slack bot token (`xoxb-...`) |
-| `NEMOCLAW_SLACK_APP_TOKEN` | No | Slack app token (`xapp-...`) |
+| `NEMOCLAWD_GATEWAY_TOKEN` | Yes | Auth token for gateway connections (auto-generated) |
+| `NEMOCLAWD_API_KEY` | Yes | Your LLM provider API key |
+| `NEMOCLAWD_AUTH_CHOICE` | Yes | Provider identifier (set by deploy script) |
+| `NEMOCLAWD_DISCORD_TOKEN` | No | Discord bot token |
+| `NEMOCLAWD_TELEGRAM_TOKEN` | No | Telegram bot token |
+| `NEMOCLAWD_SLACK_BOT_TOKEN` | No | Slack bot token (`xoxb-...`) |
+| `NEMOCLAWD_SLACK_APP_TOKEN` | No | Slack app token (`xapp-...`) |
 | `SOLANA_RPC_URL` | No | Custom Solana RPC endpoint |
 | `HELIUS_API_KEY` | No | Helius RPC API key |
 | `PRIVY_APP_ID` | No | Privy agentic wallet app ID |
@@ -97,7 +97,7 @@ All sensitive values are stored as Fly secrets, encrypted at rest and injected a
 To update a secret after deployment:
 
 ```bash
-fly secrets set NEMOCLAW_API_KEY=sk-new-key-here -a your-app-name
+fly secrets set NEMOCLAWD_API_KEY=sk-new-key-here -a your-app-name
 ```
 
 The Machine restarts automatically when secrets change.
@@ -113,10 +113,10 @@ fly scale vm shared-cpu-4x -a your-app-name
 
 ### Persistent storage
 
-Nemo Clawd stores all state on a Fly Volume mounted at `/data`:
+Nemo Clawdd stores all state on a Fly Volume mounted at `/data`:
 
 - `nemoclawd.json` — wrapper configuration
-- `.nemoclawd/` — Nemo Clawd gateway config, conversation history, context
+- `.nemoclawd/` — Nemo Clawdd gateway config, conversation history, context
 - `.nemoclawd/wallets/` — wallet data (encrypted)
 - `.nemoclawd/vault/` — append-only JSONL trade and heartbeat logs
 

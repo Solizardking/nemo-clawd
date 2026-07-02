@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Strict baseline policy for the Nemo Clawd sandbox.
+# Strict baseline policy for the Nemo Clawdd sandbox.
 # Principle: deny by default, allow only what's needed for core functionality.
 # Dynamic updates (network_policies, inference) can be applied post-creation
 # via `openshell policy set`. Static fields are effectively creation-locked.
@@ -10,7 +10,7 @@
 #   strict  — this file. Minimum for onboard + basic agent operation.
 #   relaxed — adds third-party model providers, broader web access.
 #
-# To add endpoints: update this file and re-run `nemo clawd nemoclawd migrate `
+# To add endpoints: update this file and re-run `nemoclawdd nemoclawd migrate `
 # or apply dynamically via `openshell policy set`.
 
 version: 1
@@ -78,7 +78,7 @@ network_policies:
           - allow: { method: "*", path: "/**" }
     binaries:
       - { path: /usr/local/bin/claude }
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
 
   github:
     name: github
@@ -93,9 +93,9 @@ network_policies:
       - { path: /usr/bin/gh }
       - { path: /usr/bin/git }
 
-  # ── Nemo Clawd "phone home" ────────────────────────────────────────────
-  # Minimum viable set for Nemo Clawd to authenticate, discover plugins,
-  # and reach ClawHub. Binary-restricted to nemo clawd only.
+  # ── Nemo Clawdd "phone home" ────────────────────────────────────────────
+  # Minimum viable set for Nemo Clawdd to authenticate, discover plugins,
+  # and reach ClawHub. Binary-restricted to nemoclawdd only.
   # Docs access is read-only (GET). ClawHub and nemo-clawd.ai are
   # restricted to GET+POST (auth flows, plugin discovery).
 
@@ -111,7 +111,7 @@ network_policies:
           - allow: { method: GET, path: "/**" }
           - allow: { method: POST, path: "/**" }
     binaries:
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
 
   nemoclawd_api:
     name: nemoclawd_api
@@ -125,7 +125,7 @@ network_policies:
           - allow: { method: GET, path: "/**" }
           - allow: { method: POST, path: "/**" }
     binaries:
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
 
   nemoclawd_docs:
     name: nemoclawd_docs
@@ -138,7 +138,7 @@ network_policies:
         rules:
           - allow: { method: GET, path: "/**" }
     binaries:
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
 
   # npm registry — needed for `nemoclawd plugins install` and `npm install`
   npm_registry:
@@ -148,7 +148,7 @@ network_policies:
         port: 443
         access: full
     binaries:
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
       - { path: /usr/local/bin/npm }
 
   # ── Messaging — pre-allowed for agent notifications ────────────
@@ -179,5 +179,5 @@ network_policies:
         rules:
           - allow: { method: "*", path: "/**" }
     binaries:
-      - { path: /usr/local/bin/nemo clawd }
+      - { path: /usr/local/bin/nemoclawdd }
       - { path: /usr/bin/curl }

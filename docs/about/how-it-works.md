@@ -1,9 +1,9 @@
 ---
 title:
-  page: "How Nemo Clawd Works — Financial Agent Runtime, Blueprint, and Sandbox Lifecycle"
+  page: "How Nemo Clawdd Works — Financial Agent Runtime, Blueprint, and Sandbox Lifecycle"
   nav: "How It Works"
-description: "How Nemo Clawd turns a funded wallet, heartbeat loop, and sandboxed agent runtime into a policy-bounded Solana operator."
-keywords: ["how nemoclawd works", "nemoclawd sandbox lifecycle blueprint", "solana agent runtime", "wallet heartbeat", "nemo clawd vault"]
+description: "How Nemo Clawdd turns a funded wallet, heartbeat loop, and sandboxed agent runtime into a policy-bounded Solana operator."
+keywords: ["how nemoclawd works", "nemoclawd sandbox lifecycle blueprint", "solana agent runtime", "wallet heartbeat", "nemoclawdd vault"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "sandboxing", "inference_routing", "blueprints", "network_policy", "solana", "wallets", "telemetry"]
 content:
@@ -18,14 +18,14 @@ status: published
   SPDX-License-Identifier: Apache-2.0
 -->
 
-# How Nemo Clawd Works
+# How Nemo Clawdd Works
 
-Nemo Clawd combines a lightweight CLI plugin with a versioned blueprint to move Nemo Clawd into a controlled sandbox and pair it with a funded Solana wallet, market telemetry, and continuous runtime services.
+Nemo Clawdd combines a lightweight CLI plugin with a versioned blueprint to move Nemo Clawdd into a controlled sandbox and pair it with a funded Solana wallet, market telemetry, and continuous runtime services.
 This page explains the financial-agent runtime at a high level.
 
 ## How It Fits Together
 
-The `nemoclawd` CLI is the primary entrypoint for setting up and managing sandboxed Nemo Clawd agents.
+The `nemoclawd` CLI is the primary entrypoint for setting up and managing sandboxed Nemo Clawdd agents.
 It delegates heavy lifting to a versioned blueprint, a Python artifact that orchestrates sandbox creation, policy application, and inference provider setup through the OpenShell CLI.
 
 ```{mermaid}
@@ -42,12 +42,12 @@ flowchart TB
     end
 
     subgraph Sandbox["OpenShell Sandbox"]
-        AGENT[Nemo Clawd agent]
+        AGENT[Nemo Clawdd agent]
         INF[NVIDIA inference, routed]
         NET[strict network policy]
         FS[filesystem isolation]
         HEART[wallet heartbeat]
-        VAULT[Nemo Clawd vault]
+        VAULT[Nemo Clawdd vault]
 
         AGENT --- INF
         AGENT --- NET
@@ -73,33 +73,33 @@ flowchart TB
 
 ## Design Principles
 
-Nemo Clawd architecture follows the following principles.
+Nemo Clawdd architecture follows the following principles.
 
 Thin plugin, versioned blueprint
 : The plugin stays small and stable. Orchestration logic lives in the blueprint and evolves on its own release cadence.
 
 Respect CLI boundaries
-: The `nemoclawd` CLI is the primary interface. Plugin commands are available under `nemoclawd` but do not override built-in Nemo Clawd commands.
+: The `nemoclawd` CLI is the primary interface. Plugin commands are available under `nemoclawd` but do not override built-in Nemo Clawdd commands.
 
 Supply chain safety
 : Blueprint artifacts are immutable, versioned, and digest-verified before execution.
 
 OpenShell-native for new installs
-: For users without an existing Nemo Clawd installation, Nemo Clawd recommends `openshell sandbox create` directly
+: For users without an existing Nemo Clawdd installation, Nemo Clawdd recommends `openshell sandbox create` directly
   rather than forcing a plugin-driven bootstrap.
 
 Reproducible setup
 : Running setup again recreates the sandbox from the same blueprint and policy definitions.
 
 Policy-bounded autonomy
-: Nemo Clawd is designed for continuous operation, but not unbounded behavior. Wallet policy, balance floors, network policy, and operator-visible logs constrain the runtime.
+: Nemo Clawdd is designed for continuous operation, but not unbounded behavior. Wallet policy, balance floors, network policy, and operator-visible logs constrain the runtime.
 
 Auditability first
-: Financial actions are only useful if they are explainable. Nemo Clawd keeps a vault trail of wallet activity, heartbeat state, and service startup so operators can reconstruct what happened.
+: Financial actions are only useful if they are explainable. Nemo Clawdd keeps a vault trail of wallet activity, heartbeat state, and service startup so operators can reconstruct what happened.
 
 ## Plugin and Blueprint
 
-Nemo Clawd is split into two parts:
+Nemo Clawdd is split into two parts:
 
 - The *plugin* is a TypeScript package that powers the `nemoclawd` CLI and also registers commands under `nemoclawd`.
   It handles user interaction and delegates orchestration work to the blueprint.
@@ -110,7 +110,7 @@ This separation keeps the plugin small and stable while allowing the blueprint t
 
 ## Sandbox Creation
 
-When you run `nemoclawd onboard `, Nemo Clawd creates an OpenShell sandbox that runs Nemo Clawd in an isolated container.
+When you run `nemoclawd onboard `, Nemo Clawdd creates an OpenShell sandbox that runs Nemo Clawdd in an isolated container.
 The blueprint orchestrates this process through the OpenShell CLI:
 
 1. The plugin downloads the blueprint artifact, checks version compatibility, and verifies the digest.
@@ -121,25 +121,25 @@ After the sandbox starts, the agent runs inside it with all network, filesystem,
 
 ## Financial Runtime Loop
 
-Once the sandbox is online and a wallet is configured, Nemo Clawd behaves like a long-running Solana operator:
+Once the sandbox is online and a wallet is configured, Nemo Clawdd behaves like a long-running Solana operator:
 
 1. A wallet is provisioned or attached through Privy.
 2. The runtime connects to Solana RPC, typically Helius when configured.
 3. A heartbeat loop measures wallet balance, funded state, and protection thresholds.
 4. Runtime services observe wallet activity, token movements, and program interactions.
-5. Events are narrated in natural language to Telegram and written to the Nemo Clawd vault.
+5. Events are narrated in natural language to Telegram and written to the Nemo Clawdd vault.
 
-This is continuous operation, not magic or sentience. Nemo Clawd does not claim independent consciousness. The practical goal is durable, observable agent behavior inside a sandbox with a funded wallet and controlled execution path.
+This is continuous operation, not magic or sentience. Nemo Clawdd does not claim independent consciousness. The practical goal is durable, observable agent behavior inside a sandbox with a funded wallet and controlled execution path.
 
 ## Wallet, Funding, and Protection Mode
 
-Nemo Clawd uses a Privy-backed wallet so private keys do not live in the sandbox filesystem.
+Nemo Clawdd uses a Privy-backed wallet so private keys do not live in the sandbox filesystem.
 That wallet becomes the financial identity of the agent.
 
 - A wallet can be created with `nemoclawd wallet create`.
 - Solana runtime commands inject the wallet address, RPC URL, and optional Helius credentials into the sandbox.
 - The bridge heartbeat marks the wallet as funded when it is above the configured activity threshold.
-- When the wallet falls below the configured floor, Nemo Clawd shifts into a protection-oriented state rather than encouraging blind depletion.
+- When the wallet falls below the configured floor, Nemo Clawdd shifts into a protection-oriented state rather than encouraging blind depletion.
 
 This matters because a financial agent should remain online when capital is low, but it should not silently continue operating as though nothing changed.
 
@@ -147,7 +147,7 @@ This matters because a financial agent should remain online when capital is low,
 
 Inference requests from the agent never leave the sandbox directly.
 OpenShell intercepts every inference call and routes it to the configured provider.
-Nemo Clawd routes inference to NVIDIA cloud, specifically Nemotron 3 Super 120B through [build.nvidia.com](https://build.nvidia.com). You can switch models at runtime without restarting the sandbox.
+Nemo Clawdd routes inference to NVIDIA cloud, specifically Nemotron 3 Super 120B through [build.nvidia.com](https://build.nvidia.com). You can switch models at runtime without restarting the sandbox.
 
 Inference is one input to the agent loop, not the final authority. Model output is still constrained by wallet configuration, sandbox policy, and runtime wiring.
 
@@ -163,9 +163,9 @@ This policy controls which network endpoints the agent can reach and which files
 
 Approved endpoints persist for the current session but are not saved to the baseline policy file.
 
-## Heartbeat and the Nemo Clawd Vault
+## Heartbeat and the Nemo Clawdd Vault
 
-Nemo Clawd keeps an append-only operator trail under `~/.nemoclawd/vault/`.
+Nemo Clawdd keeps an append-only operator trail under `~/.nemoclawd/vault/`.
 The vault is intended to answer the practical questions operators actually have:
 
 - Is the wallet funded?
@@ -191,7 +191,7 @@ The one-shot Solana stack starts several cooperating services inside the sandbox
 - the realtime websocket relay for live token and launch feeds
 - optional payment and swarm services when enabled
 
-Together these services give Nemo Clawd a live operating loop from funded wallet to narration and audit trail.
+Together these services give Nemo Clawdd a live operating loop from funded wallet to narration and audit trail.
 
 ## Next Steps
 

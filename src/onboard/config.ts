@@ -8,7 +8,7 @@ const CONFIG_DIR = join(process.env.HOME ?? "/tmp", ".nemoclawd");
 
 export type EndpointType = "build" | "ncp" | "nim-local" | "vllm" | "ollama" | "custom";
 
-export interface NemoClawOnboardConfig {
+export interface NemoClawddOnboardConfig {
   endpointType: EndpointType;
   endpointUrl: string;
   ncpPartner: string | null;
@@ -32,16 +32,16 @@ function configPath(): string {
   return join(CONFIG_DIR, "config.json");
 }
 
-export function loadOnboardConfig(): NemoClawOnboardConfig | null {
+export function loadOnboardConfig(): NemoClawddOnboardConfig | null {
   ensureConfigDir();
   const path = configPath();
   if (!existsSync(path)) {
     return null;
   }
-  return JSON.parse(readFileSync(path, "utf-8")) as NemoClawOnboardConfig;
+  return JSON.parse(readFileSync(path, "utf-8")) as NemoClawddOnboardConfig;
 }
 
-export function saveOnboardConfig(config: NemoClawOnboardConfig): void {
+export function saveOnboardConfig(config: NemoClawddOnboardConfig): void {
   ensureConfigDir();
   writeFileSync(configPath(), JSON.stringify(config, null, 2));
 }

@@ -1,9 +1,9 @@
 ---
 title:
-  page: "NVIDIA Nemo Clawd Developer Guide"
-  nav: "Nemo Clawd"
-description: "Sandbox Nemo Clawd with NVIDIA inference routing and strict network policies."
-keywords: ["nemoclawd sandboxed ai agent", "nemo clawd openshell plugin"]
+  page: "NVIDIA Nemo Clawdd Developer Guide"
+  nav: "Nemo Clawdd"
+description: "Sandbox Nemo Clawdd with NVIDIA inference routing and strict network policies."
+keywords: ["nemoclawd sandboxed ai agent", "nemoclawdd openshell plugin"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "sandboxing", "inference_routing", "nemoclawd"]
 content:
@@ -18,20 +18,20 @@ status: published
   SPDX-License-Identifier: Apache-2.0
 -->
 
-# NVIDIA Nemo Clawd
+# NVIDIA Nemo Clawdd
 
 ```{include} ../README.md
 :start-after: <!-- start-badges -->
 :end-before: <!-- end-badges -->
 ```
 
-Nemo Clawd is the Nemo Clawd plugin for [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell).
-It runs Nemo Clawd inside a sandboxed environment with NVIDIA cloud inference, such as Nemotron 3 Super 120B through [build.nvidia.com](https://build.nvidia.com).
+Nemo Clawdd is the Nemo Clawdd plugin for [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell).
+It runs Nemo Clawdd inside a sandboxed environment with NVIDIA cloud inference, such as Nemotron 3 Super 120B through [build.nvidia.com](https://build.nvidia.com).
 The sandbox enforces strict network policies and operator-controlled egress approval.
 
 ## Get Started
 
-Install the CLI and launch a sandboxed Nemo Clawd instance in a few commands.
+Install the CLI and launch a sandboxed Nemo Clawdd instance in a few commands.
 
 ```{raw} html
 <style>
@@ -83,7 +83,7 @@ Install the CLI and launch a sandboxed Nemo Clawd instance in a few commands.
 ```
 
 Run `nemoclawd doctor ` to validate your machine, or `nemoclawd --help` to view the full CLI reference.
-You can also clone the [Nemo Clawd repository](https://github.com/x402agent/Nemo Clawd) to explore the plugin source and blueprint.
+You can also clone the [Nemo Clawdd repository](https://github.com/x402agent/Nemo Clawdd) to explore the plugin source and blueprint.
 
 Proceed to the [Quickstart](get-started/quickstart.md) for step-by-step instructions.
 
@@ -94,11 +94,11 @@ Proceed to the [Quickstart](get-started/quickstart.md) for step-by-step instruct
 ::::{grid} 2 2 3 3
 :gutter: 3
 
-:::{grid-item-card} About Nemo Clawd
+:::{grid-item-card} About Nemo Clawdd
 :link: about/overview
 :link-type: doc
 
-Learn what Nemo Clawd does and how it integrates Nemo Clawd with OpenShell.
+Learn what Nemo Clawdd does and how it integrates Nemo Clawdd with OpenShell.
 
 +++
 {bdg-secondary}`Concept`
@@ -183,7 +183,7 @@ Home <self>
 ```
 
 ```{toctree}
-:caption: About Nemo Clawd
+:caption: About Nemo Clawdd
 :hidden:
 
 Overview <about/overview>

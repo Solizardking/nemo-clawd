@@ -1,8 +1,8 @@
 {
   "id": "nemoclawd",
-  "name": "Nemo Clawd",
+  "name": "Nemo Clawdd",
   "version": "0.1.0",
-  "description": "Migrate and run Nemo Clawd inside OpenShell with optional NIM-backed inference",
+  "description": "Migrate and run Nemo Clawdd inside OpenShell with optional NIM-backed inference",
   "configSchema": {
     "type": "object",
     "properties": {
@@ -18,7 +18,7 @@
       },
       "sandboxName": {
         "type": "string",
-        "description": "Name for the Nemo Clawd sandbox in OpenShell",
+        "description": "Name for the Nemo Clawdd sandbox in OpenShell",
         "default": "nemoclawd"
       },
       "inferenceProvider": {

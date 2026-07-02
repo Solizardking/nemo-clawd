@@ -1,5 +1,5 @@
-# Nemo Clawd Fly.io deployment image
-# Builds the full Nemo Clawd stack + wrapper server for managed deployment.
+# Nemo Clawdd Fly.io deployment image
+# Builds the full Nemo Clawdd stack + wrapper server for managed deployment.
 
 FROM node:22-slim
 
@@ -32,13 +32,13 @@ RUN set -eux; \
 # Install PyYAML for blueprint runner
 RUN pip3 install --break-system-packages pyyaml
 
-# Install Nemo Clawd CLI
-RUN npm install -g nemo clawd@1.0.0
+# Install Nemo Clawdd CLI
+RUN npm install -g nemoclawdd@1.0.0
 
 # Install Helius CLI
 RUN npm install -g helius-cli 2>/dev/null || echo 'WARN: helius-cli install skipped'
 
-# ── Copy Nemo Clawd plugin + assets ──────────────────────────────────
+# ── Copy Nemo Clawdd plugin + assets ──────────────────────────────────
 COPY nemoclawd/dist/ /opt/nemoclawd/dist/
 COPY nemoclawd/nemoclawd.plugin.json /opt/nemoclawd/
 COPY nemoclawd/package.json /opt/nemoclawd/

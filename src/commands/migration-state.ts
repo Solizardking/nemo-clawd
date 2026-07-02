@@ -89,7 +89,7 @@ type NemoclawdConfigDocument = Record<string, unknown>;
 
 function resolveHostHome(env: NodeJS.ProcessEnv = process.env): string {
   const fallbackHome = env.HOME?.trim() || env.USERPROFILE?.trim() || os.homedir();
-  const explicitHome = env.NEMOCLAW_HOME?.trim();
+  const explicitHome = env.NEMOCLAWD_HOME?.trim();
   if (explicitHome) {
     if (explicitHome === "~") {
       return fallbackHome;
@@ -125,7 +125,7 @@ function isWithinRoot(candidatePath: string, rootPath: string): boolean {
 }
 
 function resolveStateDir(env: NodeJS.ProcessEnv = process.env): string {
-  const override = env.NEMOCLAW_STATE_DIR?.trim();
+  const override = env.NEMOCLAWD_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env);
   }
@@ -133,7 +133,7 @@ function resolveStateDir(env: NodeJS.ProcessEnv = process.env): string {
 }
 
 function resolveConfigPath(stateDir: string, env: NodeJS.ProcessEnv = process.env): string {
-  const override = env.NEMOCLAW_CONFIG_PATH?.trim();
+  const override = env.NEMOCLAWD_CONFIG_PATH?.trim();
   if (override) {
     return resolveUserPath(override, env);
   }
@@ -213,7 +213,7 @@ function registerRoot(
 
 function defaultWorkspacePath(env: NodeJS.ProcessEnv = process.env): string {
   const home = resolveHostHome(env);
-  const profile = env.NEMOCLAW_PROFILE?.trim();
+  const profile = env.NEMOCLAWD_PROFILE?.trim();
   if (profile && profile.toLowerCase() !== "default") {
     return path.join(home, ".nemoclawd", `workspace-${profile}`);
   }
@@ -397,14 +397,14 @@ export function detectHostNemoclawd(env: NodeJS.ProcessEnv = process.env): HostN
   let config: NemoclawdConfigDocument | null = null;
 
   if (!stateExists) {
-    errors.push(`Resolved Nemo Clawd state directory does not exist: ${stateDir}`);
+    errors.push(`Resolved Nemo Clawdd state directory does not exist: ${stateDir}`);
   }
 
   try {
     config = loadConfigDocument(configPath);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    errors.push(`Failed to parse Nemo Clawd config at ${configPath}: ${msg}`);
+    errors.push(`Failed to parse Nemo Clawdd config at ${configPath}: ${msg}`);
   }
 
   const rootInfo = collectExternalRoots(config, stateDir);
@@ -555,7 +555,7 @@ export function createSnapshotBundle(
   options: { persist: boolean },
 ): SnapshotBundle | null {
   if (!hostState.stateDir || !hostState.homeDir) {
-    logger.error("Cannot snapshot host Nemo Clawd state: no state directory was resolved.");
+    logger.error("Cannot snapshot host Nemo Clawdd state: no state directory was resolved.");
     return null;
   }
 
@@ -669,7 +669,7 @@ export function restoreSnapshotToHost(snapshotDir: string, logger: PluginLogger)
       logger.info(`Restored external config to ${manifest.configPath}`);
     }
 
-    logger.info("Host Nemo Clawd state restored.");
+    logger.info("Host Nemo Clawdd state restored.");
     return true;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

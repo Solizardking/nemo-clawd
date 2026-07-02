@@ -35,7 +35,7 @@ export function handleSlashCommand(
 function slashHelp(): PluginCommandResult {
   return {
     text: [
-      "**Nemo Clawd**",
+      "**Nemo Clawdd**",
       "",
       "Usage: `/nemoclawd <subcommand>`",
       "",
@@ -45,11 +45,11 @@ function slashHelp(): PluginCommandResult {
       "  `onboard` - Show onboarding status and instructions",
       "",
       "For full management use the CLI:",
-      "  `nemo clawd nemoclawd status `",
-      "  `nemo clawd nemoclawd migrate `",
-      "  `nemo clawd nemoclawd launch `",
-      "  `nemo clawd nemoclawd connect `",
-      "  `nemo clawd nemoclawd eject --confirm`",
+      "  `nemoclawdd nemoclawd status `",
+      "  `nemoclawdd nemoclawd migrate `",
+      "  `nemoclawdd nemoclawd launch `",
+      "  `nemoclawdd nemoclawd connect `",
+      "  `nemoclawdd nemoclawd eject --confirm`",
     ].join("\n"),
   };
 }
@@ -59,12 +59,12 @@ function slashStatus(): PluginCommandResult {
 
   if (!state.lastAction) {
     return {
-      text: "**Nemo Clawd**: No operations performed yet. Run `nemo clawd nemoclawd launch ` or `nemo clawd nemoclawd migrate ` to get started.",
+      text: "**Nemo Clawdd**: No operations performed yet. Run `nemoclawdd nemoclawd launch ` or `nemoclawdd nemoclawd migrate ` to get started.",
     };
   }
 
   const lines = [
-    "**Nemo Clawd Status**",
+    "**Nemo Clawdd Status**",
     "",
     `Last action: ${state.lastAction}`,
     `Blueprint: ${state.blueprintVersion ?? "unknown"}`,
@@ -85,7 +85,7 @@ function slashOnboard(): PluginCommandResult {
   if (config) {
     return {
       text: [
-        "**Nemo Clawd Onboard Status**",
+        "**Nemo Clawdd Onboard Status**",
         "",
         `Endpoint: ${config.endpointType} (${config.endpointUrl})`,
         config.ncpPartner ? `NCP Partner: ${config.ncpPartner}` : null,
@@ -94,7 +94,7 @@ function slashOnboard(): PluginCommandResult {
         `Profile: ${config.profile}`,
         `Onboarded: ${config.onboardedAt}`,
         "",
-        "To reconfigure, run: `nemo clawd nemoclawd onboard `",
+        "To reconfigure, run: `nemoclawdd nemoclawd onboard `",
       ]
         .filter(Boolean)
         .join("\n"),
@@ -102,17 +102,17 @@ function slashOnboard(): PluginCommandResult {
   }
   return {
     text: [
-      "**Nemo Clawd Onboarding**",
+      "**Nemo Clawdd Onboarding**",
       "",
       "No configuration found. Run the onboard command to set up inference:",
       "",
       "```",
-      "nemo clawd nemoclawd onboard ",
+      "nemoclawdd nemoclawd onboard ",
       "```",
       "",
       "Or non-interactively:",
       "```",
-      'nemo clawd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-super-120b-a12b',
+      'nemoclawdd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-super-120b-a12b',
       "```",
     ].join("\n"),
   };
@@ -122,7 +122,7 @@ function slashEject(): PluginCommandResult {
   const state = loadState();
 
   if (!state.lastAction) {
-    return { text: "No Nemo Clawd deployment found. Nothing to eject from." };
+    return { text: "No Nemo Clawdd deployment found. Nothing to eject from." };
   }
 
   if (!state.migrationSnapshot && !state.hostBackupPath) {
@@ -133,12 +133,12 @@ function slashEject(): PluginCommandResult {
 
   return {
     text: [
-      "**Eject from Nemo Clawd**",
+      "**Eject from Nemo Clawdd**",
       "",
-      "To rollback to your host Nemo Clawd installation, run:",
+      "To rollback to your host Nemo Clawdd installation, run:",
       "",
       "```",
-      "nemo clawd nemoclawd eject --confirm",
+      "nemoclawdd nemoclawd eject --confirm",
       "```",
       "",
       `Snapshot: ${state.migrationSnapshot ?? state.hostBackupPath ?? "none"}`,

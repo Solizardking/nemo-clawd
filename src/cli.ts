@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * CLI registrar for `nemo clawd nemoclawd <subcommand>`.
+ * CLI registrar for `nemoclawdd nemoclawd <subcommand>`.
  *
  * Wires commander.js subcommands to the existing blueprint infrastructure.
  */
@@ -21,9 +21,9 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
   const { program, logger } = ctx;
   const pluginConfig = getPluginConfig(api);
 
-  const nemoclawd = program.command("nemoclawd").description("Nemo Clawd sandbox management");
+  const nemoclawd = program.command("nemoclawd").description("Nemo Clawdd sandbox management");
 
-  // nemo clawd nemoclawd status
+  // nemoclawdd nemoclawd status
   nemoclawd
     .command("status")
     .description("Show sandbox, blueprint, and inference state")
@@ -32,10 +32,10 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
       await cliStatus({ json: opts.json, logger, pluginConfig });
     });
 
-  // nemo clawd nemoclawd migrate
+  // nemoclawdd nemoclawd migrate
   nemoclawd
     .command("migrate")
-    .description("Migrate host Nemo Clawd installation into an OpenShell sandbox")
+    .description("Migrate host Nemo Clawdd installation into an OpenShell sandbox")
     .option("--dry-run", "Show what would be migrated without making changes", false)
     .option("--profile <profile>", "Blueprint profile to use", "default")
     .option("--skip-backup", "Skip creating a host backup snapshot", false)
@@ -49,10 +49,10 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
       });
     });
 
-  // nemo clawd nemoclawd launch
+  // nemoclawdd nemoclawd launch
   nemoclawd
     .command("launch")
-    .description("Fresh setup: bootstrap Nemo Clawd inside OpenShell")
+    .description("Fresh setup: bootstrap Nemo Clawdd inside OpenShell")
     .option("--force", "Skip ergonomics warning and force plugin-driven bootstrap", false)
     .option("--profile <profile>", "Blueprint profile to use", "default")
     .action(async (opts: { force: boolean; profile: string }) => {
@@ -64,16 +64,16 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
       });
     });
 
-  // nemo clawd nemoclawd connect
+  // nemoclawdd nemoclawd connect
   nemoclawd
     .command("connect")
-    .description("Open an interactive shell inside the Nemo Clawd sandbox")
+    .description("Open an interactive shell inside the Nemo Clawdd sandbox")
     .option("--sandbox <name>", "Sandbox name to connect to", pluginConfig.sandboxName)
     .action(async (opts: { sandbox: string }) => {
       await cliConnect({ sandbox: opts.sandbox, logger });
     });
 
-  // nemo clawd nemoclawd logs
+  // nemoclawdd nemoclawd logs
   nemoclawd
     .command("logs")
     .description("Stream blueprint execution and sandbox logs")
@@ -90,7 +90,7 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
       });
     });
 
-  // nemo clawd nemoclawd eject
+  // nemoclawdd nemoclawd eject
   nemoclawd
     .command("eject")
     .description("Rollback from OpenShell and restore host installation")
@@ -105,7 +105,7 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
       });
     });
 
-  // nemo clawd nemoclawd onboard
+  // nemoclawdd nemoclawd onboard
   nemoclawd
     .command("onboard")
     .description("Interactive setup: configure inference endpoint, credential, and model")

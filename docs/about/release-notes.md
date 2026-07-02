@@ -1,8 +1,8 @@
 ---
 title:
-  page: "Nemo Clawd Release Notes"
+  page: "Nemo Clawdd Release Notes"
   nav: "Release Notes"
-description: "Changelog and feature history for Nemo Clawd releases."
+description: "Changelog and feature history for Nemo Clawdd releases."
 keywords: ["nemoclawd release notes", "nemoclawd changelog"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "releases"]
@@ -20,11 +20,11 @@ status: published
 
 # Release Notes
 
-Nemo Clawd is in active development and follows a frequent release cadence. Use the following GitHub resources directly.
+Nemo Clawdd is in active development and follows a frequent release cadence. Use the following GitHub resources directly.
 
 | Resource | Description |
 |---|---|
-| [Releases](https://github.com/x402agent/Nemo Clawd/releases) | Versioned release notes and downloadable assets. |
-| [Release comparison](https://github.com/x402agent/Nemo Clawd/compare) | Diff between any two tags or branches. |
-| [Merged pull requests](https://github.com/x402agent/Nemo Clawd/pulls?q=is%3Apr+is%3Amerged) | Individual changes with review discussion. |
-| [Commit history](https://github.com/x402agent/Nemo Clawd/commits/main) | Full commit log on `main`. |
+| [Releases](https://github.com/x402agent/Nemo Clawdd/releases) | Versioned release notes and downloadable assets. |
+| [Release comparison](https://github.com/x402agent/Nemo Clawdd/compare) | Diff between any two tags or branches. |
+| [Merged pull requests](https://github.com/x402agent/Nemo Clawdd/pulls?q=is%3Apr+is%3Amerged) | Individual changes with review discussion. |
+| [Commit history](https://github.com/x402agent/Nemo Clawdd/commits/main) | Full commit log on `main`. |

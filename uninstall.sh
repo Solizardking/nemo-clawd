@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawd uninstaller.
+# Nemo Clawdd uninstaller.
 # Removes the host-side resources created by the installer/setup flow:
-#   - Nemo Clawd helper services
-#   - All OpenShell sandboxes plus the Nemo Clawd gateway/providers
-#   - Nemo Clawd/OpenShell/Nemo Clawd Docker images built or pulled for the sandbox flow
+#   - Nemo Clawdd helper services
+#   - All OpenShell sandboxes plus the Nemo Clawdd gateway/providers
+#   - Nemo Clawdd/OpenShell/Nemo Clawdd Docker images built or pulled for the sandbox flow
 #   - ~/.nemoclawd plus ~/.config/{openshell,nemoclawd} state
 #   - Global nemoclawd npm install/link
 #   - OpenShell binary if it was installed to the standard installer path
@@ -25,9 +25,9 @@ warn() { echo -e "${YELLOW}[uninstall]${NC} $1"; }
 fail() { echo -e "${RED}[uninstall]${NC} $1"; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-NEMOCLAW_STATE_DIR="${HOME}/.nemoclawd"
+NEMOCLAWD_STATE_DIR="${HOME}/.nemoclawd"
 OPENSHELL_CONFIG_DIR="${HOME}/.config/openshell"
-NEMOCLAW_CONFIG_DIR="${HOME}/.config/nemoclawd"
+NEMOCLAWD_CONFIG_DIR="${HOME}/.config/nemoclawd"
 DEFAULT_GATEWAY="nemoclawd"
 PROVIDERS=("nvidia-nim" "vllm-local" "ollama-local" "nvidia-ncp" "nim-local")
 OPEN_SHELL_INSTALL_PATHS=("/usr/local/bin/openshell")
@@ -45,7 +45,7 @@ Usage: ./uninstall.sh [--yes] [--keep-openshell] [--delete-models]
 Options:
   --yes             Skip the confirmation prompt
   --keep-openshell  Leave the openshell binary installed
-  --delete-models   Remove Nemo Clawd-pulled Ollama models
+  --delete-models   Remove Nemo Clawdd-pulled Ollama models
   -h, --help        Show this help
 EOF
 }
@@ -80,7 +80,7 @@ confirm() {
   fi
 
   echo ""
-  warn "This will remove all OpenShell sandboxes, Nemo Clawd-managed gateway/providers,"
+  warn "This will remove all OpenShell sandboxes, Nemo Clawdd-managed gateway/providers,"
   warn "related Docker images, and local state under ~/.nemoclawd, ~/.config/openshell,"
   warn "and ~/.config/nemoclawd."
   warn "It will not uninstall Docker, Ollama, npm, Node.js, or other shared tooling."
@@ -139,7 +139,7 @@ remove_file_with_optional_sudo() {
 
 stop_helper_services() {
   if [ -x "$SCRIPT_DIR/scripts/start-services.sh" ]; then
-    run_optional "Stopped Nemo Clawd helper services" "$SCRIPT_DIR/scripts/start-services.sh" --stop
+    run_optional "Stopped Nemo Clawdd helper services" "$SCRIPT_DIR/scripts/start-services.sh" --stop
   fi
 
   remove_glob_paths "${TMP_ROOT}/nemoclawd-services-*"
@@ -201,9 +201,9 @@ remove_nemoclawd_cli() {
 }
 
 remove_nemoclawd_state() {
-  remove_path "$NEMOCLAW_STATE_DIR"
+  remove_path "$NEMOCLAWD_STATE_DIR"
   remove_path "$OPENSHELL_CONFIG_DIR"
-  remove_path "$NEMOCLAW_CONFIG_DIR"
+  remove_path "$NEMOCLAWD_CONFIG_DIR"
 }
 
 remove_related_docker_containers() {
@@ -228,7 +228,7 @@ remove_related_docker_containers() {
           BEGIN { IGNORECASE=1 }
           {
             ref=$0
-            if (ref ~ /openshell-cluster/ || ref ~ /openshell/ || ref ~ /nemo clawd/ || ref ~ /nemoclawd/) {
+            if (ref ~ /openshell-cluster/ || ref ~ /openshell/ || ref ~ /nemoclawdd/ || ref ~ /nemoclawd/) {
               print $1
             }
           }
@@ -237,7 +237,7 @@ remove_related_docker_containers() {
   )
 
   if [ "${#container_ids[@]}" -eq 0 ]; then
-    info "No Nemo Clawd/OpenShell Docker containers found"
+    info "No Nemo Clawdd/OpenShell Docker containers found"
     return 0
   fi
 
@@ -279,7 +279,7 @@ remove_related_docker_images() {
           BEGIN { IGNORECASE=1 }
           {
             ref=$0
-            if (ref ~ /openshell/ || ref ~ /nemo clawd/ || ref ~ /nemoclawd/) {
+            if (ref ~ /openshell/ || ref ~ /nemoclawdd/ || ref ~ /nemoclawd/) {
               print $1
             }
           }
@@ -288,7 +288,7 @@ remove_related_docker_images() {
   )
 
   if [ "${#image_ids[@]}" -eq 0 ]; then
-    info "No Nemo Clawd/OpenShell Docker images found"
+    info "No Nemo Clawdd/OpenShell Docker images found"
     return 0
   fi
 
@@ -363,19 +363,19 @@ remove_openshell_binary() {
 main() {
   confirm
 
-  info "Stopping Nemo Clawd helper services..."
+  info "Stopping Nemo Clawdd helper services..."
   stop_helper_services
 
   info "Stopping local OpenShell forward processes..."
   stop_openshell_forward_processes
 
-  info "Removing OpenShell resources created for Nemo Clawd..."
+  info "Removing OpenShell resources created for Nemo Clawdd..."
   remove_openshell_resources
 
   info "Removing global nemoclawd install..."
   remove_nemoclawd_cli
 
-  info "Removing Nemo Clawd state..."
+  info "Removing Nemo Clawdd state..."
   remove_nemoclawd_state
 
   info "Removing related Docker containers..."

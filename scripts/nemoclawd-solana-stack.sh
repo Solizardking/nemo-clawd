@@ -11,7 +11,7 @@ set -euo pipefail
 SERVICES_DIR="${HOME:-/sandbox}/.nemoclawd/services"
 LOG_DIR="${SERVICES_DIR}/logs"
 PID_DIR="${SERVICES_DIR}/pids"
-VAULT_DIR="${NEMOCLAW_VAULT_DIR:-${HOME:-/sandbox}/.nemoclawd/vault}"
+VAULT_DIR="${NEMOCLAWD_VAULT_DIR:-${HOME:-/sandbox}/.nemoclawd/vault}"
 STACK_DAY="$(date -u +%F)"
 STACK_LOG="${VAULT_DIR}/stack-${STACK_DAY}.log"
 
@@ -76,7 +76,7 @@ if [ "${START_TELEGRAM_BOT}" = "true" ] || [ "${START_SOLANA_BRIDGE}" = "true" ]
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[solana-stack] Nemo Clawd Solana One-Shot Startup"
+echo "[solana-stack] Nemo Clawdd Solana One-Shot Startup"
 echo "[solana-stack] RPC: ${SOLANA_RPC_URL:-https://rpc.solanatracker.io/public}"
 echo "[solana-stack] WS:  ${SOLANA_WS_URL:-auto}"
 echo "[solana-stack] Wallet: ${DEVELOPER_WALLET:-not-configured}"

@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawd setup for DGX Spark devices.
+# Nemo Clawdd setup for DGX Spark devices.
 #
 # Spark ships Ubuntu 24.04 (cgroup v2) + Docker 28.x but no k3s.
 # OpenShell's gateway starts k3s inside a Docker container, which

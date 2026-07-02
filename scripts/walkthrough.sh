@@ -2,10 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawd walkthrough — sandboxed agent approval flow.
+# Nemo Clawdd walkthrough — sandboxed agent approval flow.
 #
 # This sets up a split-screen workflow:
-#   LEFT:  Nemo Clawd agent (chat)
+#   LEFT:  Nemo Clawdd agent (chat)
 #   RIGHT: OpenShell TUI (monitor + approve network egress)
 #
 # The agent runs inside a sandboxed environment with a strict network
@@ -13,7 +13,7 @@
 # the TUI prompts the operator to approve or deny the request.
 #
 # Prerequisites:
-#   - Nemo Clawd setup complete (./scripts/setup.sh)
+#   - Nemo Clawdd setup complete (./scripts/setup.sh)
 #   - NVIDIA_API_KEY in environment
 #
 # Suggested prompts that trigger the approval flow:
@@ -47,10 +47,10 @@ set -euo pipefail
 
 echo ""
 echo "  ┌─────────────────────────────────────────────────────┐"
-echo "  │  Nemo Clawd Walkthrough                               │"
+echo "  │  Nemo Clawdd Walkthrough                               │"
 echo "  │                                                     │"
 echo "  │  LEFT pane:   OpenShell TUI (monitor + approve)     │"
-echo "  │  RIGHT pane:  Nemo Clawd agent (chat)                 │"
+echo "  │  RIGHT pane:  Nemo Clawdd agent (chat)                 │"
 echo "  │                                                     │"
 echo "  │  When the agent tries to access a new service,      │"
 echo "  │  the TUI will prompt you to approve or deny.        │"

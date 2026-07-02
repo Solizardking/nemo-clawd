@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Nemo Clawd setup — run this on the HOST to set up everything.
+# Nemo Clawdd setup — run this on the HOST to set up everything.
 #
 # Prerequisites:
 #   - Docker running (Colima, Docker Desktop, or native)
@@ -19,7 +19,7 @@
 #   3. Creates nvidia-nim provider (build.nvidia.com)
 #   4. Creates vllm-local provider (if vLLM is running)
 #   5. Sets inference route to nvidia-nim by default
-#   6. Builds and creates the Nemo Clawd sandbox
+#   6. Builds and creates the Nemo Clawdd sandbox
 #   7. Prints next steps
 
 set -euo pipefail
@@ -142,7 +142,7 @@ openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotro
 info "Deleting old nemoclawd sandbox (if any)..."
 openshell sandbox delete nemoclawd > /dev/null 2>&1 || true
 
-info "Building and creating Nemo Clawd sandbox (this takes a few minutes on first run)..."
+info "Building and creating Nemo Clawdd sandbox (this takes a few minutes on first run)..."
 
 # Stage a clean build context (openshell doesn't honor .dockerignore)
 BUILD_CTX="$(mktemp -d)"

@@ -13,12 +13,12 @@ profiles:
   - vllm
 
 description: |
-  Nemo Clawd blueprint: orchestrates Nemo Clawd sandbox creation, migration,
+  Nemo Clawdd blueprint: orchestrates Nemo Clawdd sandbox creation, migration,
   and NIM/vLLM inference routing inside OpenShell.
 
 components:
   sandbox:
-    image: "ghcr.io/nvidia/openshell-community/sandboxes/nemo clawd:latest"
+    image: "ghcr.io/nvidia/openshell-community/sandboxes/nemoclawdd:latest"
     name: "nemoclawd"
     forward_ports:
       - 18789
@@ -55,7 +55,7 @@ components:
         credential_default: "dummy"
 
   policy:
-    base: "sandboxes/nemo clawd/policy.yaml"
+    base: "sandboxes/nemoclawdd/policy.yaml"
     additions:
       nim_service:
         name: nim_service

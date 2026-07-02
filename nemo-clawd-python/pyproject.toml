@@ -1,7 +1,7 @@
 [project]
 name = "nemoclawd-blueprint"
 version = "0.1.0"
-description = "Nemo Clawd blueprint runner and migration tooling for Nemo Clawd"
+description = "Nemo Clawdd blueprint runner and migration tooling for Nemo Clawdd"
 license = "Apache-2.0"
 requires-python = ">=3.11"
 dependencies = ["pyyaml>=6.0"]

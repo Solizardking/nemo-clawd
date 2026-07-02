@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Nemo Clawd Inference Profiles"
+  page: "Nemo Clawdd Inference Profiles"
   nav: "Inference Profiles"
 description: "Configuration reference for inference profiles — Ollama (DeepSolana), NVIDIA Cloud, vLLM."
 keywords: ["nemoclawd inference profiles", "nemoclawd deepsolana", "nemoclawd ollama", "nemoclawd nvidia cloud provider"]
@@ -20,14 +20,14 @@ status: published
 
 # Inference Profiles
 
-Nemo Clawd ships with an inference profile defined in `blueprint.yaml`.
+Nemo Clawdd ships with an inference profile defined in `blueprint.yaml`.
 The profile configures an OpenShell inference provider and model route.
 The agent inside the sandbox uses whichever model is active.
 Inference requests are routed transparently through the OpenShell gateway.
 
 ## Default: Ollama + `8bit/DeepSolana`
 
-When Ollama is detected on `localhost:11434` during `nemoclawd onboard `, Nemo Clawd:
+When Ollama is detected on `localhost:11434` during `nemoclawd onboard `, Nemo Clawdd:
 
 1. Automatically selects the `ollama-local` provider
 2. Pulls `8bit/DeepSolana` (`ollama pull 8bit/DeepSolana`)

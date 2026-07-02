@@ -12,8 +12,8 @@ export interface ConnectOptions {
 export async function cliConnect(opts: ConnectOptions): Promise<void> {
   const { sandbox: sandboxName, logger } = opts;
 
-  logger.info(`Connecting to Nemo Clawd sandbox: ${sandboxName}`);
-  logger.info("You will be inside the sandbox. Run 'nemo clawd' commands normally.");
+  logger.info(`Connecting to Nemo Clawdd sandbox: ${sandboxName}`);
+  logger.info("You will be inside the sandbox. Run 'nemoclawdd' commands normally.");
   logger.info("Type 'exit' to return to your host shell.");
   logger.info("");
 
@@ -34,6 +34,6 @@ export async function cliConnect(opts: ConnectOptions): Promise<void> {
 
   if (exitCode !== 0 && exitCode !== null) {
     logger.error(`Sandbox '${sandboxName}' exited with code ${String(exitCode)}.`);
-    logger.info("Run 'nemo clawd nemoclawd status ' to check available sandboxes.");
+    logger.info("Run 'nemoclawdd nemoclawd status ' to check available sandboxes.");
   }
 }

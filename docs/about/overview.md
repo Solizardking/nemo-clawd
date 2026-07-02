@@ -1,9 +1,9 @@
 ---
 title:
-  page: "Nemo Clawd Overview — What It Does and How It Fits Together"
+  page: "Nemo Clawdd Overview — What It Does and How It Fits Together"
   nav: "Overview"
-description: "Nemo Clawd sandboxes Nemo Clawd with NVIDIA inference and declarative policy."
-keywords: ["nemoclawd overview", "nemo clawd openshell sandbox plugin"]
+description: "Nemo Clawdd sandboxes Nemo Clawdd with NVIDIA inference and declarative policy."
+keywords: ["nemoclawd overview", "nemoclawdd openshell sandbox plugin"]
 topics: ["generative_ai", "ai_agents"]
 tags: ["nemoclawd", "openshell", "sandboxing", "inference_routing", "blueprints"]
 content:
@@ -20,22 +20,22 @@ status: published
 
 # Overview
 
-Nemo Clawd is the [Nemo Clawd](https://nemo-clawd.ai) plugin for [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell).
-It moves Nemo Clawd into a sandboxed environment where every network request, file access, and inference call is governed by declarative policy.
+Nemo Clawdd is the [Nemo Clawdd](https://nemo-clawd.ai) plugin for [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell).
+It moves Nemo Clawdd into a sandboxed environment where every network request, file access, and inference call is governed by declarative policy.
 
 | Capability              | Description                                                                                                                                          |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Sandbox Nemo Clawd        | Creates an OpenShell sandbox pre-configured for Nemo Clawd, with strict filesystem and network policies applied from the first boot.                   |
+| Sandbox Nemo Clawdd        | Creates an OpenShell sandbox pre-configured for Nemo Clawdd, with strict filesystem and network policies applied from the first boot.                   |
 | Route inference         | Configures OpenShell inference routing so agent traffic flows through cloud-hosted Nemotron 3 Super 120B via [build.nvidia.com](https://build.nvidia.com). |
 | Manage the lifecycle    | Handles blueprint versioning, digest verification, and sandbox setup.                                                                                |
 
 ## Challenge
 
-Autonomous AI agents like Nemo Clawd can make arbitrary network requests, access the host filesystem, and call any inference endpoint. Without guardrails, this creates security, cost, and compliance risks that grow as agents run unattended.
+Autonomous AI agents like Nemo Clawdd can make arbitrary network requests, access the host filesystem, and call any inference endpoint. Without guardrails, this creates security, cost, and compliance risks that grow as agents run unattended.
 
 ## Benefits
 
-Nemo Clawd provides the following benefits.
+Nemo Clawdd provides the following benefits.
 
 | Benefit                    | Description                                                                                                            |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------|
@@ -47,20 +47,20 @@ Nemo Clawd provides the following benefits.
 
 ## Use Cases
 
-You can use Nemo Clawd for various use cases including the following.
+You can use Nemo Clawdd for various use cases including the following.
 
 | Use Case                  | Description                                                                                  |
 |---------------------------|----------------------------------------------------------------------------------------------|
-| Always-on assistant       | Run an Nemo Clawd assistant with controlled network access and operator-approved egress.        |
+| Always-on assistant       | Run an Nemo Clawdd assistant with controlled network access and operator-approved egress.        |
 | Sandboxed testing         | Test agent behavior in a locked-down environment before granting broader permissions.         |
 | Remote GPU deployment     | Deploy a sandboxed agent to a remote GPU instance for persistent operation.                   |
 
 ## Next Steps
 
-Explore the following pages to learn more about Nemo Clawd.
+Explore the following pages to learn more about Nemo Clawdd.
 
-- [How It Works](../about/how-it-works.md) to understand the key concepts behind Nemo Clawd.
-- [Quickstart](../get-started/quickstart.md) to install Nemo Clawd and run your first agent.
+- [How It Works](../about/how-it-works.md) to understand the key concepts behind Nemo Clawdd.
+- [Quickstart](../get-started/quickstart.md) to install Nemo Clawdd and run your first agent.
 - [Switch Inference Providers](../inference/switch-inference-providers.md) to configure the inference provider.
 - [Approve or Deny Network Requests](../network-policy/approve-network-requests.md) to manage egress approvals.
 - [Deploy to a Remote GPU Instance](../deployment/deploy-to-remote-gpu.md) for persistent operation.

@@ -1,6 +1,6 @@
 ---
 title:
-  page: "Nemo Clawd Network Policies — Baseline Rules and Operator Approval"
+  page: "Nemo Clawdd Network Policies — Baseline Rules and Operator Approval"
   nav: "Network Policies"
 description: "Baseline network policy, filesystem rules, and operator approval flow."
 keywords: ["nemoclawd network policy", "sandbox egress control operator approval"]
@@ -20,7 +20,7 @@ status: published
 
 # Network Policies
 
-Nemo Clawd runs with a strict-by-default network policy.
+Nemo Clawdd runs with a strict-by-default network policy.
 The sandbox can only reach endpoints that are explicitly allowed.
 Any request to an unlisted destination is intercepted by OpenShell, and the operator is prompted to approve or deny it in real time through the TUI.
 
@@ -58,7 +58,7 @@ The following endpoint groups are allowed by default:
 
 * - `nvidia`
   - `integrate.api.nvidia.com:443`, `inference-api.nvidia.com:443`
-  - `/usr/local/bin/claude`, `/usr/local/bin/nemo clawd`
+  - `/usr/local/bin/claude`, `/usr/local/bin/nemoclawdd`
   - All methods
 
 * - `github`
@@ -73,22 +73,22 @@ The following endpoint groups are allowed by default:
 
 * - `clawdhub`
   - `clawdhub.com:443`
-  - `/usr/local/bin/nemo clawd`
+  - `/usr/local/bin/nemoclawdd`
   - GET, POST
 
 * - `nemoclawd_api`
   - `nemo-clawd.ai:443`
-  - `/usr/local/bin/nemo clawd`
+  - `/usr/local/bin/nemoclawdd`
   - GET, POST
 
 * - `nemoclawd_docs`
   - `docs.nemo-clawd.ai:443`
-  - `/usr/local/bin/nemo clawd`
+  - `/usr/local/bin/nemoclawdd`
   - GET only
 
 * - `npm_registry`
   - `registry.npmjs.org:443`
-  - `/usr/local/bin/nemo clawd`, `/usr/local/bin/npm`
+  - `/usr/local/bin/nemoclawdd`, `/usr/local/bin/npm`
   - GET only
 
 * - `telegram`
