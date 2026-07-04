@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const MAGIC_ROUTER_STRATEGY = "magic-router";
-const ZAI_DEFAULT_PROVIDER = "zai-glm";
-const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
-const NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
-const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
+const OLLAMA_DEFAULT_PROVIDER = "ollama-local";
+const OLLAMA_DEFAULT_MODEL = "hf.co/ordlibrary/hauhau-qwen36-onchain";
 const OPENROUTER_PROVIDER = "openrouter";
 const OPENROUTER_AUTO_MODEL = "openrouter/auto";
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
+const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
 
 function hasEnv(env, key) {
   return Boolean(env[key] && String(env[key]).trim());
@@ -52,13 +52,13 @@ function toolSetForTask(taskType, openRouterAvailable) {
 }
 
 function buildInferenceRoutes(env) {
-  const zai = {
-    provider: ZAI_DEFAULT_PROVIDER,
-    model: ZAI_DEFAULT_MODEL,
-    credentialEnv: "ZAI_API_KEY",
-    available: hasEnv(env, "ZAI_API_KEY"),
+  const ollama = {
+    provider: OLLAMA_DEFAULT_PROVIDER,
+    model: (env.OLLAMA_MODEL && String(env.OLLAMA_MODEL).trim()) || OLLAMA_DEFAULT_MODEL,
+    credentialEnv: "OLLAMA_HOST",
+    available: true,
     role: "selected",
-    reason: "Default Nemo Clawd inference route for GLM 5.2.",
+    reason: "Default Ollama inference route — hf.co/ordlibrary/hauhau-qwen36-onchain runs locally.",
   };
 
   const openrouter = {
@@ -83,10 +83,11 @@ function buildInferenceRoutes(env) {
     reason: "NVIDIA NIM fallback for NVIDIA-hosted inference.",
   };
 
-  if (zai.available) return { selected: zai, advisor: openrouter.available ? openrouter : undefined, fallbacks: [openrouter, nvidia].filter((r) => r.provider !== zai.provider) };
-  if (openrouter.available) return { selected: { ...openrouter, role: "selected" }, advisor: undefined, fallbacks: [zai, nvidia] };
-  if (nvidia.available) return { selected: { ...nvidia, role: "selected" }, advisor: openrouter, fallbacks: [zai, openrouter] };
-  return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
+  return {
+    selected: ollama,
+    advisor: openrouter.available ? openrouter : undefined,
+    fallbacks: [openrouter, nvidia],
+  };
 }
 
 function resolveMagicRouter(input, env = process.env) {
@@ -121,13 +122,13 @@ function describeMagicRouter(route) {
 
 module.exports = {
   MAGIC_ROUTER_STRATEGY,
-  ZAI_DEFAULT_PROVIDER,
-  ZAI_DEFAULT_MODEL,
-  NVIDIA_FALLBACK_PROVIDER,
-  NVIDIA_FALLBACK_MODEL,
+  OLLAMA_DEFAULT_PROVIDER,
+  OLLAMA_DEFAULT_MODEL,
   OPENROUTER_PROVIDER,
   OPENROUTER_AUTO_MODEL,
   OPENROUTER_API_URL,
+  NVIDIA_FALLBACK_PROVIDER,
+  NVIDIA_FALLBACK_MODEL,
   classifyMagicRouterTask,
   resolveMagicRouter,
   describeMagicRouter,

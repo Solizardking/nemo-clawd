@@ -1,11 +1,11 @@
 export declare const MAGIC_ROUTER_STRATEGY = "magic-router";
-export declare const ZAI_DEFAULT_PROVIDER = "zai-glm";
-export declare const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
-export declare const NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
-export declare const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
+export declare const OLLAMA_DEFAULT_PROVIDER = "ollama-local";
+export declare const OLLAMA_DEFAULT_MODEL = "hf.co/ordlibrary/hauhau-qwen36-onchain";
 export declare const OPENROUTER_PROVIDER = "openrouter";
 export declare const OPENROUTER_AUTO_MODEL = "openrouter/auto";
 export declare const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+export declare const NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
+export declare const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
 type EnvLike = Record<string, string | undefined>;
 export type MagicRouterTaskType = "coding" | "zk_proof" | "solana_trading" | "prediction_market" | "wallet_ops" | "research" | "general";
 export interface MagicRouterInferenceRoute {

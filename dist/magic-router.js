@@ -2,18 +2,18 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OPENROUTER_API_URL = exports.OPENROUTER_AUTO_MODEL = exports.OPENROUTER_PROVIDER = exports.NVIDIA_FALLBACK_MODEL = exports.NVIDIA_FALLBACK_PROVIDER = exports.ZAI_DEFAULT_MODEL = exports.ZAI_DEFAULT_PROVIDER = exports.MAGIC_ROUTER_STRATEGY = void 0;
+exports.NVIDIA_FALLBACK_MODEL = exports.NVIDIA_FALLBACK_PROVIDER = exports.OPENROUTER_API_URL = exports.OPENROUTER_AUTO_MODEL = exports.OPENROUTER_PROVIDER = exports.OLLAMA_DEFAULT_MODEL = exports.OLLAMA_DEFAULT_PROVIDER = exports.MAGIC_ROUTER_STRATEGY = void 0;
 exports.classifyMagicRouterTask = classifyMagicRouterTask;
 exports.resolveMagicRouter = resolveMagicRouter;
 exports.describeMagicRouter = describeMagicRouter;
 exports.MAGIC_ROUTER_STRATEGY = "magic-router";
-exports.ZAI_DEFAULT_PROVIDER = "zai-glm";
-exports.ZAI_DEFAULT_MODEL = "zai/glm-5.2";
-exports.NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
-exports.NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
+exports.OLLAMA_DEFAULT_PROVIDER = "ollama-local";
+exports.OLLAMA_DEFAULT_MODEL = "hf.co/ordlibrary/hauhau-qwen36-onchain";
 exports.OPENROUTER_PROVIDER = "openrouter";
 exports.OPENROUTER_AUTO_MODEL = "openrouter/auto";
 exports.OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+exports.NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
+exports.NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
 function hasEnv(env, key) {
     return Boolean(env[key]?.trim());
 }
@@ -59,13 +59,13 @@ function toolSetForTask(taskType, openRouterAvailable) {
     }
 }
 function buildInferenceRoutes(env) {
-    const zai = {
-        provider: exports.ZAI_DEFAULT_PROVIDER,
-        model: exports.ZAI_DEFAULT_MODEL,
-        credentialEnv: "ZAI_API_KEY",
-        available: hasEnv(env, "ZAI_API_KEY"),
+    const ollama = {
+        provider: exports.OLLAMA_DEFAULT_PROVIDER,
+        model: env.OLLAMA_MODEL?.trim() || exports.OLLAMA_DEFAULT_MODEL,
+        credentialEnv: "OLLAMA_HOST",
+        available: true,
         role: "selected",
-        reason: "Default Nemo Clawd inference route for GLM 5.2.",
+        reason: "Default Ollama inference route — hf.co/ordlibrary/hauhau-qwen36-onchain runs locally.",
     };
     const openrouter = {
         provider: exports.OPENROUTER_PROVIDER,
@@ -84,13 +84,11 @@ function buildInferenceRoutes(env) {
         role: "fallback",
         reason: "NVIDIA NIM fallback for NVIDIA-hosted inference.",
     };
-    if (zai.available)
-        return { selected: zai, advisor: openrouter.available ? openrouter : undefined, fallbacks: [openrouter, nvidia].filter((r) => r.provider !== zai.provider) };
-    if (openrouter.available)
-        return { selected: { ...openrouter, role: "selected" }, advisor: undefined, fallbacks: [zai, nvidia] };
-    if (nvidia.available)
-        return { selected: { ...nvidia, role: "selected" }, advisor: openrouter, fallbacks: [zai, openrouter] };
-    return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
+    return {
+        selected: ollama,
+        advisor: openrouter.available ? openrouter : undefined,
+        fallbacks: [openrouter, nvidia],
+    };
 }
 function resolveMagicRouter(input, env = process.env) {
     const taskType = classifyMagicRouterTask(input);

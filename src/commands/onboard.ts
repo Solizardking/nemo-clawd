@@ -22,13 +22,15 @@ export interface OnboardOptions {
   pluginConfig: NemoClawdConfig;
 }
 
-const ENDPOINT_TYPES: EndpointType[] = ["zai", "build", "ncp", "nim-local", "vllm", "ollama", "custom"];
-const SUPPORTED_ENDPOINT_TYPES: EndpointType[] = ["zai", "build", "ncp"];
+const ENDPOINT_TYPES: EndpointType[] = ["ollama", "zai", "build", "ncp", "nim-local", "vllm", "custom"];
+const SUPPORTED_ENDPOINT_TYPES: EndpointType[] = ["ollama", "zai", "build", "ncp"];
 
 function isExperimentalEnabled(): boolean {
   return process.env.NEMOCLAWD_EXPERIMENTAL === "1";
 }
 
+const OLLAMA_DEFAULT_URL = "http://localhost:11434/v1";
+const OLLAMA_DEFAULT_MODEL = "hf.co/ordlibrary/hauhau-qwen36-onchain";
 const ZAI_ENDPOINT_URL = "https://api.z.ai/api/paas/v4";
 const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
 const BUILD_ENDPOINT_URL = "https://integrate.api.nvidia.com/v1";
@@ -48,6 +50,8 @@ const NVIDIA_MODELS = [
 
 function resolveProfile(endpointType: EndpointType): string {
   switch (endpointType) {
+    case "ollama":
+      return "ollama";
     case "zai":
       return "zai";
     case "build":
@@ -59,13 +63,13 @@ function resolveProfile(endpointType: EndpointType): string {
       return "nim-local";
     case "vllm":
       return "vllm";
-    case "ollama":
-      return "ollama";
   }
 }
 
 function resolveProviderName(endpointType: EndpointType): string {
   switch (endpointType) {
+    case "ollama":
+      return "ollama-local";
     case "zai":
       return "zai-glm";
     case "build":
@@ -77,13 +81,13 @@ function resolveProviderName(endpointType: EndpointType): string {
       return "nim-local";
     case "vllm":
       return "vllm-local";
-    case "ollama":
-      return "ollama-local";
   }
 }
 
 function resolveCredentialEnv(endpointType: EndpointType): string {
   switch (endpointType) {
+    case "ollama":
+      return "OPENAI_API_KEY";
     case "zai":
       return "ZAI_API_KEY";
     case "build":
@@ -93,7 +97,6 @@ function resolveCredentialEnv(endpointType: EndpointType): string {
     case "nim-local":
       return "NIM_API_KEY";
     case "vllm":
-    case "ollama":
       return "OPENAI_API_KEY";
   }
 }
@@ -157,11 +160,21 @@ function showConfig(config: NemoClawdOnboardConfig, logger: PluginLogger): void 
 async function promptEndpoint(
   ollama: { installed: boolean; running: boolean },
 ): Promise<EndpointType> {
+  const ollamaHint = ollama.running
+    ? "recommended — running on localhost:11434"
+    : ollama.installed
+      ? "recommended — installed locally, start with `ollama serve`"
+      : "recommended — install at ollama.com";
   const options = [
+    {
+      label: "Local Ollama (hf.co/ordlibrary/hauhau-qwen36-onchain)",
+      value: "ollama",
+      hint: ollamaHint,
+    },
     {
       label: "ZAI GLM 5.2",
       value: "zai",
-      hint: "recommended default — ZAI_API_KEY",
+      hint: "requires ZAI_API_KEY",
     },
     {
       label: "NVIDIA Build (build.nvidia.com)",
@@ -186,11 +199,6 @@ async function promptEndpoint(
         label: "Local vLLM [experimental]",
         value: "vllm",
         hint: "experimental — local development",
-      },
-      {
-        label: "Local Ollama [experimental]",
-        value: "ollama",
-        hint: `experimental — ${ollama.installed ? "installed locally" : "localhost:11434"}`,
       },
     );
   }
@@ -247,10 +255,14 @@ export async function cliOnboard(opts: OnboardOptions): Promise<void> {
     endpointType = ep;
   } else {
     const ollama = detectOllama();
-    if (ollama.running && isExperimentalEnabled()) {
+    if (ollama.running) {
       logger.info("Detected Ollama on localhost:11434. Using it for onboarding.");
       endpointType = "ollama";
+    } else if (ollama.installed) {
+      logger.info("Ollama detected but not running. Start it with: ollama serve");
+      endpointType = "ollama";
     } else {
+      logger.info("Ollama not detected. You can install it from https://ollama.com");
       endpointType = await promptEndpoint(ollama);
     }
   }

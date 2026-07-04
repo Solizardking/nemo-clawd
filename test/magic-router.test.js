@@ -10,34 +10,43 @@ describe("magic router", () => {
     assert.equal(classifyMagicRouterTask("quote a Kalshi prediction market YES token"), "prediction_market");
   });
 
-  it("keeps ZAI GLM 5.2 as the default when configured", () => {
-    const route = resolveMagicRouter("debug this TypeScript repo", {
-      ZAI_API_KEY: "zai-test",
-      OPENROUTER_API_KEY: "or-test",
-      NVIDIA_API_KEY: "nv-test",
+  it("uses Ollama-local as the default inference route", () => {
+    const route = resolveMagicRouter("debug this TypeScript repo", {});
+    assert.equal(route.inference.provider, "ollama-local");
+    assert.equal(route.inference.model, "hf.co/ordlibrary/hauhau-qwen36-onchain");
+    assert.equal(route.inference.credentialEnv, "OLLAMA_HOST");
+  });
+
+  it("honors OLLAMA_MODEL env override", () => {
+    const route = resolveMagicRouter("debug this repo", {
+      OLLAMA_MODEL: "hf.co/custom/onchain-model",
     });
-    assert.equal(route.inference.provider, "zai-glm");
-    assert.equal(route.inference.model, "zai/glm-5.2");
+    assert.equal(route.inference.provider, "ollama-local");
+    assert.equal(route.inference.model, "hf.co/custom/onchain-model");
+  });
+
+  it("uses OpenRouter advisor when available alongside Ollama default", () => {
+    const route = resolveMagicRouter("research latest model benchmarks", {
+      OPENROUTER_API_KEY: "or-test",
+    });
+    assert.equal(route.inference.provider, "ollama-local");
+    assert.equal(route.inference.model, "hf.co/ordlibrary/hauhau-qwen36-onchain");
+    assert.ok(route.advisor);
     assert.equal(route.advisor.provider, "openrouter");
     assert.equal(route.advisor.model, "openrouter/auto");
     assert.ok(route.toolSet.includes("openrouter-auto-router"));
   });
 
-  it("uses OpenRouter auto when ZAI is unavailable and OpenRouter is configured", () => {
-    const route = resolveMagicRouter("research latest model benchmarks", {
-      OPENROUTER_API_KEY: "or-test",
-    });
-    assert.equal(route.inference.provider, "openrouter");
-    assert.equal(route.inference.model, "openrouter/auto");
-    assert.equal(route.inference.credentialEnv, "OPENROUTER_API_KEY");
-  });
-
-  it("uses hosted Nemotron 3 Ultra for NVIDIA fallback by default", () => {
+  it("uses hosted Nemotron 3 Ultra when NVIDIA key is the only credential set", () => {
     const route = resolveMagicRouter("debug this repo", {
       NVIDIA_API_KEY: "nv-test",
     });
-    assert.equal(route.inference.provider, "nvidia-nim");
-    assert.equal(route.inference.model, "nvidia/nemotron-3-ultra-550b-a55b");
+    // Ollama remains default, NVIDIA is a fallback
+    assert.equal(route.inference.provider, "ollama-local");
+    assert.equal(route.inference.model, "hf.co/ordlibrary/hauhau-qwen36-onchain");
+    assert.equal(route.fallbacks.length, 2);
+    assert.equal(route.fallbacks[1].provider, "nvidia-nim");
+    assert.equal(route.fallbacks[1].model, "nvidia/nemotron-3-ultra-550b-a55b");
   });
 
   it("allows the hosted NVIDIA model to be overridden", () => {
@@ -45,14 +54,13 @@ describe("magic router", () => {
       NVIDIA_API_KEY: "nv-test",
       NEMOCLAWD_NVIDIA_MODEL: "nvidia/nemotron-3-super-120b-a12b",
     });
-    assert.equal(route.inference.provider, "nvidia-nim");
-    assert.equal(route.inference.model, "nvidia/nemotron-3-super-120b-a12b");
+    // Ollama remains default, NVIDIA fallback is overridden
+    assert.equal(route.inference.provider, "ollama-local");
+    assert.equal(route.fallbacks[1].model, "nvidia/nemotron-3-super-120b-a12b");
   });
 
   it("selects DFlow plus Proof/KYC tools for prediction markets", () => {
-    const route = resolveMagicRouter("buy a prediction market outcome token", {
-      ZAI_API_KEY: "zai-test",
-    });
+    const route = resolveMagicRouter("buy a prediction market outcome token", {});
     assert.equal(route.taskType, "prediction_market");
     assert.ok(route.toolSet.includes("dflow-prediction-metadata"));
     assert.ok(route.toolSet.includes("proof-kyc-check"));
@@ -60,9 +68,7 @@ describe("magic router", () => {
   });
 
   it("routes ZK attestation and nullifier tasks to the Clawd ZK tools", () => {
-    const route = resolveMagicRouter("derive a nullifier and publish a Groth16 model attestation", {
-      ZAI_API_KEY: "zai-test",
-    });
+    const route = resolveMagicRouter("derive a nullifier and publish a Groth16 model attestation", {});
     assert.equal(route.taskType, "zk_proof");
     assert.ok(route.toolSet.includes("clawd-zk-agent"));
     assert.ok(route.toolSet.includes("clawd-zk-client"));
