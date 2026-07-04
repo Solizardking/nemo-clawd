@@ -20,6 +20,7 @@ const ZAI_MODELS = [
     { id: ZAI_DEFAULT_MODEL, label: "GLM 5.2" },
 ];
 const NVIDIA_MODELS = [
+    { id: "nvidia/nemotron-3-ultra-550b-a55b", label: "Nemotron 3 Ultra 550B-A55B" },
     { id: "nvidia/nemotron-3-super-120b-a12b", label: "Nemotron 3 Super 120B" },
     { id: "nvidia/llama-3.1-nemotron-ultra-253b-v1", label: "Nemotron Ultra 253B" },
     { id: "nvidia/llama-3.3-nemotron-super-49b-v1.5", label: "Nemotron Super 49B v1.5" },

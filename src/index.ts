@@ -259,6 +259,12 @@ export default function register(api: NemoclawdPluginApi): void {
     models: {
       chat: [
         {
+          id: "nvidia/nemotron-3-ultra-550b-a55b",
+          label: "Nemotron 3 Ultra 550B-A55B",
+          contextWindow: 1000000,
+          maxOutput: 32768,
+        },
+        {
           id: "nvidia/nemotron-3-super-120b-a12b",
           label: "Nemotron 3 Super 120B (March 2026)",
           contextWindow: 131072,
