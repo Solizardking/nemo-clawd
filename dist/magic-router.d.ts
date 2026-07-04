@@ -7,7 +7,7 @@ export declare const OPENROUTER_PROVIDER = "openrouter";
 export declare const OPENROUTER_AUTO_MODEL = "openrouter/auto";
 export declare const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 type EnvLike = Record<string, string | undefined>;
-export type MagicRouterTaskType = "coding" | "solana_trading" | "prediction_market" | "wallet_ops" | "research" | "general";
+export type MagicRouterTaskType = "coding" | "zk_proof" | "solana_trading" | "prediction_market" | "wallet_ops" | "research" | "general";
 export interface MagicRouterInferenceRoute {
     provider: string;
     model: string;

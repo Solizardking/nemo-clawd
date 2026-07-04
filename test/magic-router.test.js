@@ -41,4 +41,14 @@ describe("magic router", () => {
     assert.ok(route.toolSet.includes("proof-kyc-check"));
     assert.equal(route.dflow.predictionMarketDefault, true);
   });
+
+  it("routes ZK attestation and nullifier tasks to the Clawd ZK tools", () => {
+    const route = resolveMagicRouter("derive a nullifier and publish a Groth16 model attestation", {
+      ZAI_API_KEY: "zai-test",
+    });
+    assert.equal(route.taskType, "zk_proof");
+    assert.ok(route.toolSet.includes("clawd-zk-agent"));
+    assert.ok(route.toolSet.includes("clawd-zk-client"));
+    assert.ok(route.toolSet.includes("light-protocol"));
+  });
 });

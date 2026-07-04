@@ -100,3 +100,23 @@ Agent (sandbox)  ──▶  OpenShell gateway  ──▶  NVIDIA cloud (build.nv
 ```
 
 Refer to [Inference Profiles](../reference/inference-profiles.md) for provider configuration details.
+
+## ZK Primitive Layer
+
+The repository also includes `zk-primitives/`, a separate workspace for proof and provenance infrastructure.
+It is kept outside the default plugin build so operators can inspect and test it without automatically enabling transaction submission.
+
+```text
+zk-primitives/
+├── client/                    TypeScript SDK for nullifiers, proof packing, and instruction builders
+├── agent/                     Deterministic intent router and CLI wrapper
+├── programs/clawd-zk/         Anchor-style on-chain program scaffold
+├── configs/                   Light Protocol tree and runtime examples
+├── docs/                      Architecture and integration notes
+└── tests/                     Off-chain and on-chain test references
+```
+
+The ZK layer supports three core operations: `publish_attestation`, `consume_attestation`, and `commit_encrypted_state`.
+Instruction construction is local and auditable; signing and live submission remain explicit operator actions.
+
+Run `npm run check:zk` from the repository root to build, lint, and test the TypeScript ZK packages after installing the workspace with `pnpm --dir zk-primitives install --frozen-lockfile`.

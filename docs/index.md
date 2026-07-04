@@ -154,6 +154,16 @@ Plugin structure, blueprint system, and sandbox lifecycle.
 {bdg-secondary}`Reference`
 :::
 
+:::{grid-item-card} ZK Primitives
+:link: reference/zk-primitives
+:link-type: doc
+
+Nullifiers, Groth16 proof preparation, and compressed-state helpers.
+
++++
+{bdg-secondary}`Reference`
+:::
+
 :::{grid-item-card} Network Policies
 :link: reference/network-policies
 :link-type: doc
@@ -203,6 +213,13 @@ Quickstart <get-started/quickstart>
 :hidden:
 
 Switch Inference Providers <inference/switch-inference-providers>
+```
+
+```{toctree}
+:caption: ZK
+:hidden:
+
+ZK Primitives <reference/zk-primitives>
 ```
 
 ```{toctree}

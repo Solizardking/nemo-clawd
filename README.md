@@ -1,3 +1,4 @@
+<!-- start-badges -->
 <p align="center">
   <strong>nemoclawd</strong><br/>
   <em>Solana x xAI Agentic Trading Engine — Powered by $CLAWD</em>
@@ -16,6 +17,7 @@
 </p>
 
 ---
+<!-- end-badges -->
 
 ## solana-clawd Integration
 
@@ -50,6 +52,7 @@
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
+<!-- start-quickstart-guide -->
 ### Quick Start
 
 ```bash
@@ -61,6 +64,7 @@ nemoclawd launch
 # Run demo walkthrough
 nemoclawd demo
 ```
+<!-- end-quickstart-guide -->
 
 ### DFlow Spot and Prediction Routing
 
@@ -72,6 +76,18 @@ nemoclawd dflow status
 ```
 
 Spot swaps and prediction outcome-token orders both use DFlow's `/order` trading endpoint. Prediction market discovery uses the DFlow prediction metadata API.
+
+### ZK Primitives
+
+The repository includes `zk-primitives/`, a Solana-native ZK workspace for model attestations, one-shot nullifiers, Groth16 proof preparation, and Light Protocol compressed-state helpers.
+
+```bash
+pnpm --dir zk-primitives install --frozen-lockfile
+npm run build:zk
+npm run test:zk
+```
+
+The ZK agent builds instructions and derives proof metadata locally. Signing and transaction submission remain explicit operator actions.
 
 ### xAI Grok Setup
 
@@ -241,6 +257,10 @@ XAI_API_KEY=                  # Grok: chat, voice, vision, search, multi-agent
 
 # OpenRouter (optional)
 OPENROUTER_API_KEY=           # Multi-model LLM routing
+
+# ZK primitives (optional)
+ZK_SHARK_RPC_URL=             # RPC for ZK instruction construction
+CLAWD_ZK_RPC_URL=             # Legacy alias accepted by zk-primitives
 
 # Telegram
 TELEGRAM_BOT_TOKEN=           # From @BotFather

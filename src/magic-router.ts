@@ -14,6 +14,7 @@ type EnvLike = Record<string, string | undefined>;
 
 export type MagicRouterTaskType =
   | "coding"
+  | "zk_proof"
   | "solana_trading"
   | "prediction_market"
   | "wallet_ops"
@@ -56,7 +57,8 @@ function textFromInput(input: string | string[] | undefined): string {
 
 export function classifyMagicRouterTask(input: string | string[] | undefined): MagicRouterTaskType {
   const text = textFromInput(input).toLowerCase();
-  if (/\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc|proof)\b/.test(text)) return "prediction_market";
+  if (/\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc)\b/.test(text)) return "prediction_market";
+  if (/\b(zk|zero[- ]knowledge|groth16|nullifier|attest|attestation|publish_attestation|commit_encrypted_state|encrypted state|ciphertext commitment|validity proof|compressed state|light protocol|proof)\b/.test(text)) return "zk_proof";
   if (/\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc|mint)\b/.test(text)) return "solana_trading";
   if (/\b(wallet|sign|signature|keypair|balance|airdrop|transfer|send sol|private wallet)\b/.test(text)) return "wallet_ops";
   if (/\b(code|build|test|debug|typescript|python|repo|script|compile|install)\b/.test(text)) return "coding";
@@ -67,6 +69,8 @@ export function classifyMagicRouterTask(input: string | string[] | undefined): M
 function toolSetForTask(taskType: MagicRouterTaskType, openRouterAvailable: boolean): string[] {
   const openRouterTool = openRouterAvailable ? ["openrouter-auto-router"] : [];
   switch (taskType) {
+    case "zk_proof":
+      return ["clawd-zk-agent", "clawd-zk-client", "light-protocol", "solana-rpc", "instruction-builder", "wallet-approval", ...openRouterTool];
     case "prediction_market":
       return ["dflow-prediction-metadata", "dflow-order", "proof-kyc-check", "solana-rpc", "wallet-approval", ...openRouterTool];
     case "solana_trading":
