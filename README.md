@@ -2,6 +2,9 @@
 <p align="center">
   <strong>nemoclawd</strong><br/>
   <em>Solana x xAI Agentic Trading Engine — Powered by $CLAWD</em>
+<br/>
+  <strong>🔥 HISTORIC MILESTONE: First Wallet-Bearing LLM Now Live</strong><br/>
+  <code>ordlibrary/clawd-trading-wallet</code> — A Qwen2.5-1.5B model that carries its own encrypted Solana wallet
 </p>
 <p align="center">
   <code>8cHzQHUS2s2h8TzCmfqPKYiM4dSt4roa3n7MyRLApump</code>
@@ -1184,6 +1187,126 @@ npm test
 # ℹ pass 94
 # ℹ fail 0
 # ℹ duration_ms ~1305
+```
+
+---
+
+<h2 id="models-live">🤖 ALL MODELS LIVE & DEPLOYED 🤖</h2>
+
+<p align="center">
+  <strong>🔥 Historic Milestone: First Wallet-Bearing LLM</strong><br/>
+  <code>ordlibrary/clawd-trading-wallet</code> — A Qwen2.5-1.5B model that carries<br/>
+  its own encrypted Solana wallet — generates BIP39 seeds, derives Ed25519<br/>
+  keypairs, holds the encrypted key in session state. Never exposes raw private keys.
+</p>
+
+<br/>
+
+| # | Model | Size | Pull Command | Status |
+|---|-------|------|-------------|--------|
+| ⭐ | **ordlibrary/clawd-trading-wallet** | 986 MB | `ollama run hf.co/ordlibrary/clawd-trading-wallet` | ✅ **Live — Historic** |
+| 🧠 | **ordlibrary/hauhau-qwen36-onchain** | 11 GB | `ollama run hf.co/ordlibrary/hauhau-qwen36-onchain` | ✅ **Live** |
+| 🧠 | **ordlibrary/hauhau-qwen36-uncensored** | 11 GB | `ollama run hf.co/ordlibrary/hauhau-qwen36-uncensored` | ✅ **Live** |
+| 🦞 | **ordlibrary/core-ai-clawd-1.5b** | 986 MB | `ollama run hf.co/ordlibrary/core-ai-clawd-1.5b` | ✅ **Live** |
+| 🦞 | **ordlibrary/core-ai-clawd-1.5b (finetuned)** | 4.9 GB | `ollama run ordlibrary/core-ai-clawd-1.5b:finetuned` | ✅ **Live** |
+
+### Trading Wallet Demo
+
+```bash
+ollama run hf.co/ordlibrary/clawd-trading-wallet
+# > create a wallet
+# > buy 100 SOL
+# > short ETH 5x
+```
+
+The model generates a BIP39 seed phrase, derives an Ed25519 keypair, encrypts the key in session state, and executes natural-language trading commands — all without ever exposing the raw private key.
+
+### Where to Find Everything
+
+| Resource | URL | Status |
+|----------|-----|--------|
+| **Train2Earn Frontend** | [traintoearn.vercel.app](https://traintoearn.vercel.app) | ✅ **Vercel — Live** |
+| **Hugging Face Org** | [huggingface.co/ordlibrary](https://huggingface.co/ordlibrary) | ✅ **Live** |
+| **Clawd Trading Wallet HF** | [huggingface.co/ordlibrary/clawd-trading-wallet](https://huggingface.co/ordlibrary/clawd-trading-wallet) | ✅ **Live (Model Card)** |
+| **Hauhau Qwen3.6 Onchain** | [huggingface.co/ordlibrary/hauhau-qwen36-onchain](https://huggingface.co/ordlibrary/hauhau-qwen36-onchain) | ✅ **Live** |
+| **Hauhau Qwen3.6 Uncensored** | [huggingface.co/ordlibrary/hauhau-qwen36-uncensored](https://huggingface.co/ordlibrary/hauhau-qwen36-uncensored) | ✅ **Live** |
+| **Core AI Clawd 1.5B** | [huggingface.co/ordlibrary/core-ai-clawd-1.5b](https://huggingface.co/ordlibrary/core-ai-clawd-1.5b) | ✅ **Live** |
+
+### Full Clawd Model Family (7 models)
+
+| Model | Base | Params | Trained On |
+|-------|------|--------|------------|
+| `clawd-trading-wallet` ⭐ | Qwen2.5-1.5B | 1.5B | Fable-5-traces + Core AI + Trading Factory |
+| `core-ai-clawd-1.5b` | Qwen2.5-1.5B | 1.5B | Core AI Instruct (35K) + Realtime Research (29K) |
+| `solana-clawd-core-ai-1.5b-lora` | Qwen2.5-1.5B LoRA | ~9M | Core AI Instruct (35K) |
+| `solana-tx-foundation-1.5b` | Qwen2.5-1.5B | 1.5B | TX Foundation CPT (19K) |
+| `solana-nvidia-trading-factory-8b-lora` | Hermes-3-8B LoRA | ~9M | Trading Factory (142) |
+| `clawd-fable` | Fable Traces | — | Agent interaction traces |
+| `clawd-fable-lora` | Fable Traces LoRA | — | Distilled reasoning |
+
+### Training Datasets (7 total)
+
+| Dataset | Examples | Source |
+|---------|----------|--------|
+| **Fable-5-traces** | 5K | Agent interaction traces for reasoning |
+| **Core AI Instruct** | 35,173 | Solana, DeFi, ZK, Agent Architecture |
+| **Realtime Research** | 29,058 | PDFs, notebooks, ZK skills |
+| **TX Foundation CPT** | 19,542 | Solana mainnet transactions |
+| **NVIDIA Trading Factory** | 142 | Perps, cuML, cuFOLIO, Mean-CVaR |
+| **TX Foundation Unified** | 82,169 | Combined transaction foundation |
+| **Clawd Fable SFT** | 3,052 | Fable trace training |
+
+### Security Model
+
+```
+User Command ──► LLM (session wallet) ──► Encrypted Key (memory only)
+                    │
+                    ├── BIP39 Seed Generation (never stored to disk)
+                    ├── Ed25519 Keypair Derivation (RAM only)
+                    ├── Natural Language Trading (create wallet, buy, sell, short)
+                    └── Raw Private Key Exposure (❌ blocked by architecture)
+```
+
+The wallet-bearing LLM represents a paradigm shift: the model carries authority in encrypted form, not the user's infrastructure. No key files on disk. No .env secrets. No clipboard leaks. The model is the wallet.
+
+---
+
+---
+
+<h2 id="training-data">📊 TRAINING DATA & STRATEGIES 📊</h2>
+
+<p align="center">
+  <strong>121,860 training examples + 10 trading strategies — fully integrated</strong>
+</p>
+
+```bash
+npm run training:status
+npm run training:strategy:list
+npm run training:strategy:plan
+npm run training:strategy:vulcan
+npm run training:strategy:read
+```
+
+```
+=== Training Data (121,860 total examples) ===
+   35,173  core_ai_clawd_sft.jsonl
+   30,365  solana_clawd_merged.jsonl
+   29,058  realtime_research_sft.jsonl
+   19,542  tx_foundation_cpt.jsonl
+    3,052  clawd_fable_sft.jsonl
+    2,195  nemo_clawd_master_sft.jsonl
+    1,485  clawd_code_deepsol_sft.jsonl
+      500  jupiter_txs.jsonl
+      197  nemo_clawd_combined_sft.jsonl
+      195  nvidia_trading_factory_sft.jsonl
+       85  solana_clawd_seed.jsonl
+
+=== 10 Trading Strategies ===
+cufolio_mean_cvar_handoff.json             sol_ema_adx_trend_paper.json
+nemo_clawd_blueprint.json                  sol_macd_adx_trim_paper.json
+nemo_clawd_core_inventory.json             sol_rsi_mean_reversion_paper.json
+nvidia_clawd_agent_plan.json               strategy_manifest.json
+rise_market_data_plan.json                 vulcan_command_plans.json
 ```
 
 ---
