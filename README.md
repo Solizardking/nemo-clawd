@@ -196,11 +196,46 @@ npm run build:plugin
 node bin/nemoclawd.js magic-router "check solana price"
 
 # ── Output ──────────────────────────────────────────────────
-# Magic Router
-#   Task:      general              ✅ Classified
-#   Inference: zai-glm / zai/glm-5.2
-#   DFlow:     spot=true predictions=true  ✅ Ready to trade
+#  🪄  Magic Router v2.0.0 — Decision Trace
+#  ────────────────────────────────────────────────
+#
+#  🧠  Task Classification
+#     Input type:    General Purpose
+#     Confidence:    60%
+#     Description:   Chat, Q&A, brainstorming, creative writing, anything else
+#
+#  ⚡  Performance Profile
+#     Latency:       fast
+#     Requires key:  no
+#     Needs wallet:  no
+#
+#  🧠  Inference Route
+#     Primary:       ✅ ollama-local / hf.co/ordlibrary/hauhau-qwen36-onchain
+#     Credential:    $OLLAMA_HOST
+#     Fallback:      ❌ openrouter / openrouter/auto
+#     Fallback:      ❌ nvidia-nim / nvidia/nemotron-3-ultra-550b-a55b
+#
+#  🛠️  Tool Set (2)
+#     • chat
+#     • web-search
+#
+#  🛡️  Guardrails
+#     ✓ least-privilege-tools
+#     ✓ read-only-before-signing
+#     ✓ explicit-approval-before-wallet-actions
+#     ✓ no-private-key-or-seed-phrase-handling
+#
+#  🔀  DFlow Routing
+#     Spot trading:           ✅ enabled
+#     Prediction markets:     ✅ enabled
+#     Credential:             $DFLOW_API_KEY
 # ─────────────────────────────────────────────────────────────
+# ▶ Also try:
+#   nemoclawd magic-router "audit this smart contract for rug risk"
+#   nemoclawd magic-router "buy a Kalshi YES token on the election"
+#   nemoclawd magic-router "generate a Solana meme image"
+#   nemoclawd magic-router "show me my wallet PnL and portfolio"
+#   nemoclawd magic-router "check the floor price of my NFT collection"
 ```
 
 ---
@@ -1132,23 +1167,23 @@ cp .env.local .env
 | CLI dispatch | 17 | ✅ All pass |
 | DFlow routing defaults | 4 | ✅ All pass |
 | Installer runtime preflight | 1 | ✅ Passes |
-| Magic router | 7 | ✅ All pass |
+| Magic router v2.0 🪄 | 17 | ✅ All pass |
 | NIM (NVIDIA Inference Microservice) | 6 | ✅ All pass |
 | Policies | 8 | ✅ All pass |
 | CGroup config | 7 | ✅ All pass |
 | Registry | 15 | ✅ All pass |
-| Docker helpres | 3 | ✅ All pass |
-| **Total** | **84** | **✅ 0 failures, 0 skipped** |
+| Docker helpers | 3 | ✅ All pass |
+| **Total** | **94** | **✅ 0 failures, 0 skipped** |
 
 ```bash
 npm test
 
 # Expected output:
-# ℹ tests 84
+# ℹ tests 94
 # ℹ suites 24
-# ℹ pass 84
+# ℹ pass 94
 # ℹ fail 0
-# ℹ duration_ms ~1680
+# ℹ duration_ms ~1305
 ```
 
 ---
