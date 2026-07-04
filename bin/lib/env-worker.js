@@ -137,8 +137,7 @@ function maskValue(value) {
     return parsed.toString();
   } catch {}
 
-  if (text.length <= 8) return "****";
-  return `${text.slice(0, 4)}...${text.slice(-4)}`;
+  return "****";
 }
 
 function statusSnapshot(envFile = getEnvFilePath()) {
@@ -180,9 +179,12 @@ function startWorker(opts = {}) {
   const logFile = path.join(ENV_DIR, "env-worker.log");
   fs.mkdirSync(ENV_DIR, { recursive: true, mode: 0o700 });
 
+  const logFd = fs.openSync(logFile, "a", 0o600);
+  fs.chmodSync(logFile, 0o600);
+
   const child = spawn(process.execPath, [__filename, "--serve", envFile], {
     detached: true,
-    stdio: ["ignore", fs.openSync(logFile, "a"), fs.openSync(logFile, "a")],
+    stdio: ["ignore", logFd, logFd],
     env: { ...process.env, NEMOCLAWD_ENV_FILE: envFile },
   });
   child.unref();
