@@ -7,7 +7,7 @@
  * available inside the Nemo Clawd host process and cannot be imported at build
  * time.
  */
-import type { Command } from "commander";
+type Command = import("commander").Command;
 /** Subset of NemoclawdConfig that we actually read. */
 export interface NemoclawdConfig {
     [key: string]: unknown;
@@ -129,4 +129,5 @@ export interface NemoClawdConfig {
 }
 export declare function getPluginConfig(api: NemoclawdPluginApi): NemoClawdConfig;
 export default function register(api: NemoclawdPluginApi): void;
+export {};
 //# sourceMappingURL=index.d.ts.map

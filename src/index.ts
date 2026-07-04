@@ -11,7 +11,9 @@
  * time.
  */
 
-import type { Command } from "commander";
+/** Minimal stub — commander is ESM-only and cannot be type-imported in a CJS project. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Command = any;
 import { registerCliCommands } from "./cli.js";
 import { handleSlashCommand } from "./commands/slash.js";
 import { loadOnboardConfig } from "./onboard/config.js";

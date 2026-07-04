@@ -9,8 +9,8 @@ WORKDIR /build
 COPY package*.json tsconfig.json ./
 COPY nemo-clawd-mcp/package*.json ./nemo-clawd-mcp/
 
-RUN npm ci --no-audit --no-fund \
-    && npm ci --no-audit --no-fund --prefix nemo-clawd-mcp
+RUN npm ci --include=dev --no-audit --no-fund \
+    && npm ci --include=dev --no-audit --no-fund --prefix nemo-clawd-mcp
 
 COPY src/ ./src/
 COPY bin/ ./bin/
