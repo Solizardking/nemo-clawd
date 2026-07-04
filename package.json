@@ -51,6 +51,7 @@
     "services:build": "npm run services:gateway:build && npm run services:inference-mesh:build && npm run services:clawdrouter:build",
     "services:test": "npm run services:gateway:test && npm run services:clawdrouter:test && npm run services:operator:check && npm run services:livekit:check",
     "build": "npm run build:plugin && npm run build:mcp",
+    "training:build": "python3 scripts/build_training_data.py",
     "public:audit": "bash scripts/public-release-audit.sh",
     "pack:check": "npm pack --dry-run --cache /tmp/nemoclawd-npm-cache",
     "release:check": "npm run build && npm test && npm run public:audit && npm run pack:check",
