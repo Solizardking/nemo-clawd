@@ -2,6 +2,8 @@
 
 > **WIP** — This page is actively being updated as we work through Spark installs. Expect changes.
 
+> **Jetson Orin Nano users:** do not use this DGX Spark path. Use [Nemo Clawd on Jetson Orin Nano](orin-nano-install.md) instead.
+
 ## Quick Start
 
 ```bash

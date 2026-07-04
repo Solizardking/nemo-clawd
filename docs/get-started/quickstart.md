@@ -28,6 +28,7 @@ status: published
 ### Next Steps
 
 - [Switch inference providers](../inference/switch-inference-providers.md) to use a different model or endpoint.
+- [Set up Jetson Orin Nano](../deployment/set-up-orin-nano.md) when running Nemo Clawd on Orin Nano hardware.
 - [Approve or deny network requests](../network-policy/approve-network-requests.md) when the agent tries to reach external hosts.
 - [Customize the network policy](../network-policy/customize-network-policy.md) to pre-approve trusted domains.
 - [Deploy to a remote GPU instance](../deployment/deploy-to-remote-gpu.md) for always-on operation.

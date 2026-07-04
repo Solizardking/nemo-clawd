@@ -56,10 +56,13 @@ The `nvidia-nim` provider registers the following models from [build.nvidia.com]
 
 | Model ID | Label | Context Window | Max Output |
 |---|---|---|---|
+| `nvidia/nemotron-3-ultra-550b-a55b` | Nemotron 3 Ultra 550B-A55B | 1,000,000 | 32,768 |
 | `nvidia/nemotron-3-super-120b-a12b` | Nemotron 3 Super 120B | 131,072 | 8,192 |
 | `nvidia/llama-3.1-nemotron-ultra-253b-v1` | Nemotron Ultra 253B | 131,072 | 4,096 |
 | `nvidia/llama-3.3-nemotron-super-49b-v1.5` | Nemotron Super 49B v1.5 | 131,072 | 4,096 |
 | `nvidia/nemotron-3-nano-30b-a3b` | Nemotron 3 Nano 30B | 131,072 | 4,096 |
+
+Model availability can vary by account, endpoint, or NVIDIA Cloud Partner. If the hosted endpoint exposes `nvidia/nemotron-3-ultra-550b-a55b`, use it as a hosted model; do not treat it as a local single-device deployment target.
 
 ## Switching Models at Runtime
 
@@ -72,6 +75,9 @@ $ openshell inference set --no-verify --provider ollama-local --model llama3
 
 # Switch to NVIDIA Cloud
 $ openshell inference set --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b
+
+# Switch to hosted Nemotron 3 Ultra when available
+$ openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-ultra-550b-a55b
 ```
 
 The change takes effect immediately.

@@ -357,6 +357,7 @@ $ nemoclawd status
 #### `nemoclawd setup-spark`
 
 Set up Nemo Clawd on DGX Spark (cgroup v2 + Docker fixes for Ubuntu 24.04).
+This command is for DGX Spark only. Jetson Orin Nano users should follow [Set Up Jetson Orin Nano](../deployment/set-up-orin-nano.md) instead.
 
 ```console
 $ sudo nemoclawd setup-spark

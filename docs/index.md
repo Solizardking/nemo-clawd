@@ -184,6 +184,16 @@ Task-oriented guides for inference, deployment, and policy management.
 {bdg-secondary}`How-To`
 :::
 
+:::{grid-item-card} Jetson Orin Nano
+:link: deployment/set-up-orin-nano
+:link-type: doc
+
+Set up Nemo Clawd on a single Jetson Orin Nano with hosted Nemotron inference.
+
++++
+{bdg-secondary}`How-To`
+:::
+
 ::::
 
 ```{toctree}
@@ -235,6 +245,7 @@ Customize the Network Policy <network-policy/customize-network-policy>
 :hidden:
 
 Deploy to a Remote GPU Instance <deployment/deploy-to-remote-gpu>
+Set Up Jetson Orin Nano <deployment/set-up-orin-nano>
 Set Up the Telegram Bridge <deployment/set-up-telegram-bridge>
 ```
 
