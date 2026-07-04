@@ -16,7 +16,7 @@
       "sha256": "ded0f34c7a68df6ad794a9f54dcd68237fa124fe519e7505641b5de8c7c1b21d"
     }
   ],
-  "generated_at": "2026-07-04T13:07:48.868677+00:00",
+  "generated_at": "2026-07-04T13:08:47.649058+00:00",
   "input_corrections": {
     "/Users/8bit/drive/pdfs/2 412.07591v2.pdf": "/Users/8bit/drive/pdfs/2412.07591v2.pdf"
   },
@@ -159,7 +159,7 @@
       "id": "pdf:2412.04913v3",
       "pages": 4,
       "path": "/Users/8bit/drive/pdfs/2412.04913v3.pdf",
-      "primary_theme": "document_intelligence",
+      "primary_theme": "memecoin_intelligence",
       "redactions": {
         "api_tokens": 0,
         "emails": 3,
@@ -168,7 +168,6 @@
       "sha256": "c36a743dc30649a657691ce6709a1da662b60bbe960bb8bae621b34eb5c411fb",
       "source_type": "pdf",
       "themes": [
-        "document_intelligence",
         "memecoin_intelligence"
       ],
       "title": "Bridging Culture and Finance: A Multimodal Analysis of Memecoins in the Web3 Ecosystem"
@@ -197,7 +196,7 @@
       "id": "pdf:2412.07591v2",
       "pages": 4,
       "path": "/Users/8bit/drive/pdfs/2412.07591v2.pdf",
-      "primary_theme": "document_intelligence",
+      "primary_theme": "memecoin_intelligence",
       "redactions": {
         "api_tokens": 0,
         "emails": 4,
@@ -206,7 +205,6 @@
       "sha256": "22d9fb4d23cf2eab79f1014c2af356b608e6007b692f128e1547957da352129e",
       "source_type": "pdf",
       "themes": [
-        "document_intelligence",
         "memecoin_intelligence"
       ],
       "title": "CoinCLIP: A Multimodal Framework for Assessing Viability in Web3 Memecoins"
@@ -358,7 +356,7 @@
       "id": "pdf:2512.19113v2",
       "pages": 36,
       "path": "/Users/8bit/drive/pdfs/2512.19113v2.pdf",
-      "primary_theme": "agentic_trading_safety",
+      "primary_theme": "market_risk_derivatives",
       "redactions": {
         "api_tokens": 0,
         "emails": 4,
@@ -368,7 +366,6 @@
       "sha256": "e6158f8c8dc4dc917b2809dcbb08424bad90eb822c7a486d718fbcfb9e1e14c8",
       "source_type": "pdf",
       "themes": [
-        "agentic_trading_safety",
         "market_risk_derivatives"
       ],
       "title": "A Unified Framework and Comparative Study of Decentralized Finance Derivatives Protocols"
@@ -413,7 +410,7 @@
       "id": "pdf:2512.22476v1",
       "pages": 67,
       "path": "/Users/8bit/drive/pdfs/2512.22476v1.pdf",
-      "primary_theme": "confidential_execution",
+      "primary_theme": "market_risk_derivatives",
       "redactions": {
         "api_tokens": 0,
         "emails": 1,
@@ -422,9 +419,7 @@
       "sha256": "9ce1b45de34cc25442f358a29615e7ded30ccd003a310e765b19e73edb002fbd",
       "source_type": "pdf",
       "themes": [
-        "confidential_execution",
-        "market_risk_derivatives",
-        "operator_learning"
+        "market_risk_derivatives"
       ],
       "title": "AutoQuant: An Auditable Expert-System Framework for Execution-Constrained Auto-Tuning in Cryptocurrency Perpetual Futures"
     },

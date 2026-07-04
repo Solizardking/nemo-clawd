@@ -26,7 +26,7 @@ The builder requires Poppler (`pdfinfo` and `pdftotext`) and uses no Python pack
 
 ## Current Build
 
-- Generated at: `2026-07-04T13:07:48.868677+00:00`
+- Generated at: `2026-07-04T13:08:47.649058+00:00`
 - Unique PDF sources: 24
 - Duplicate PDF files deduplicated: 2
 - PDF chunks: 413

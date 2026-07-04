@@ -1,6 +1,6 @@
 # Training Data Quality Report
 
-Generated at `2026-07-04T13:07:48.868677+00:00`.
+Generated at `2026-07-04T13:08:47.649058+00:00`.
 
 ## Counts
 
@@ -17,11 +17,11 @@ Generated at `2026-07-04T13:07:48.868677+00:00`.
 
 ## Themes
 
-- `agentic_trading_safety`: 5
-- `confidential_execution`: 4
-- `document_intelligence`: 3
-- `market_risk_derivatives`: 6
-- `memecoin_intelligence`: 2
+- `agentic_trading_safety`: 4
+- `confidential_execution`: 3
+- `document_intelligence`: 1
+- `market_risk_derivatives`: 8
+- `memecoin_intelligence`: 4
 - `operator_learning`: 1
 - `prediction_markets`: 3
 

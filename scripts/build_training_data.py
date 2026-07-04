@@ -137,7 +137,8 @@ THEME_RULES = [
         "agentic_trading_safety",
         [
             "agentic",
-            "agents",
+            "paper agents",
+            "investment agents",
             "survivability",
             "risk intelligence",
             "autonomous",
@@ -358,9 +359,16 @@ def themes_for(title: str, abstract: str, path: str) -> list[str]:
     haystack = f"{title}\n{abstract}\n{Path(path).stem}".lower()
     matches: list[str] = []
     for theme, keywords in THEME_RULES:
-        if any(keyword in haystack for keyword in keywords):
+        if any(keyword_matches(haystack, keyword) for keyword in keywords):
             matches.append(theme)
     return matches or ["repo_operations"]
+
+
+def keyword_matches(haystack: str, keyword: str) -> bool:
+    if re.fullmatch(r"[a-z0-9.+#_-]+", keyword):
+        pattern = rf"(?<![a-z0-9]){re.escape(keyword)}(?![a-z0-9])"
+        return re.search(pattern, haystack) is not None
+    return keyword in haystack
 
 
 def extract_abstract(full_text: str) -> str:
