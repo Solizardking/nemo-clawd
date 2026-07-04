@@ -45,7 +45,10 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 function findRepoRoot(): string {
   let current = MODULE_DIR;
   for (let i = 0; i < 8; i += 1) {
-    if (fs.existsSync(path.join(current, 'agents', 'agents-catalog.json'))) {
+    if (
+      fs.existsSync(path.join(current, 'agents', 'agents-catalog.json')) ||
+      fs.existsSync(path.join(current, 'package.json'))
+    ) {
       return current;
     }
     const next = path.dirname(current);
@@ -129,6 +132,40 @@ function safeJsonRead<T>(filePath: string, fallback: T): T {
   return fallback;
 }
 
+function fallbackCatalogAgents(): Array<Record<string, unknown>> {
+  return Object.values(AGENTS).map((agent) => ({
+    identifier: agent.slug,
+    slug: agent.slug,
+    symbol: agent.symbol,
+    title: agent.name,
+    name: agent.name,
+    description: agent.description,
+    category: 'core',
+    author: 'x402agent',
+    capabilities: agent.capabilities,
+    model: agent.model,
+    metadata_uri: `${BASE_URL}/metadata/agent${agent.id}.json`,
+    catalogUrl: `${BASE_URL}/api/agents/catalog/${agent.slug}.json`,
+  }));
+}
+
+function fallbackAgentCatalog(): Record<string, unknown> {
+  const agents = fallbackCatalogAgents();
+  return {
+    version: VERSION,
+    generatedAt: SPAWN_DATE,
+    stats: { totalAgents: agents.length },
+    agents,
+    featured: agents,
+    oneShots: [],
+    fallback: true,
+  };
+}
+
+function loadAgentCatalog(): Record<string, unknown> {
+  return safeJsonRead<Record<string, unknown>>(AGENTS_CATALOG_PATH, fallbackAgentCatalog());
+}
+
 function serveJsonFile(filePath: string, res: Response): void {
   if (!fs.existsSync(filePath)) {
     res.status(404).json({ error: 'not found', path: filePath });
@@ -160,7 +197,11 @@ function formatFeedXml(turns: ConversationTurn[]): string {
 // ── Full agent catalog (124+ agents) ─────────────────────────────────────────
 
 router.get('/api/agents/catalog', cacheHeaders(120), (_req: Request, res: Response) => {
-  serveJsonFile(AGENTS_CATALOG_PATH, res);
+  if (fs.existsSync(AGENTS_CATALOG_PATH)) {
+    serveJsonFile(AGENTS_CATALOG_PATH, res);
+    return;
+  }
+  res.json(loadAgentCatalog());
 });
 
 router.get('/api/agents/catalog/:agentId', cacheHeaders(120), (req: Request, res: Response) => {
@@ -170,6 +211,13 @@ router.get('/api/agents/catalog/:agentId', cacheHeaders(120), (req: Request, res
   const catalogFile = path.join(AGENTS_PUBLIC_CATALOG_DIR, `${id}.json`);
 
   if (!fs.existsSync(catalogFile)) {
+    const fallback = fallbackCatalogAgents().find((agent) =>
+      agent.identifier === id || agent.slug === id || agent.symbol === id.toUpperCase()
+    );
+    if (fallback) {
+      res.json(fallback);
+      return;
+    }
     res.status(404).json({ error: 'agent not found', id });
     return;
   }
@@ -271,7 +319,7 @@ router.get('/api/agents', cacheHeaders(60), (_req: Request, res: Response) => {
   }
 
   // Fallback
-  const catalog = safeJsonRead<Record<string, unknown>>(AGENTS_CATALOG_PATH, {});
+  const catalog = loadAgentCatalog();
   res.json({
     name: 'OpenClawd Agents API',
     version: catalog?.version ?? '1.0',
@@ -305,7 +353,7 @@ router.get('/registry', cacheHeaders(120), (_req: Request, res: Response) => {
   }));
 
   // Include catalog stats if available
-  const catalog = safeJsonRead<Record<string, unknown>>(AGENTS_CATALOG_PATH, {});
+  const catalog = loadAgentCatalog();
   const rawCatalog = catalog as Record<string, unknown>;
   const catalogAgents: Array<Record<string, unknown>> = (rawCatalog.agents as Array<Record<string, unknown>>)?.map((a: Record<string, unknown>) => {
     const m = (a.meta ?? {}) as Record<string, unknown>;
@@ -336,7 +384,7 @@ router.get('/registry', cacheHeaders(120), (_req: Request, res: Response) => {
 });
 
 router.get('/identity', cacheHeaders(300), (_req: Request, res: Response) => {
-  const catalog = safeJsonRead<Record<string, unknown>>(AGENTS_CATALOG_PATH, {});
+  const catalog = loadAgentCatalog();
   res.json({
     title: 'CLAWD Agent Identity', version: VERSION,
     agents: Object.values(AGENTS).map(a => ({ id: a.id, name: a.name, symbol: a.symbol, description: a.description, capabilities: a.capabilities })),

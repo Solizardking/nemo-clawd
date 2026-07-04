@@ -9,7 +9,8 @@ import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import bs58 from 'bs58';
 import nacl from 'tweetnacl';
 
@@ -20,7 +21,10 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 function findRepoRoot(): string {
   let current = MODULE_DIR;
   for (let i = 0; i < 8; i += 1) {
-    if (fs.existsSync(path.join(current, 'skills', 'catalog.json'))) {
+    if (
+      fs.existsSync(path.join(current, 'skills', 'catalog.json')) ||
+      fs.existsSync(path.join(current, 'package.json'))
+    ) {
       return current;
     }
     const next = path.dirname(current);
@@ -33,6 +37,8 @@ function findRepoRoot(): string {
 const REPO_ROOT = findRepoRoot();
 const SKILLS_ROOT = path.join(REPO_ROOT, 'skills');
 const PUBLIC_BASE_URL = process.env.GATEWAY_BASE_URL ?? 'https://x402.wtf';
+const REGISTRY_PATH = process.env.SKILL_HUB_REGISTRY_PATH ??
+  path.join(process.env.DATA_DIR ?? path.join(REPO_ROOT, 'data'), 'skill-hub-registry.json');
 
 type ComponentKind = 'agent' | 'skill' | 'plugin' | 'mcp_server' | 'program';
 
@@ -84,19 +90,162 @@ interface SkillHubModule {
   catalogEntryToKind(entry: CatalogEntry): ComponentKind;
 }
 
-const skillHubModule = await import(
-  pathToFileURL(path.join(REPO_ROOT, 'trading', 'formal_verification', 'skill-hub.js')).href
-) as SkillHubModule;
+const FALLBACK_CATALOG: CatalogEntry[] = [
+  {
+    slug: 'github',
+    name: 'GitHub',
+    description: 'Repository, issue, pull request, and release automation for agent workflows.',
+    category: 'developer-tools',
+  },
+  {
+    slug: 'solana',
+    name: 'Solana',
+    description: 'Wallet, RPC, token, and on-chain transaction utilities for Solana agents.',
+    category: 'blockchain',
+  },
+  {
+    slug: 'dflow',
+    name: 'DFlow',
+    description: 'Spot trading and prediction-market order routing through DFlow endpoints.',
+    category: 'trading',
+  },
+  {
+    slug: 'x402',
+    name: 'x402 Payments',
+    description: 'HTTP 402 payment patterns for paid APIs and agent-to-agent commerce.',
+    category: 'payments',
+  },
+  {
+    slug: 'telegram',
+    name: 'Telegram Bot',
+    description: 'Telegram command and webhook integration for operator-facing agents.',
+    category: 'messaging',
+  },
+  {
+    slug: 'zk-primitives',
+    name: 'ZK Primitives',
+    description: 'Nullifier, proof metadata, and compressed-state helpers for Solana agents.',
+    category: 'program',
+    path: 'zk-primitives',
+  },
+];
 
-const {
-  listSkills,
-  getSkillById,
-  getSkillBySlug,
-  registerSkill,
-  revokeSkill,
-  loadCatalog,
-  catalogEntryToKind,
-} = skillHubModule;
+function readJsonFile<T>(filePath: string, fallback: T): T {
+  try {
+    if (!fs.existsSync(filePath)) return fallback;
+    return JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function stableHash(input: unknown): string {
+  return createHash('sha256').update(JSON.stringify(input)).digest('hex');
+}
+
+function loadRegistry(): SkillHubEntry[] {
+  const raw = readJsonFile<SkillHubEntry[] | { skills?: SkillHubEntry[] }>(REGISTRY_PATH, []);
+  return Array.isArray(raw) ? raw : raw.skills ?? [];
+}
+
+function saveRegistry(entries: SkillHubEntry[]): void {
+  fs.mkdirSync(path.dirname(REGISTRY_PATH), { recursive: true });
+  fs.writeFileSync(REGISTRY_PATH, JSON.stringify({ skills: entries }, null, 2));
+  fs.chmodSync(REGISTRY_PATH, 0o600);
+}
+
+function loadCatalog(): CatalogEntry[] {
+  const candidates = [
+    path.join(SKILLS_ROOT, 'catalog.json'),
+    path.join(REPO_ROOT, 'data', 'skills-catalog.json'),
+    path.join(REPO_ROOT, 'skill-catalog.json'),
+  ];
+
+  for (const candidate of candidates) {
+    const raw = readJsonFile<CatalogEntry[] | { skills?: CatalogEntry[]; catalog?: CatalogEntry[] } | null>(candidate, null);
+    if (Array.isArray(raw)) return raw;
+    if (raw?.skills) return raw.skills;
+    if (raw?.catalog) return raw.catalog;
+  }
+
+  return FALLBACK_CATALOG;
+}
+
+function catalogEntryToKind(entry: CatalogEntry): ComponentKind {
+  const text = `${entry.category} ${entry.path ?? ''}`.toLowerCase();
+  if (text.includes('agent')) return 'agent';
+  if (text.includes('plugin')) return 'plugin';
+  if (text.includes('mcp')) return 'mcp_server';
+  if (text.includes('program') || text.includes('zk')) return 'program';
+  return 'skill';
+}
+
+function listSkills(filter: { kind?: ComponentKind; active?: boolean } = {}): SkillHubEntry[] {
+  return loadRegistry()
+    .filter((entry) => !filter.kind || entry.kind === filter.kind)
+    .filter((entry) => filter.active === undefined || entry.active === filter.active);
+}
+
+function getSkillById(skillId: string): SkillHubEntry | undefined {
+  return loadRegistry().find((entry) => entry.skill_id === skillId);
+}
+
+function getSkillBySlug(slug: string): SkillHubEntry | undefined {
+  return loadRegistry().find((entry) => entry.slug === slug && entry.active);
+}
+
+async function registerSkill(opts: {
+  slug: string;
+  name: string;
+  kind: ComponentKind;
+  authority: string;
+  metadata_uri?: string;
+  component_path?: string;
+  kani_verified?: boolean;
+}): Promise<{
+  skill_id: string;
+  entry: SkillHubEntry;
+  verification: { stride_score: number };
+}> {
+  const spec_hash = stableHash({
+    slug: opts.slug,
+    name: opts.name,
+    kind: opts.kind,
+    metadata_uri: opts.metadata_uri,
+    component_path: opts.component_path,
+    kani_verified: opts.kani_verified === true,
+  });
+  const skill_id = stableHash({ slug: opts.slug, authority: opts.authority, spec_hash });
+  const stride_score = opts.kani_verified ? 90 : 70;
+  const entry: SkillHubEntry = {
+    skill_id,
+    slug: opts.slug,
+    name: opts.name,
+    kind: opts.kind,
+    stride_score,
+    kani_verified: opts.kani_verified === true,
+    spec_hash,
+    authority: opts.authority,
+    metadata_uri: opts.metadata_uri ?? `${PUBLIC_BASE_URL}/api/skills/slug/${opts.slug}/metadata.json`,
+    registered_at: new Date().toISOString(),
+    active: true,
+    on_chain: false,
+  };
+
+  const entries = loadRegistry().filter((candidate) => candidate.skill_id !== skill_id);
+  entries.push(entry);
+  saveRegistry(entries);
+  return { skill_id, entry, verification: { stride_score } };
+}
+
+function revokeSkill(skillId: string, authority: string): void {
+  const entries = loadRegistry();
+  const entry = entries.find((candidate) => candidate.skill_id === skillId);
+  if (!entry) throw new Error('Skill not found');
+  if (entry.authority !== authority) throw new Error('Authority does not control this skill');
+  entry.active = false;
+  saveRegistry(entries);
+}
 
 const metadataRouteLimiter = rateLimit({
   windowMs: 60 * 1000,

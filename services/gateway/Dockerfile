@@ -29,8 +29,6 @@ RUN addgroup -S clawd && adduser -S -G clawd clawd \
 COPY --from=deps  --chown=clawd:clawd /build/node_modules ./node_modules
 COPY --from=build --chown=clawd:clawd /build/services/gateway/dist ./dist
 COPY --chown=clawd:clawd services/gateway/package*.json ./
-COPY --chown=clawd:clawd trading/formal_verification/ ./trading/formal_verification/
-COPY --chown=clawd:clawd skills/ ./skills/
 
 # /data is the Fly persistent volume mount point for sessions.json
 VOLUME ["/data"]

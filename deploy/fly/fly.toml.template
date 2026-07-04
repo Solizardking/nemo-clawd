@@ -2,7 +2,7 @@ app = "APP_NAME_PLACEHOLDER"
 primary_region = "REGION_PLACEHOLDER"
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = "deploy/fly/Dockerfile"
 
 [env]
   DATA_DIR = "/data"

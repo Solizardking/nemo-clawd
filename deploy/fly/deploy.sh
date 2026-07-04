@@ -66,7 +66,7 @@ fi
 info "Repo root: ${REPO_ROOT}"
 
 # Verify critical files exist
-for f in Dockerfile nemoclawd/dist nemoclawd/nemoclawd.plugin.json scripts/nemoclawd-start.sh; do
+for f in package.json package-lock.json src bin scripts/nemoclawd-start.sh nemoclawd.plugin.json deploy/fly/Dockerfile deploy/fly/wrapper/server.js; do
   [ -e "${REPO_ROOT}/${f}" ] || fail "Missing ${f} — is this a complete Nemo Clawd checkout?"
 done
 

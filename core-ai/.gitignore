@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Clawd Code runtime state and artifacts
+.clawd/
+.clawd-code/
+clawd-code/dist/
+clawd-code/outputs/
+clawd-code/node_modules/
+clawd-code/.clawd/
+clawd-code/*.tsbuildinfo
+clawd-code/coverage/
+
+# Clawd Grok runtime state and artifacts
+clawd-grok/dist/
+clawd-grok/node_modules/
+clawd-grok/.clawd/
+clawd-grok/*.tsbuildinfo
+clawd-grok/bun.lockb
+
+# Clawd Agents runtime state and artifacts
+clawd-agents/clawd-perps-agent/dist/
+clawd-agents/clawd-perps-agent/node_modules/
+clawd-agents/clawd-perps-agent/.clawd/
+clawd-agents/clawd-perps-agent/*.tsbuildinfo
+
+# MCP server runtime state and artifacts
+mcp-server/dist/
+mcp-server/node_modules/
+mcp-server/*.tsbuildinfo
+
+# v3 runtime state and artifacts
+v3/dist/
+v3/outputs/
+v3/node_modules/
+v3/.clawd/
+v3/*.tsbuildinfo
+
+# Knowledge base - keep in git (no ignores)
+
+# Package tarballs
+*.tgz
+
+# Lockfiles (not needed for published packages)
+pnpm-lock.yaml
+
+# Project docs - keep in git now (was: docs/)
+TG.md
