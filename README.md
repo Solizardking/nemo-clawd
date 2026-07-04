@@ -8,7 +8,7 @@
 </p>
 <p align="center">
   <a href="https://www.npmjs.com/package/@mawdbotsonsolana/nemoclawd"><img src="https://img.shields.io/npm/v/@mawdbotsonsolana/nemoclawd.svg?style=flat-square&color=cb3837" alt="npm"></a>
-  <a href="https://github.com/x402agent/nemo-clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
+  <a href="https://github.com/Solizardking/nemo-clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/status-alpha-orange?style=flat-square" alt="Status">
   <img src="https://img.shields.io/badge/Solana-Mainnet-9945FF?style=flat-square&logo=solana&logoColor=white" alt="Solana">
   <img src="https://img.shields.io/badge/xAI-Grok%204.20-black?style=flat-square&logo=x" alt="xAI Grok">
@@ -42,7 +42,7 @@
 ## ⚡ One-Shot Install
 
 ```bash
-npm install -g @mawdbotsonsolana/nemoclawd
+sudo npm install -g @mawdbotsonsolana/nemoclawd
 
 # Start with Grok + Solana tools
 nemoclawd launch
@@ -54,7 +54,7 @@ nemoclawd demo
 Need Node.js 20+? The bundled [`install.sh`](install.sh) handles everything — Node.js via nvm, optional GPU/Ollama support, and the CLI — in a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/x402agent/nemo-clawd/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Solizardking/nemo-clawd/main/install.sh | bash
 ```
 
 <!-- start-quickstart-guide -->
