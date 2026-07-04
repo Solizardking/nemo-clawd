@@ -3,6 +3,7 @@
 //
 // NIM container management — pull, start, stop, health-check NIM images.
 
+const fs = require("fs");
 const { run, runCapture } = require("./runner");
 const nimImages = require("./nim-images.json");
 
@@ -21,6 +22,42 @@ function listModels() {
     image: m.image,
     minGpuMemoryMB: m.minGpuMemoryMB,
   }));
+}
+
+function readText(path) {
+  try {
+    return fs.readFileSync(path, "utf-8").replace(/\0/g, "").trim();
+  } catch {
+    return "";
+  }
+}
+
+function readSystemMemoryMB() {
+  try {
+    const memLine = runCapture("free -m | awk '/Mem:/ {print $2}'", { ignoreError: true });
+    return memLine ? parseInt(memLine.trim(), 10) || 0 : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function detectJetson() {
+  if (process.platform !== "linux") return null;
+  const model = readText("/proc/device-tree/model");
+  const tegraRelease = readText("/etc/nv_tegra_release");
+  const looksJetson = /jetson/i.test(model) || /tegra/i.test(tegraRelease);
+  if (!looksJetson) return null;
+  const name = model || "NVIDIA Jetson";
+  const totalMemoryMB = readSystemMemoryMB();
+  return {
+    type: "jetson",
+    name,
+    count: 1,
+    totalMemoryMB,
+    perGpuMB: totalMemoryMB,
+    nimCapable: false,
+    orinNano: /jetson.*orin nano/i.test(name),
+  };
 }
 
 function detectGpu() {
@@ -69,6 +106,9 @@ function detectGpu() {
       };
     }
   } catch {}
+
+  const jetson = detectJetson();
+  if (jetson) return jetson;
 
   // macOS: detect Apple Silicon or discrete GPU
   if (process.platform === "darwin") {
@@ -198,6 +238,7 @@ module.exports = {
   containerName,
   getImageForModel,
   listModels,
+  detectJetson,
   detectGpu,
   pullNimImage,
   startNimContainer,

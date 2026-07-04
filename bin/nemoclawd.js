@@ -23,6 +23,7 @@ Getting Started
   nemoclawd onboard              Configure and launch a Solana-native sandbox
   nemoclawd launch               Alias for onboard
   nemoclawd doctor [--fix]       Check local prerequisites
+  nemoclawd setup-orin-nano      Prepare Jetson Orin Nano for OpenShell
   nemoclawd demo                 Print a quick demo command
   nemoclawd birth                Create a Blockchain Buddy placeholder
 
@@ -74,6 +75,18 @@ function execOpenshell(args, opts = {}) {
   const result = spawnSync("openshell", args, { stdio: opts.stdio || "inherit", encoding: "utf-8" });
   if (result.error) {
     fail(`openshell not available: ${result.error.message}`);
+  }
+  process.exit(result.status || 0);
+}
+
+function runBundledScript(scriptName, scriptArgs = []) {
+  const result = spawnSync("bash", [path.join(SCRIPTS, scriptName), ...scriptArgs], {
+    stdio: "inherit",
+    cwd: ROOT,
+    env: process.env,
+  });
+  if (result.error) {
+    fail(`Failed to run ${scriptName}: ${result.error.message}`);
   }
   process.exit(result.status || 0);
 }
@@ -311,7 +324,11 @@ async function main() {
     return;
   }
   if (cmd === "setup-spark") {
-    run(`bash "${path.join(SCRIPTS, "setup-spark.sh")}"`);
+    runBundledScript("setup-spark.sh", args.slice(1));
+    return;
+  }
+  if (cmd === "setup-orin-nano" || cmd === "setup-jetson") {
+    runBundledScript("setup-orin-nano.sh", args.slice(1));
     return;
   }
 

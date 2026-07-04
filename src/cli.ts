@@ -8,6 +8,8 @@
  */
 
 import type { NemoclawdPluginApi, PluginCliContext } from "./index.js";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 import { getPluginConfig } from "./index.js";
 import { cliStatus } from "./commands/status.js";
 import { cliMigrate } from "./commands/migrate.js";
@@ -16,6 +18,11 @@ import { cliConnect } from "./commands/connect.js";
 import { cliEject } from "./commands/eject.js";
 import { cliLogs } from "./commands/logs.js";
 import { cliOnboard } from "./commands/onboard.js";
+
+function runBundledScript(scriptName: string, scriptArgs: string[] = []): void {
+  const scriptPath = path.resolve(__dirname, "..", "scripts", scriptName);
+  execFileSync("bash", [scriptPath, ...scriptArgs], { stdio: "inherit" });
+}
 
 export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginApi): void {
   const { program, logger } = ctx;
@@ -133,4 +140,15 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
         });
       },
     );
+
+  // nemoclawd nemoclawd setup-orin-nano
+  nemoclawd
+    .command("setup-orin-nano")
+    .description("Prepare a Jetson Orin Nano host for OpenShell and hosted Nemotron")
+    .option("--dry-run", "Print detected host state without changing it", false)
+    .option("--smoke-test", "Alias for --dry-run", false)
+    .action((opts: { dryRun: boolean; smokeTest: boolean }) => {
+      const scriptArgs = opts.dryRun || opts.smokeTest ? ["--dry-run"] : [];
+      runBundledScript("setup-orin-nano.sh", scriptArgs);
+    });
 }

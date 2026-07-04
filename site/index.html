@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nemo Clawd — One-Shot Solana Builder Stack for Mac and AI Agents</title>
-  <meta name="description" content="Launch a shareable Solana agent stack on your Mac, wire wallet and Telegram safely, then hand the repo to your coding agent with one SKILL.md.">
-  <meta name="keywords" content="Nemo Clawd, Solana, trading agent, AI, DeepSolana, Pump-Fun, Telegram bot, DeFi, autonomous agent, NVIDIA, OpenShell">
-  <meta property="og:title" content="Nemo Clawd — One-Shot Solana Builder Stack for Mac and AI Agents">
-  <meta property="og:description" content="One-shot on macOS. Shareable Solana demos, safe wallet handling, and one SKILL.md for your coding agent.">
+  <title>Nemo Clawd — Sandboxed Solana Builder Stack for Mac, Jetson, and AI Agents</title>
+  <meta name="description" content="Launch a shareable Solana agent stack on Mac or Jetson Orin Nano, route inference through hosted Nemotron or local Ollama, and hand your coding agent one SKILL.md.">
+  <meta name="keywords" content="Nemo Clawd, Solana, trading agent, AI, DeepSolana, Pump-Fun, Telegram bot, DeFi, autonomous agent, NVIDIA, OpenShell, Jetson Orin Nano, Nemotron">
+  <meta property="og:title" content="Nemo Clawd — Sandboxed Solana Builder Stack for Mac, Jetson, and AI Agents">
+  <meta property="og:description" content="One-shot on macOS, Jetson Orin Nano host prep, hosted Nemotron routing, safe wallet handling, and one SKILL.md for your coding agent.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -556,14 +556,14 @@
   <!-- ═══════════ HERO ═══════════ -->
   <section class="hero">
     <div class="hero-content">
-      <div class="hero-badge"><span class="dot"></span> Live on Solana Mainnet</div>
+      <div class="hero-badge"><span class="dot"></span> Mac + Jetson Orin Nano</div>
       <h1>
         <span class="gradient">Nemo Clawd</span><br>
         Launch It in 3 Commands.<br>Ship It With Your Agent.
       </h1>
       <p class="hero-sub">
-        Launch a sandboxed Solana operator on your Mac, demo it on Telegram, then paste one
-        <strong>SKILL.md</strong> into Claude, Codex, or Cursor so your agent can run the stack without leaking keys or fumbling setup.
+        Launch a sandboxed Solana operator on your Mac or Jetson Orin Nano, route inference through hosted
+        <strong>Nemotron</strong> or local Ollama, then paste one <strong>SKILL.md</strong> into Claude, Codex, or Cursor so your agent can run the stack without leaking keys.
       </p>
 
       <!-- Terminal Animation -->
@@ -576,7 +576,7 @@
         </div>
         <div class="terminal-body">
           <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">npm install -g @mawdbotsonsolana/nemoclawd</span></div>
-          <div class="terminal-line"><span class="success">✓ installed v0.4.2</span></div>
+          <div class="terminal-line"><span class="success">✓ installed v0.5.0</span></div>
           <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"</span></div>
           <div class="terminal-line"><span class="prompt">$</span> <span class="cmd">nemoclawd launch </span></div>
           <div class="terminal-line"><span class="comment"># Doctor → onboard if needed → start the stack</span></div>
@@ -589,6 +589,7 @@
 
       <div class="cta-row">
         <a href="#mac-skill" class="btn btn-primary">Launch in 3 Commands</a>
+        <a href="#orin-nano" class="btn btn-secondary">Set Up Orin Nano</a>
         <button class="btn btn-secondary" type="button" data-copy-target="macCommandText">Copy Install Block</button>
         <button class="btn btn-ghost" type="button" data-download-target="skillText" data-download-name="Nemo Clawd-Mac-Launch-SKILL.md">Download SKILL.md</button>
       </div>
@@ -603,8 +604,8 @@
           <div class="stat-label">Setup Steps</div>
         </div>
         <div class="stat">
-          <div class="stat-value">3</div>
-          <div class="stat-label">Commands to Launch</div>
+          <div class="stat-value">2</div>
+          <div class="stat-label">Host Targets</div>
         </div>
         <div class="stat">
           <div class="stat-value">0</div>
@@ -652,6 +653,45 @@ nemoclawd launch </div>
               <span>`nemoclawd doctor ` catches machine drift before you waste time inside the wizard.</span>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ORIN NANO ═══════════ -->
+  <section class="commands-section" id="orin-nano">
+    <div class="container">
+      <div class="section-label">Jetson Orin Nano</div>
+      <h2 class="section-title">Run the Sandbox on Orin, Keep Nemotron Hosted</h2>
+      <p class="section-desc">Orin Nano is a strong edge host for Nemo Clawd, OpenShell policy, Solana tooling, and small local fallback models. Nemotron 3 Ultra stays on NVIDIA-hosted inference or OpenRouter.</p>
+      <div class="launch-grid">
+        <div class="launch-card">
+          <div class="skill-header">
+            <h3>Host Prep</h3>
+            <button class="copy-btn" type="button" data-copy-target="orinCommandText">Copy</button>
+          </div>
+          <p>Use the Orin-specific setup command. It applies the Docker cgroup namespace fix OpenShell needs and avoids Spark cluster assumptions.</p>
+          <div class="skill-code" id="orinCommandText">sudo nemoclawd setup-orin-nano
+export NVIDIA_API_KEY="nvapi-..."
+nemoclawd onboard
+openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-ultra-550b-a55b</div>
+        </div>
+        <div class="launch-card">
+          <div class="skill-header">
+            <h3>Why Not Spark?</h3>
+          </div>
+          <p>DGX Spark recipes assume four nodes, ConnectX/RoCE networking, and tensor-parallel vLLM for giant checkpoints. A single Orin Nano should run the agent stack locally and call hosted Nemotron.</p>
+          <div class="skill-meta">
+            <span class="skill-chip">Orin Nano</span>
+            <span class="skill-chip">Hosted Nemotron</span>
+            <span class="skill-chip">OpenShell</span>
+          </div>
+          <div class="skill-code">Docs:
+docs/deployment/set-up-orin-nano.md
+
+Do not run:
+nemoclawd setup-spark
+recipes/4x-spark-cluster/*</div>
         </div>
       </div>
     </div>
@@ -719,8 +759,8 @@ docker start openshell-cluster-nemoclawd</div>
 
         <div class="feature-card">
           <div class="feature-icon model">🧠</div>
-          <h3>8bit/DeepSolana</h3>
-          <p>Solana-tuned LLM via Ollama. Auto-pulled during onboard. Understands Pump-Fun, DeFi, wallet narration. Swap for any Ollama model.</p>
+          <h3>Nemotron + DeepSolana</h3>
+          <p>Hosted Nemotron 3 Ultra or Super for heavier reasoning, with 8bit/DeepSolana via Ollama available as a local Solana-tuned fallback.</p>
         </div>
 
         <div class="feature-card">
@@ -796,6 +836,10 @@ Ready to make some waves in Solana trading? 🦀</div>
         <div class="cmd-card">
           <h4>nemoclawd onboard </h4>
           <p>Full 9-step setup wizard. Docker, gateway, sandbox, inference, wallet, policies — all automated.</p>
+        </div>
+        <div class="cmd-card">
+          <h4>sudo nemoclawd setup-orin-nano</h4>
+          <p>Prepare Jetson Orin Nano for OpenShell, Docker cgroupns=host, and hosted Nemotron routing.</p>
         </div>
         <div class="cmd-card">
           <h4>nemoclawd solana start</h4>
@@ -887,7 +931,7 @@ Ready to make some waves in Solana trading? 🦀</div>
     <div class="container">
       <div class="section-label">Architecture</div>
       <h2 class="section-title">How It Works</h2>
-      <p class="section-desc">Policy-governed sandbox with encrypted wallet and local inference.</p>
+      <p class="section-desc">Policy-governed sandbox with encrypted wallet and local or hosted inference.</p>
       <div class="arch-diagram">                     ┌──────────────────────┐
                      │   nemoclawd CLI       │
                      │   (host machine)     │
@@ -918,9 +962,9 @@ Ready to make some waves in Solana trading? 🦀</div>
      └───────────────────────────────────────────────────┘
                                │
                  ┌─────────────▼─────────────┐
-                 │         Ollama             │
-                 │   8bit/DeepSolana          │
-                 │   localhost:11434           │
+                 │  Inference Route            │
+                 │  hosted Nemotron or Ollama  │
+                 │  gateway-mediated           │
                  └───────────────────────────┘</div>
     </div>
   </section>
@@ -931,6 +975,7 @@ Ready to make some waves in Solana trading? 🦀</div>
       <a href="https://github.com/x402agent/nemo-clawd">GitHub</a>
       <a href="https://www.npmjs.com/package/@mawdbotsonsolana/nemoclawd">npm</a>
       <a href="https://github.com/x402agent/nemo-clawd/blob/main/docs/reference/commands.md">Docs</a>
+      <a href="https://github.com/x402agent/nemo-clawd/blob/main/docs/deployment/set-up-orin-nano.md">Orin Nano</a>
       <a href="https://github.com/x402agent/nemo-clawd/blob/main/LICENSE">Apache 2.0</a>
     </div>
     <p>Built with 🦀 by the Nemo Clawd team · Powered by <a href="https://ollama.com">Ollama</a> + <a href="https://github.com/NVIDIA/OpenShell">OpenShell</a></p>

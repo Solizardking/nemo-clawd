@@ -66,6 +66,19 @@ nemoclawd demo
 ```
 <!-- end-quickstart-guide -->
 
+### Jetson Orin Nano
+
+For a single Jetson Orin Nano or Orin Nano Super Developer Kit, use the dedicated Orin path instead of `setup-spark`:
+
+```bash
+sudo nemoclawd setup-orin-nano
+export NVIDIA_API_KEY="nvapi-..."
+nemoclawd onboard
+openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-ultra-550b-a55b
+```
+
+See [docs/deployment/set-up-orin-nano.md](docs/deployment/set-up-orin-nano.md).
+
 ### DFlow Spot and Prediction Routing
 
 DFlow is the default Solana-native route for spot trading and prediction markets. Set `DFLOW_API_KEY` for production; without it, nemoclawd uses DFlow developer endpoints.

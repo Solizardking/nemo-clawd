@@ -97,6 +97,7 @@
     "scripts/nemoclawd-websocket-server.sh",
     "scripts/pre-commit-secrets.sh",
     "scripts/public-release-audit.sh",
+    "scripts/setup-orin-nano.sh",
     "scripts/setup-spark.sh",
     "scripts/setup.sh",
     "scripts/start-services.sh",

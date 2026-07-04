@@ -67,7 +67,19 @@ If you are using the Orin Nano Super performance mode, enable `MAXN SUPER` from 
 
 ## 2. Install Docker, Node.js, and OpenShell
 
-Check Docker first because some JetPack images already include it:
+If you already have the `nemoclawd` CLI installed, use the Orin Nano setup command after JetPack is installed. It configures Docker for OpenShell's k3s-in-Docker gateway, installs the OpenShell CLI if needed, and prints the hosted Nemotron onboarding commands.
+
+```console
+$ sudo nemoclawd setup-orin-nano
+```
+
+If you are preparing from a source checkout before global CLI install, run the script directly:
+
+```console
+$ sudo bash scripts/setup-orin-nano.sh
+```
+
+Check Docker first if you want to do the steps manually, because some JetPack images already include it:
 
 ```console
 $ docker --version
@@ -106,6 +118,12 @@ Install the published CLI:
 ```console
 $ sudo npm install -g @mawdbotsonsolana/nemoclawd
 $ nemoclawd doctor
+```
+
+Then run the Orin Nano host-prep command if you did not run the script directly in the previous step:
+
+```console
+$ sudo nemoclawd setup-orin-nano
 ```
 
 Or install from a local checkout:

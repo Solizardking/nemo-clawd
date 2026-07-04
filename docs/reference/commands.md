@@ -354,6 +354,15 @@ $ nemoclawd status
 
 ### Infrastructure
 
+#### `nemoclawd setup-orin-nano`
+
+Prepare a single Jetson Orin Nano host for Nemo Clawd and OpenShell.
+This configures Docker for OpenShell's k3s-in-Docker gateway, installs the OpenShell CLI if needed, and keeps the model route on hosted Nemotron or a small local model.
+
+```console
+$ sudo nemoclawd setup-orin-nano
+```
+
 #### `nemoclawd setup-spark`
 
 Set up Nemo Clawd on DGX Spark (cgroup v2 + Docker fixes for Ubuntu 24.04).

@@ -1,8 +1,13 @@
 "use strict";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerCliCommands = registerCliCommands;
+const node_child_process_1 = require("node:child_process");
+const node_path_1 = __importDefault(require("node:path"));
 const index_js_1 = require("./index.js");
 const status_js_1 = require("./commands/status.js");
 const migrate_js_1 = require("./commands/migrate.js");
@@ -11,6 +16,10 @@ const connect_js_1 = require("./commands/connect.js");
 const eject_js_1 = require("./commands/eject.js");
 const logs_js_1 = require("./commands/logs.js");
 const onboard_js_1 = require("./commands/onboard.js");
+function runBundledScript(scriptName, scriptArgs = []) {
+    const scriptPath = node_path_1.default.resolve(__dirname, "..", "scripts", scriptName);
+    (0, node_child_process_1.execFileSync)("bash", [scriptPath, ...scriptArgs], { stdio: "inherit" });
+}
 function registerCliCommands(ctx, api) {
     const { program, logger } = ctx;
     const pluginConfig = (0, index_js_1.getPluginConfig)(api);
@@ -110,6 +119,16 @@ function registerCliCommands(ctx, api) {
             logger,
             pluginConfig,
         });
+    });
+    // nemoclawd nemoclawd setup-orin-nano
+    nemoclawd
+        .command("setup-orin-nano")
+        .description("Prepare a Jetson Orin Nano host for OpenShell and hosted Nemotron")
+        .option("--dry-run", "Print detected host state without changing it", false)
+        .option("--smoke-test", "Alias for --dry-run", false)
+        .action((opts) => {
+        const scriptArgs = opts.dryRun || opts.smokeTest ? ["--dry-run"] : [];
+        runBundledScript("setup-orin-nano.sh", scriptArgs);
     });
 }
 //# sourceMappingURL=cli.js.map

@@ -154,9 +154,13 @@ async function preflight() {
     console.error("");
     console.error("       openat2 /sys/fs/cgroup/kubepods/pids.max: no such file or directory");
     console.error("");
-    console.error("     To fix, run:");
+    const jetson = nim.detectJetson();
+    const setupCommand = jetson && jetson.orinNano
+      ? "sudo nemoclawd setup-orin-nano"
+      : "sudo nemoclawd setup-spark";
+    console.error("     To fix, run the host setup command for this device:");
     console.error("");
-    console.error("       nemoclawd setup-spark");
+    console.error(`       ${setupCommand}`);
     console.error("");
     console.error("     This adds \"default-cgroupns-mode\": \"host\" to /etc/docker/daemon.json");
     console.error("     (preserving any existing settings) and restarts Docker.");
@@ -170,6 +174,9 @@ async function preflight() {
   const gpu = nim.detectGpu();
   if (gpu && gpu.type === "nvidia") {
     console.log(`  ✓ NVIDIA GPU detected: ${gpu.count} GPU(s), ${gpu.totalMemoryMB} MB VRAM`);
+  } else if (gpu && gpu.type === "jetson") {
+    console.log(`  ✓ Jetson detected: ${gpu.name || "Jetson"}, ${gpu.totalMemoryMB} MB unified memory`);
+    console.log("  ⓘ Use hosted Nemotron or small local Ollama models on Orin Nano.");
   } else if (gpu && gpu.type === "apple") {
     console.log(`  ✓ Apple GPU detected: ${gpu.name}${gpu.cores ? ` (${gpu.cores} cores)` : ""}, ${gpu.totalMemoryMB} MB unified memory`);
     console.log("  ⓘ NIM requires NVIDIA GPU — will use cloud inference");

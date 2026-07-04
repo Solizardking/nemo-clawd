@@ -31,6 +31,7 @@ describe("CLI dispatch", () => {
     assert.ok(r.out.includes("Policy Presets"), "missing Policy Presets section");
     assert.ok(r.out.includes("doctor"), "missing doctor command");
     assert.ok(r.out.includes("launch"), "missing launch command");
+    assert.ok(r.out.includes("setup-orin-nano"), "missing Orin Nano setup command");
     assert.ok(r.out.includes("solana-agent"), "missing Solana agent action");
     assert.ok(r.out.includes("solana-bridge"), "missing Solana bridge action");
     assert.ok(r.out.includes("solana start"), "missing Solana one-shot action");
@@ -40,6 +41,13 @@ describe("CLI dispatch", () => {
 
   it("--help exits 0", () => {
     assert.equal(run("--help").code, 0);
+  });
+
+  it("setup-orin-nano --dry-run exits 0", () => {
+    const r = run("setup-orin-nano --dry-run");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("Dry run"), r.out);
+    assert.ok(r.out.includes("setup is only for Jetson Orin Nano Linux hosts") || r.out.includes("Host:"), r.out);
   });
 
   it("-h exits 0", () => {
