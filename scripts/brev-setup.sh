@@ -6,7 +6,8 @@
 #
 # Run on a fresh Brev VM:
 #   export ZAI_API_KEY=...          # preferred GLM 5.2 default
-#   export NVIDIA_API_KEY=nvapi-... # optional fallback/local GPU path
+#   export NVIDIA_API_KEY=nvapi-... # optional hosted Nemotron fallback
+#   export VLLM_MODEL=...           # optional local vLLM model override
 #   ./scripts/brev-setup.sh
 #
 # What it does:
@@ -34,7 +35,7 @@ usage() {
 Usage: brev-setup.sh [--dry-run]
 
 Bootstrap a fresh Brev VM for Nemo Clawd. This installs prerequisites,
-optionally starts local vLLM when a GPU is available, then runs setup.sh.
+optionally starts local vLLM when a remote GPU is available, then runs setup.sh.
 
 Options:
   --dry-run, --smoke-test  Print the planned actions without changing the host.
@@ -152,8 +153,8 @@ else
   info "cloudflared already installed"
 fi
 
-# --- 4. vLLM (local inference, if GPU present) ---
-VLLM_MODEL="nvidia/nemotron-3-nano-30b-a3b"
+# --- 4. vLLM (local inference on the Brev GPU, if present) ---
+VLLM_MODEL="${VLLM_MODEL:-${NEMOCLAWD_VLLM_MODEL:-nvidia/nemotron-3-nano-30b-a3b}}"
 if command -v nvidia-smi > /dev/null 2>&1; then
   if ! python3 -c "import vllm" 2>/dev/null; then
     info "Installing vLLM..."

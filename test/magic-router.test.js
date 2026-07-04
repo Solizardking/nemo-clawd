@@ -32,6 +32,23 @@ describe("magic router", () => {
     assert.equal(route.inference.credentialEnv, "OPENROUTER_API_KEY");
   });
 
+  it("uses hosted Nemotron 3 Ultra for NVIDIA fallback by default", () => {
+    const route = resolveMagicRouter("debug this repo", {
+      NVIDIA_API_KEY: "nv-test",
+    });
+    assert.equal(route.inference.provider, "nvidia-nim");
+    assert.equal(route.inference.model, "nvidia/nemotron-3-ultra-550b-a55b");
+  });
+
+  it("allows the hosted NVIDIA model to be overridden", () => {
+    const route = resolveMagicRouter("debug this repo", {
+      NVIDIA_API_KEY: "nv-test",
+      NEMOCLAWD_NVIDIA_MODEL: "nvidia/nemotron-3-super-120b-a12b",
+    });
+    assert.equal(route.inference.provider, "nvidia-nim");
+    assert.equal(route.inference.model, "nvidia/nemotron-3-super-120b-a12b");
+  });
+
   it("selects DFlow plus Proof/KYC tools for prediction markets", () => {
     const route = resolveMagicRouter("buy a prediction market outcome token", {
       ZAI_API_KEY: "zai-test",

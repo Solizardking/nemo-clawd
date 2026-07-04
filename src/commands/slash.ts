@@ -112,7 +112,7 @@ function slashOnboard(): PluginCommandResult {
       "",
       "Or non-interactively:",
       "```",
-      'nemoclawd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-super-120b-a12b',
+      'nemoclawd nemoclawd onboard --api-key "$NVIDIA_API_KEY" --endpoint build --model nvidia/nemotron-3-ultra-550b-a55b',
       "```",
     ].join("\n"),
   };

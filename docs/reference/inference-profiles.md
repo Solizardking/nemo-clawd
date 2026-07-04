@@ -48,7 +48,7 @@ $ openshell inference set --no-verify --provider ollama-local --model 8bit/DeepS
 | Profile | Provider | Model | Endpoint | Use Case |
 |---|---|---|---|---|
 | `ollama-local` (default) | Ollama | `8bit/DeepSolana` | `localhost:11434` | Local inference. No API key required. |
-| `nvidia-nim` | NVIDIA Cloud | `nvidia/nemotron-3-super-120b-a12b` | `integrate.api.nvidia.com` | Production. Requires NVIDIA API key. |
+| `nvidia-nim` | NVIDIA Cloud | `nvidia/nemotron-3-ultra-550b-a55b` | `integrate.api.nvidia.com` | Production hosted inference. Requires NVIDIA API key. |
 
 ## Available NVIDIA Cloud Models
 
@@ -73,11 +73,11 @@ After the sandbox is running, switch models with the OpenShell CLI:
 $ ollama pull llama3
 $ openshell inference set --no-verify --provider ollama-local --model llama3
 
-# Switch to NVIDIA Cloud
-$ openshell inference set --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b
-
-# Switch to hosted Nemotron 3 Ultra when available
+# Switch to hosted Nemotron 3 Ultra
 $ openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-ultra-550b-a55b
+
+# Switch to hosted Nemotron 3 Super
+$ openshell inference set --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b
 ```
 
 The change takes effect immediately.
@@ -95,7 +95,7 @@ No sandbox restart is needed.
 
 - **Provider type:** `nvidia`
 - **Endpoint:** `https://integrate.api.nvidia.com/v1`
-- **Model:** `nvidia/nemotron-3-super-120b-a12b`
+- **Default model:** `nvidia/nemotron-3-ultra-550b-a55b`
 - **Credential:** `NVIDIA_API_KEY` environment variable
 
 Get an API key from [build.nvidia.com](https://build.nvidia.com).

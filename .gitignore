@@ -22,3 +22,11 @@ __pycache__/
 .venv/
 
 docs/_build/
+
+services/**/node_modules/
+services/**/dist/
+services/**/.agent/
+services/**/.surfpool/
+services/**/.logs/
+services/**/logs/
+services/**/output/

@@ -1,0 +1,36 @@
+app = "clawd-gateway"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+  # Deploy from the repo root: cd /Users/8bit/Downloads/solana-clawd && fly deploy --app clawd-gateway
+  # The Dockerfile uses COPY paths relative to repo root (gateway/, formal_verification/)
+  context = ".."
+
+[env]
+  GATEWAY_PORT = "8080"
+  GATEWAY_BASE_URL = "https://clawd-gateway.fly.dev"
+
+[mounts]
+  source = "clawd_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "3s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

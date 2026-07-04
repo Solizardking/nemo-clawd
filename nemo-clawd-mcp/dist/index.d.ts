@@ -1,11 +1,9 @@
+#!/usr/bin/env node
 /**
- * nemoclawd MCP Server
- *
- * xAI Grok powered Solana agentic tools with 31 MCP tools.
- * Connects to Helius RPC/DAS and xAI Grok API for autonomous trading.
+ * nemoclawd MCP Server — STDIO entry point
  */
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-declare const server: Server<{
+export { createNemoclawdMcpServer, SERVER_NAME, SERVER_VERSION, TOOLS, } from "./server.js";
+export declare const server: import("@modelcontextprotocol/sdk/server").Server<{
     method: string;
     params?: {
         [x: string]: unknown;
@@ -39,5 +37,4 @@ declare const server: Server<{
         } | undefined;
     } | undefined;
 }>;
-export { server };
 //# sourceMappingURL=index.d.ts.map

@@ -33,7 +33,7 @@ No restart is required.
 Set the provider to `nvidia-nim` and specify a model from [build.nvidia.com](https://build.nvidia.com):
 
 ```console
-$ openshell inference set --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b
+$ openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-ultra-550b-a55b
 ```
 
 This requires the `NVIDIA_API_KEY` environment variable.
@@ -62,6 +62,7 @@ You can switch to any of these models at runtime.
 
 | Model ID | Label | Context Window | Max Output |
 |---|---|---|---|
+| `nvidia/nemotron-3-ultra-550b-a55b` | Nemotron 3 Ultra 550B-A55B | 1,000,000 | 32,768 |
 | `nvidia/nemotron-3-super-120b-a12b` | Nemotron 3 Super 120B | 131,072 | 8,192 |
 | `nvidia/llama-3.1-nemotron-ultra-253b-v1` | Nemotron Ultra 253B | 131,072 | 4,096 |
 | `nvidia/llama-3.3-nemotron-super-49b-v1.5` | Nemotron Super 49B v1.5 | 131,072 | 4,096 |

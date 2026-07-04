@@ -5,7 +5,7 @@ const MAGIC_ROUTER_STRATEGY = "magic-router";
 const ZAI_DEFAULT_PROVIDER = "zai-glm";
 const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
 const NVIDIA_FALLBACK_PROVIDER = "nvidia-nim";
-const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-super-120b-a12b";
+const NVIDIA_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b";
 const OPENROUTER_PROVIDER = "openrouter";
 const OPENROUTER_AUTO_MODEL = "openrouter/auto";
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -73,7 +73,10 @@ function buildInferenceRoutes(env) {
 
   const nvidia = {
     provider: NVIDIA_FALLBACK_PROVIDER,
-    model: NVIDIA_FALLBACK_MODEL,
+    model:
+      (env.NEMOCLAWD_NVIDIA_MODEL && String(env.NEMOCLAWD_NVIDIA_MODEL).trim()) ||
+      (env.NVIDIA_MODEL && String(env.NVIDIA_MODEL).trim()) ||
+      NVIDIA_FALLBACK_MODEL,
     credentialEnv: "NVIDIA_API_KEY",
     available: hasEnv(env, "NVIDIA_API_KEY"),
     role: "fallback",

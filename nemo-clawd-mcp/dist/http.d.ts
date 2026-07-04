@@ -1,8 +1,9 @@
+#!/usr/bin/env node
 /**
  * nemoclawd MCP Server — HTTP transport entry point
  *
  * Used by `npm run start:http` and the Fly.io deployment.
- * Exposes the MCP server over Streamable HTTP on PORT (default 3000).
+ * Exposes Streamable HTTP at /mcp, legacy SSE at /sse, and health at /health.
  */
 export {};
 //# sourceMappingURL=http.d.ts.map

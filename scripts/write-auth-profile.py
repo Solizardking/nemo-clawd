@@ -6,6 +6,11 @@ import os
 
 def build_profiles(env):
     profiles = {}
+    nvidia_model = (
+        env.get("NEMOCLAWD_NVIDIA_MODEL")
+        or env.get("NVIDIA_MODEL")
+        or "nvidia/nemotron-3-ultra-550b-a55b"
+    )
     if env.get("ZAI_API_KEY"):
         profiles["zai:glm-5.2"] = {
             "type": "api_key",
@@ -18,6 +23,7 @@ def build_profiles(env):
         profiles["nvidia:manual"] = {
             "type": "api_key",
             "provider": "nvidia",
+            "model": nvidia_model,
             "keyRef": {"source": "env", "id": "NVIDIA_API_KEY"},
             "profileId": "nvidia:manual",
         }

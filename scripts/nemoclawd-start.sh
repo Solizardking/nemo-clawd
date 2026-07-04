@@ -261,6 +261,11 @@ import os
 path = os.path.expanduser('~/.nemoclawd/agents/main/agent/auth-profiles.json')
 os.makedirs(os.path.dirname(path), exist_ok=True)
 profiles = {}
+nvidia_model = (
+    os.environ.get('NEMOCLAWD_NVIDIA_MODEL')
+    or os.environ.get('NVIDIA_MODEL')
+    or 'nvidia/nemotron-3-ultra-550b-a55b'
+)
 if os.environ.get('ZAI_API_KEY'):
     profiles['zai:glm-5.2'] = {
         'type': 'api_key',
@@ -273,6 +278,7 @@ if os.environ.get('NVIDIA_API_KEY'):
     profiles['nvidia:manual'] = {
         'type': 'api_key',
         'provider': 'nvidia',
+        'model': nvidia_model,
         'keyRef': {'source': 'env', 'id': 'NVIDIA_API_KEY'},
         'profileId': 'nvidia:manual',
     }

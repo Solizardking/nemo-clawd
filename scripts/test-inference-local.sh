@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Test inference.local routing through OpenShell provider (local vLLM)
+# Test inference.local routing through OpenShell provider (local vLLM/remote GPU)
 set -euo pipefail
 
 usage() {
@@ -7,10 +7,11 @@ usage() {
 Usage: test-inference-local.sh [--dry-run]
 
 Send a minimal chat completion request to inference.local using the local
-vLLM/Nemotron model route.
+vLLM/Nemotron model route. This is not the Jetson Orin Nano hosted route.
 
 Environment:
   INFERENCE_URL  Override the endpoint URL.
+  NEMOCLAWD_LOCAL_MODEL  Override the local vLLM model ID.
 
 Options:
   --dry-run, --smoke-test  Print the request without calling the endpoint.
@@ -37,6 +38,7 @@ case "${1:-}" in
 esac
 
 INFERENCE_URL="${INFERENCE_URL:-https://inference.local/v1/chat/completions}"
+LOCAL_MODEL="${NEMOCLAWD_LOCAL_MODEL:-${VLLM_MODEL:-nvidia/nemotron-3-nano-30b-a3b}}"
 TMP_BASE="${TMPDIR:-/tmp}"
 TMP_BASE="${TMP_BASE%/}"
 [ -n "$TMP_BASE" ] || TMP_BASE="/tmp"
@@ -46,7 +48,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-printf '%s\n' '{"model":"nvidia/nemotron-3-nano-30b-a3b","messages":[{"role":"user","content":"say hello"}]}' > "$REQUEST_FILE"
+printf '{"model":"%s","messages":[{"role":"user","content":"say hello"}]}\n' "$LOCAL_MODEL" > "$REQUEST_FILE"
 
 if [ "$DRY_RUN" = true ]; then
   echo "Would POST $REQUEST_FILE to $INFERENCE_URL"

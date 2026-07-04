@@ -13,6 +13,7 @@
  *   TELEGRAM_BOT_TOKEN  — from @BotFather
  *   ZAI_API_KEY         — for ZAI GLM 5.2 inference (preferred)
  *   NVIDIA_API_KEY      — fallback NVIDIA-hosted inference
+ *   NEMOCLAWD_NVIDIA_MODEL — hosted NVIDIA model override
  *   SANDBOX_NAME        — sandbox name (default: nemoclawd)
  *   ALLOWED_CHAT_IDS    — comma-separated Telegram chat IDs to accept (optional, accepts all if unset)
  */
@@ -47,7 +48,11 @@ if (unknownArg) {
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const INFERENCE_KEY_NAME = process.env.ZAI_API_KEY ? "ZAI_API_KEY" : "NVIDIA_API_KEY";
 const API_KEY = process.env.ZAI_API_KEY || process.env.NVIDIA_API_KEY;
-const MODEL = process.env.ZAI_API_KEY ? "zai/glm-5.2" : "nvidia/nemotron-3-super-120b-a12b";
+const NVIDIA_MODEL =
+  process.env.NEMOCLAWD_NVIDIA_MODEL ||
+  process.env.NVIDIA_MODEL ||
+  "nvidia/nemotron-3-ultra-550b-a55b";
+const MODEL = process.env.ZAI_API_KEY ? "zai/glm-5.2" : NVIDIA_MODEL;
 const SANDBOX = process.env.SANDBOX_NAME || "nemoclawd";
 const ALLOWED_CHATS = process.env.ALLOWED_CHAT_IDS
   ? process.env.ALLOWED_CHAT_IDS.split(",").map((s) => s.trim())

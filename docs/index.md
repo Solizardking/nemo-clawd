@@ -26,7 +26,7 @@ status: published
 ```
 
 Nemo Clawd is the Nemo Clawd plugin for [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell).
-It runs Nemo Clawd inside a sandboxed environment with NVIDIA cloud inference, such as Nemotron 3 Super 120B through [build.nvidia.com](https://build.nvidia.com).
+It runs Nemo Clawd inside a sandboxed environment with NVIDIA cloud inference, such as hosted Nemotron 3 Ultra through [build.nvidia.com](https://build.nvidia.com).
 The sandbox enforces strict network policies and operator-controlled egress approval.
 
 ## Get Started

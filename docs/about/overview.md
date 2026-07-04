@@ -26,7 +26,7 @@ It moves Nemo Clawd into a sandboxed environment where every network request, fi
 | Capability              | Description                                                                                                                                          |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Sandbox Nemo Clawd        | Creates an OpenShell sandbox pre-configured for Nemo Clawd, with strict filesystem and network policies applied from the first boot.                   |
-| Route inference         | Configures OpenShell inference routing so agent traffic flows through cloud-hosted Nemotron 3 Super 120B via [build.nvidia.com](https://build.nvidia.com). |
+| Route inference         | Configures OpenShell inference routing so agent traffic flows through cloud-hosted Nemotron 3 Ultra via [build.nvidia.com](https://build.nvidia.com). |
 | Manage the lifecycle    | Handles blueprint versioning, digest verification, and sandbox setup.                                                                                |
 
 ## Challenge
@@ -40,7 +40,7 @@ Nemo Clawd provides the following benefits.
 | Benefit                    | Description                                                                                                            |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------|
 | Sandboxed execution        | Every agent runs inside an OpenShell sandbox with Landlock, seccomp, and network namespace isolation. No access is granted by default. |
-| NVIDIA cloud inference     | Agent traffic routes through cloud-hosted Nemotron 3 Super 120B via [build.nvidia.com](https://build.nvidia.com), transparent to the agent.          |
+| NVIDIA cloud inference     | Agent traffic routes through cloud-hosted Nemotron 3 Ultra via [build.nvidia.com](https://build.nvidia.com), transparent to the agent.          |
 | Declarative network policy | Egress rules are defined in YAML. Unknown hosts are blocked and surfaced to the operator for approval.                 |
 | Single CLI                 | The `nemoclawd` command orchestrates the full stack: gateway, sandbox, inference provider, and network policy.           |
 | Blueprint lifecycle        | Versioned blueprints handle sandbox creation, digest verification, and reproducible setup.                             |

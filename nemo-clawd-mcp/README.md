@@ -1,12 +1,12 @@
 # nemoclawd MCP Server
 
-xAI Grok powered Solana agentic tools with 31 MCP tools.
+xAI Grok powered Solana agentic tools with 32 MCP tools.
 
 ## Features
 
 - **xAI Grok Integration** — Chat, vision, image generation, X search, multi-agent research
-- **31 MCP Tools** — Solana market data, Helius RPC/DAS, Pump.fun trading, agent fleet
-- **Multi-Transport** — STDIO (for Clawd Desktop, Cursor, VS Code) and HTTP (for Fly.io)
+- **32 MCP Tools** — Solana market data, Helius RPC/DAS, Pump.fun trading, agent fleet
+- **Multi-Transport** — STDIO, Streamable HTTP (`/mcp`), and legacy SSE (`/sse`)
 
 ## Installation
 
@@ -45,13 +45,44 @@ npm run start:http
 npx nemoclawd-mcp --http
 ```
 
-Connect via:
+Health check:
+
+```bash
+curl -s http://localhost:3000/health | jq
+```
+
+Connect with Streamable HTTP clients via:
+
 ```json
 {
   "type": "http",
-  "url": "https://your-app.fly.dev/mcp"
+  "url": "http://localhost:3000/mcp"
 }
 ```
+
+### NeMo Agent Toolkit / SSE Clients
+
+NeMo Agent Toolkit MCP clients use an SSE URL in examples such as `http://localhost:9901/sse`.
+This server exposes the same legacy MCP transport shape at `/sse`:
+
+```bash
+npm run start:http
+nat info mcp --url http://localhost:3000/sse
+nat info mcp ping --url http://localhost:3000/sse
+```
+
+When wrapping these tools from a NeMo Agent Toolkit workflow, point the MCP wrapper at the SSE endpoint:
+
+```yaml
+functions:
+  sol_price:
+    _type: mcp_tool_wrapper
+    url: "http://localhost:3000/sse"
+    mcp_tool_name: sol_price
+    description: "Returns the current SOL/USD price"
+```
+
+For authenticated remote deployments, set `MCP_API_KEY` and send `Authorization: Bearer <key>` from the MCP client.
 
 ## Environment Variables
 
@@ -62,6 +93,9 @@ Connect via:
 | `HELIUS_RPC_URL` | No | Custom RPC URL |
 | `BIRDEYE_API_KEY` | No | BirdEye API key |
 | `SOLANA_TRACKER_API_KEY` | No | Solana Tracker API key |
+| `MCP_API_KEY` | No | Bearer token required for `/mcp`, `/sse`, and `/messages` |
+| `MCP_SERVER_NAME` | No | Override the MCP server name |
+| `PORT` | No | HTTP port for `npm run start:http` or `--http` |
 
 ## Tools
 

@@ -9,12 +9,13 @@
 #   - openshell CLI installed (pip install openshell @ git+https://github.com/NVIDIA/OpenShell.git)
 #   - DFLOW_API_KEY optional for production DFlow spot/prediction routing
 #   - ZAI_API_KEY optional for ZAI GLM 5.2 inference
-#   - NVIDIA_API_KEY optional for NVIDIA-hosted fallback inference
+#   - NVIDIA_API_KEY optional for hosted Nemotron fallback inference
 #
 # Usage:
 #   export DFLOW_API_KEY=dflow-...        # optional; production DFlow routes
 #   export ZAI_API_KEY=zai-...           # optional; ZAI GLM 5.2 inference
-#   export NVIDIA_API_KEY=nvapi-...       # optional; NVIDIA fallback
+#   export NVIDIA_API_KEY=nvapi-...       # optional; hosted Nemotron fallback
+#   export NEMOCLAWD_NVIDIA_MODEL=nvidia/nemotron-3-ultra-550b-a55b
 #   ./scripts/setup.sh
 #
 # What it does:
@@ -68,9 +69,12 @@ esac
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+NVIDIA_HOSTED_MODEL_DEFAULT="nvidia/nemotron-3-ultra-550b-a55b"
+export NEMOCLAWD_NVIDIA_MODEL="${NEMOCLAWD_NVIDIA_MODEL:-${NVIDIA_MODEL:-$NVIDIA_HOSTED_MODEL_DEFAULT}}"
 
 if [ "$DRY_RUN" = true ]; then
   info "Dry run: would start OpenShell gateway, patch CoreDNS when needed, configure providers, build context, and create the nemoclawd sandbox from $REPO_DIR."
+  info "Hosted NVIDIA model default: $NEMOCLAWD_NVIDIA_MODEL"
   exit 0
 fi
 
@@ -126,6 +130,8 @@ if [ -z "${ZAI_API_KEY:-}" ]; then
 fi
 if [ -z "${NVIDIA_API_KEY:-}" ]; then
   warn "NVIDIA_API_KEY not set; skipping NVIDIA NIM fallback provider setup."
+else
+  info "Hosted NVIDIA model: $NEMOCLAWD_NVIDIA_MODEL"
 fi
 info "DFlow spot route: ${DFLOW_TRADE_API_URL}/order"
 info "DFlow prediction metadata: ${DFLOW_METADATA_API_URL}"
@@ -209,8 +215,8 @@ if [ -n "${ZAI_API_KEY:-}" ]; then
   info "Setting inference route to zai-glm / GLM 5.2..."
   openshell inference set --no-verify --provider zai-glm --model zai/glm-5.2 > /dev/null 2>&1
 elif [ -n "${NVIDIA_API_KEY:-}" ]; then
-  info "Setting inference route to nvidia-nim / Nemotron 3 Super..."
-  openshell inference set --no-verify --provider nvidia-nim --model nvidia/nemotron-3-super-120b-a12b > /dev/null 2>&1
+  info "Setting inference route to nvidia-nim / $NEMOCLAWD_NVIDIA_MODEL..."
+  openshell inference set --no-verify --provider nvidia-nim --model "$NEMOCLAWD_NVIDIA_MODEL" > /dev/null 2>&1
 fi
 
 # 5. Build and create sandbox
@@ -253,6 +259,8 @@ SANDBOX_ENV=(
 )
 if [ -n "${NVIDIA_API_KEY:-}" ]; then
   SANDBOX_ENV+=("NVIDIA_API_KEY=${NVIDIA_API_KEY}")
+  SANDBOX_ENV+=("NEMOCLAWD_NVIDIA_MODEL=${NEMOCLAWD_NVIDIA_MODEL}")
+  SANDBOX_ENV+=("NVIDIA_MODEL=${NEMOCLAWD_NVIDIA_MODEL}")
 fi
 "${CREATE_ARGS[@]}" -- env "${SANDBOX_ENV[@]}" > "$CREATE_LOG" 2>&1
 CREATE_RC=$?

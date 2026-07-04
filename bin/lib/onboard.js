@@ -14,6 +14,7 @@ const { checkCgroupConfig } = require("./preflight");
 const solana = require("./solana");
 const HOST_GATEWAY_URL = "http://host.openshell.internal";
 const EXPERIMENTAL = process.env.NEMOCLAWD_EXPERIMENTAL === "1";
+const NVIDIA_HOSTED_MODEL_DEFAULT = "nvidia/nemotron-3-ultra-550b-a55b";
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -468,7 +469,7 @@ async function setupNim(sandboxName, gpu) {
 
   if (provider === "nvidia-nim") {
     await ensureApiKey();
-    model = model || "nvidia/nemotron-3-super-120b-a12b";
+    model = model || process.env.NEMOCLAWD_NVIDIA_MODEL || process.env.NVIDIA_MODEL || NVIDIA_HOSTED_MODEL_DEFAULT;
     console.log(`  Using NVIDIA Cloud API with model: ${model}`);
   }
 

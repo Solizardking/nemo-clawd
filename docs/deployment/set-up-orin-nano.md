@@ -149,7 +149,7 @@ Run onboarding and choose `NVIDIA Cloud API (build.nvidia.com)` when prompted:
 $ nemoclawd onboard
 ```
 
-The published CLI defaults to Nemotron 3 Super. To route the sandbox to Nemotron 3 Ultra from the pasted setup material, switch the OpenShell inference route after onboarding:
+The published CLI defaults the NVIDIA-hosted route to Nemotron 3 Ultra. If you need to reapply the route after onboarding, run:
 
 ```console
 $ openshell inference set --no-verify \
