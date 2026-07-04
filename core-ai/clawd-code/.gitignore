@@ -8,6 +8,8 @@ node_modules/
 dist/
 out/
 build/
+!clawd-plugin/skills/build/
+!clawd-plugin/skills/build/**
 *.tsbuildinfo
 
 # Environment

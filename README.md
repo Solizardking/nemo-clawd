@@ -78,6 +78,32 @@ nemoclawd spinners remove
 
 The installer writes only the `spinnerVerbs` field in `~/.clawd/settings.json`, falling back to `~/.claude/settings.json` when that file already exists.
 
+### Core AI Bundle
+
+nemoclawd vendors the Clawd Core AI bundle in `core-ai/`: Helius MCP and CLI tooling, Helius skill/plugin packs, Clawd Code, the Bun-native Clawd Grok runtime, the perps agent, a standalone pump MCP server, v3 runtime scaffolding, and the Clawd knowledge base.
+
+```bash
+nemoclawd core-ai status
+nemoclawd core-ai packages
+nemoclawd core-ai package helius-mcp
+nemoclawd core-ai commands
+```
+
+Build and setup commands are exposed as root npm scripts:
+
+```bash
+npm run core-ai:helius-mcp:build
+npm run core-ai:helius-cli:build
+npm run core-ai:clawd-code:build
+npm run core-ai:mcp-server:build
+```
+
+Run the Clawd plugin directly with:
+
+```bash
+clawd --plugin-dir core-ai/helius-plugin
+```
+
 ### Jetson Orin Nano
 
 For a single Jetson Orin Nano or Orin Nano Super Developer Kit, use the dedicated Orin path instead of `setup-spark`:

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const fs = require("fs");
+const http = require("http");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { envWorkerCommand, loadEnvWorker, maskValue } = require("./lib/env-worker");
@@ -16,6 +17,7 @@ const solana = require("./lib/solana");
 const dflow = require("./lib/dflow");
 const magicRouter = require("./lib/magic-router");
 const { spinnersCommand } = require("./lib/spinners");
+const { coreAiCommand } = require("./lib/core-ai");
 
 const pkg = require(path.join(ROOT, "package.json"));
 
@@ -31,6 +33,7 @@ Getting Started
   nemoclawd demo                 Print a quick demo command
   nemoclawd birth                Create a Blockchain Buddy placeholder
   nemoclawd spinners             List or install custom spinner verb packs
+  nemoclawd core-ai status       Show bundled Core AI integration status
 
 DFlow Routing
   nemoclawd dflow status         Show spot and prediction-market routing
@@ -227,6 +230,57 @@ function saveModel(model) {
   console.log(`Model set: ${model}`);
 }
 
+function runGatewayServer() {
+  const port = parseInt(process.env.PUBLIC_PORT || process.env.GATEWAY_PORT || "18789", 10);
+  const host = process.env.GATEWAY_HOST || "127.0.0.1";
+  const startedAt = new Date();
+
+  const sendJson = (res, status, body) => {
+    res.writeHead(status, {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store",
+    });
+    res.end(JSON.stringify(body));
+  };
+
+  const server = http.createServer((req, res) => {
+    const url = new URL(req.url || "/", `http://${req.headers.host || `${host}:${port}`}`);
+
+    if (url.pathname === "/health" || url.pathname === "/healthz") {
+      sendJson(res, 200, {
+        status: "ok",
+        service: "nemoclawd-gateway",
+        version: pkg.version,
+        startedAt: startedAt.toISOString(),
+        uptimeSeconds: Math.floor((Date.now() - startedAt.getTime()) / 1000),
+        dflow: dflow.resolveDflowRouting(),
+      });
+      return;
+    }
+
+    if (url.pathname === "/" || url.pathname === "/status") {
+      sendJson(res, 200, {
+        name: "Nemo Clawd Gateway",
+        version: pkg.version,
+        status: "running",
+        endpoints: ["/health", "/status"],
+      });
+      return;
+    }
+
+    sendJson(res, 404, { error: "not_found", path: url.pathname });
+  });
+
+  server.on("upgrade", (_req, socket) => {
+    socket.write("HTTP/1.1 426 Upgrade Required\r\ncontent-type: text/plain\r\n\r\nWebSocket gateway is not available in this runtime.\n");
+    socket.destroy();
+  });
+
+  server.listen(port, host, () => {
+    console.log(`nemoclawd gateway listening on http://${host}:${port}`);
+  });
+}
+
 function sandboxCommand(sandboxName, args) {
   const cmd = args[0];
   if (!cmd) fail(`Missing command for sandbox: ${sandboxName}`);
@@ -299,6 +353,14 @@ async function main() {
     }
     return;
   }
+  if (cmd === "core-ai" || cmd === "coreai") {
+    try {
+      coreAiCommand(args.slice(1));
+    } catch (err) {
+      fail(err && err.message ? err.message : String(err));
+    }
+    return;
+  }
   if (cmd === "dflow") {
     printDflowStatus(args.includes("--json"));
     return;
@@ -340,8 +402,7 @@ async function main() {
     return;
   }
   if (cmd === "gateway" && args[1] === "run") {
-    console.log("nemoclawd gateway placeholder running");
-    setInterval(() => {}, 1 << 30);
+    runGatewayServer();
     return;
   }
   if (cmd === "setup-spark") {

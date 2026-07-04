@@ -32,5 +32,6 @@ pnpm-debug.log*
 
 # Project docs (not for npm)
 CLAUDE.md
+!CLAUDE.md
 TG.md
 src/version.ts

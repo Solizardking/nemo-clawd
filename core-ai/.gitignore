@@ -70,6 +70,8 @@ v3/*.tsbuildinfo
 
 # Lockfiles (not needed for published packages)
 pnpm-lock.yaml
+!helius-cli/pnpm-lock.yaml
+!helius-mcp/pnpm-lock.yaml
 
 # Project docs - keep in git now (was: docs/)
 TG.md

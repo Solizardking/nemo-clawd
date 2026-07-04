@@ -34,6 +34,7 @@ describe("CLI dispatch", () => {
     assert.ok(r.out.includes("launch"), "missing launch command");
     assert.ok(r.out.includes("setup-orin-nano"), "missing Orin Nano setup command");
     assert.ok(r.out.includes("spinners"), "missing spinners command");
+    assert.ok(r.out.includes("core-ai status"), "missing Core AI command");
     assert.ok(r.out.includes("solana-agent"), "missing Solana agent action");
     assert.ok(r.out.includes("solana-bridge"), "missing Solana bridge action");
     assert.ok(r.out.includes("solana start"), "missing Solana one-shot action");
@@ -80,6 +81,29 @@ describe("CLI dispatch", () => {
     const r = run("version");
     assert.equal(r.code, 0);
     assert.ok(r.out.includes(pkg.version), "missing CLI version");
+  });
+
+  it("core-ai status exits 0 and reports imported package count", () => {
+    const r = run("core-ai status");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("Core AI bundle"), r.out);
+    assert.ok(r.out.includes("Packages:"), r.out);
+    assert.ok(r.out.includes("core-ai"), r.out);
+  });
+
+  it("core-ai package shows commands for a known package", () => {
+    const r = run("core-ai package helius-mcp");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("Helius MCP"), r.out);
+    assert.ok(r.out.includes("core-ai:helius-mcp:build"), r.out);
+  });
+
+  it("core-ai packages --json prints package metadata", () => {
+    const r = run("core-ai packages --json");
+    assert.equal(r.code, 0);
+    const packages = JSON.parse(r.out);
+    assert.ok(packages.some((pkg) => pkg.id === "clawd-code"), r.out);
+    assert.ok(packages.every((pkg) => Object.prototype.hasOwnProperty.call(pkg, "exists")), r.out);
   });
 
   it("spinners list shows bundled packs", () => {

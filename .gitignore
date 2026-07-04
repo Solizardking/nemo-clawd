@@ -23,10 +23,10 @@ Thumbs.db
 *~
 .vscode/
 .idea/
-
+.env.local
 # ── Documentation build ──────────────────────────────────────────
 docs/_build/
-
+.env 
 # ── Secrets & Credentials (CRITICAL) ─────────────────────────────
 # Environment files (may contain API keys, tokens, private keys)
 .env
@@ -67,6 +67,7 @@ rpc-config.json
 
 # npm auth token (NEVER commit)
 .npmrc
+!core-ai/.npmrc
 
 # ── Build artifacts ───────────────────────────────────────────────
 *.tgz
@@ -137,6 +138,7 @@ rpc-config.json
 
 # npm auth token (NEVER commit)
 .npmrc
+!core-ai/.npmrc
 
 # ── Build artifacts ───────────────────────────────────────────────
 *.tgz
