@@ -199,7 +199,7 @@ const CLASSIFIERS: Array<{ type: MagicRouterTaskType; patterns: RegExp[]; weight
   {
     type: "nft_ops",
     patterns: [
-      /\b(nft|collection|rarity|metadata|token uri|nft.*buy|nft.*sell|nft.*list)\b/i,
+      /\b(nft|collection|rarity|metadata|token uri|mint.*nft|nft.*mint|nft.*buy|nft.*sell|nft.*list)\b/i,
       /\b(candy machine|metaplex|nft.*price|floor price|nft.*hold|nft.*transfer)\b/i,
     ],
     weight: 0.92,
