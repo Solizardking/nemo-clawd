@@ -144,15 +144,8 @@ function printMagicRouter(args) {
     return;
   }
 
-  console.log("Magic Router");
-  console.log(`  Task:      ${route.taskType}`);
-  console.log(`  Inference: ${route.inference.provider} / ${route.inference.model}`);
-  console.log(`  Key env:   ${route.inference.credentialEnv}${route.inference.available ? " (present)" : " (not set)"}`);
-  if (route.advisor) {
-    console.log(`  Advisor:   ${route.advisor.provider} / ${route.advisor.model}${route.advisor.available ? " (present)" : " (not set)"}`);
-  }
-  console.log(`  Tools:     ${route.toolSet.join(", ")}`);
-  console.log(`  DFlow:     spot=${route.dflow.spotTradingDefault} predictions=${route.dflow.predictionMarketDefault}`);
+  const pretty = magicRouter.describeMagicRouterPretty(route);
+  console.log(pretty);
 }
 
 function solanaOverview() {
