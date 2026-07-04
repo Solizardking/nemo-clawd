@@ -6,6 +6,7 @@
  * Exposes Streamable HTTP at /mcp, legacy SSE at /sse, and health at /health.
  */
 
+import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -24,12 +25,13 @@ type SseSession = {
   transport: SSEServerTransport;
 };
 
-const sseSessions = new Map<string, SseSession>();
+type StreamableSession = {
+  server: ReturnType<typeof createNemoclawdMcpServer>;
+  transport: StreamableHTTPServerTransport;
+};
 
-const streamableServer = createNemoclawdMcpServer();
-const streamableTransport = new StreamableHTTPServerTransport({
-  sessionIdGenerator: undefined,
-});
+const sseSessions = new Map<string, SseSession>();
+const streamableSessions = new Map<string, StreamableSession>();
 
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, {
@@ -133,7 +135,55 @@ async function handleSseMessage(
   await session.transport.handlePostMessage(req, res);
 }
 
-await streamableServer.connect(streamableTransport);
+async function createStreamableSession(): Promise<StreamableSession> {
+  let activeSessionId: string | undefined;
+  const server = createNemoclawdMcpServer();
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: randomUUID,
+    onsessioninitialized: (sessionId) => {
+      activeSessionId = sessionId;
+      streamableSessions.set(sessionId, { server, transport });
+    },
+    onsessionclosed: (sessionId) => {
+      streamableSessions.delete(sessionId);
+    },
+  });
+
+  transport.onclose = () => {
+    if (activeSessionId) {
+      streamableSessions.delete(activeSessionId);
+    }
+  };
+
+  await server.connect(transport);
+  return { server, transport };
+}
+
+async function handleStreamableMcp(
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<void> {
+  const sessionHeader = req.headers["mcp-session-id"];
+  const sessionId = Array.isArray(sessionHeader) ? sessionHeader[0] : sessionHeader;
+
+  if (sessionId) {
+    const session = streamableSessions.get(sessionId);
+    if (!session) {
+      sendJson(res, 404, { error: "Unknown MCP session" });
+      return;
+    }
+
+    await session.transport.handleRequest(req, res);
+    return;
+  }
+
+  const session = await createStreamableSession();
+  await session.transport.handleRequest(req, res);
+
+  if (!session.transport.sessionId) {
+    await session.server.close();
+  }
+}
 
 const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
   setCorsHeaders(res);
@@ -186,7 +236,7 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
     }
 
     if (pathname === "/mcp" || (pathname === "/" && req.method !== "GET")) {
-      await streamableTransport.handleRequest(req, res);
+      await handleStreamableMcp(req, res);
       return;
     }
 

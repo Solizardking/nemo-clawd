@@ -1,7 +1,7 @@
 /**
  * nemoclawd MCP Server
  *
- * xAI Grok powered Solana agentic tools with 31 MCP tools.
+ * xAI Grok powered Solana agentic tools with 32 MCP tools.
  * Connects to Helius RPC/DAS and xAI Grok API for autonomous trading.
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
