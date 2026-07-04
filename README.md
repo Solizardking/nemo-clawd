@@ -7,7 +7,7 @@
   <code>8cHzQHUS2s2h8TzCmfqPKYiM4dSt4roa3n7MyRLApump</code>
 </p>
 <p align="center">
-  <a href="https://www.npmjs.com/package/nemoclawd"><img src="https://img.shields.io/npm/v/nemoclawd.svg?style=flat-square&color=cb3837" alt="npm"></a>
+  <a href="https://www.npmjs.com/package/@mawdbotsonsolana/nemoclawd"><img src="https://img.shields.io/npm/v/@mawdbotsonsolana/nemoclawd.svg?style=flat-square&color=cb3837" alt="npm"></a>
   <a href="https://github.com/x402agent/nemo-clawd/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/status-alpha-orange?style=flat-square" alt="Status">
   <img src="https://img.shields.io/badge/Solana-Mainnet-9945FF?style=flat-square&logo=solana&logoColor=white" alt="Solana">
@@ -19,37 +19,42 @@
 ---
 <!-- end-badges -->
 
-## solana-clawd Integration
+<p align="center">
+<pre>
+  ╔══════════════════════════════════════════════════════════════╗
+  ║    ╱⌒╲                              ╱⌒╠══                    ║
+  ║   ( 🦞 )   █▀▀▀ █▄░█ █▀▄▀█ █▀▀▀   ( 🦞 )  LOBSTER          ║
+  ║    ╲╱      █░▀█ █░▀█ █░▀░█ ██▀    ╲╱                       ║
+  ║           ▀▀▀▀▀ ▀░░▀ ▀░░░▀ ▀▀▀                              ║
+  ║    ──────────────────────────────────────────────────────    ║
+  ║    ░▄░ █▀▀█ █▀▄▀█ ▀█▀ █▀▀█   █▀▀█ █░░ █▀▀ █░█ █▀▀▄        ║
+  ║    ▀▄▀ █░░█ █░▀░█ ░█░ █░░█   █▄▄▀ █░░ █▀▀ ▄▀▄ █░░█        ║
+  ║    ▀░▀ ▀▀▀▀ ▀░░░▀ ░▀░ ▀▀▀▀   ▀░▀▀ ▀▀▀ ▀▀▀ ▀░▀ ▀▀▀░        ║
+  ║    ──────────────────────────────────────────────────────    ║
+  ║    🦞  Solana × xAI  |  Agentic Trading Engine  |  $CLAWD  🦞   ║
+  ╚══════════════════════════════════════════════════════════════╝
+</pre>
+</p>
 
-**nemoclawd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
+---
+<!-- end-lobster-banner -->
 
-### What You Get
+## ⚡ One-Shot Install
 
+```bash
+npm install -g @mawdbotsonsolana/nemoclawd
+
+# Start with Grok + Solana tools
+nemoclawd launch
+
+# Run demo walkthrough
+nemoclawd demo
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│   xAI Grok Integration ─── 4-16 Grok agents with web + X search  │
-│   │                     Chat, vision, image gen, voice          │
-│   │                                                             │
-│   $CLAWD Token ───────── 8cHzQHUS2s2h8TzCmfqPKYiM4dSt4roa3n7MyRLApump │
-│   │                     Solana + Pump.fun native                │
-│   │                                                             │
-│   31 MCP Tools ───────── Solana market data, trading, NFTs      │
-│   │                     Helius RPC/DAS, Pump.fun SDK            │
-│   │                                                             │
-│   Multi-Agent Research ─ 4 or 16 Grok agents collaborating     │
-│   │                     Deep Solana research + intelligence   │
-│   │                                                             │
-│   Blockchain Buddies ─── 18 species with trading personalities  │
-│   │                     Procedurally generated companions       │
-│   │                                                             │
-│   Voice Mode ─────────── xAI Grok text-to-speech agent          │
-│   │                     Conversational AI + STT                 │
-│   │                                                             │
-│   Telegram Bot ───────── 60+ commands for trading + research    │
-│                         Real-time alerts, sniping, narration    │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────────┘
+
+Need Node.js 20+? The bundled [`install.sh`](install.sh) handles everything — Node.js via nvm, optional GPU/Ollama support, and the CLI — in a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/x402agent/nemo-clawd/main/install.sh | bash
 ```
 
 <!-- start-quickstart-guide -->
@@ -65,6 +70,41 @@ nemoclawd launch
 nemoclawd demo
 ```
 <!-- end-quickstart-guide -->
+
+---
+
+## solana-clawd Integration
+
+**nemoclawd** now integrates **solana-clawd** — the full xAI Grok-powered agentic framework for Solana trading, research, and autonomous agent operations.
+
+### What You Get
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│   xAI Grok Integration ─── 4-16 Grok agents with web + X search    │
+│   │                     Chat, vision, image gen, voice            │
+│   │                                                               │
+│   $CLAWD Token ───────── 8cHzQHUS2s2h8TzCmfqPKYiM4dSt4roa3n7MyRLApump │
+│   │                     Solana + Pump.fun native                  │
+│   │                                                               │
+│   31 MCP Tools ───────── Solana market data, trading, NFTs        │
+│   │                     Helius RPC/DAS, Pump.fun SDK              │
+│   │                                                               │
+│   Multi-Agent Research ─ 4 or 16 Grok agents collaborating       │
+│   │                     Deep Solana research + intelligence       │
+│   │                                                               │
+│   Blockchain Buddies ─── 18 species with trading personalities    │
+│   │                     Procedurally generated companions         │
+│   │                                                               │
+│   Voice Mode ─────────── xAI Grok text-to-speech agent            │
+│   │                     Conversational AI + STT                   │
+│   │                                                               │
+│   Telegram Bot ───────── 60+ commands for trading + research      │
+│                         Real-time alerts, sniping, narration      │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ### Spinner Packs
 
@@ -684,8 +724,8 @@ Then connect via:
 │                      │  │           cross-session)  │  │                │
 │  Risk Engine         │  │                          │  │  Solana Tracker│
 └──────────────────────┘  │  INFERRED (tentative,    │  │                │
-                          │           markdown)       │  │                │
-                          └──────────────────────────┘  └────────────────┘
+                           │           markdown)       │  │                │
+                           └──────────────────────────┘  └────────────────┘
 ```
 
 ---
