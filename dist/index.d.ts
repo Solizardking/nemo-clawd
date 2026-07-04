@@ -7,7 +7,8 @@
  * available inside the Nemo Clawd host process and cannot be imported at build
  * time.
  */
-type Command = import("commander").Command;
+/** Minimal stub — commander is ESM-only and cannot be type-imported in a CJS project. */
+type Command = any;
 /** Subset of NemoclawdConfig that we actually read. */
 export interface NemoclawdConfig {
     [key: string]: unknown;

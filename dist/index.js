@@ -171,14 +171,15 @@ function register(api) {
     const bannerModel = onboardCfg?.model ?? "zai/glm-5.2";
     const bannerTrading = `dflow ${dflowRoutes.mode}`;
     api.logger.info("");
-    api.logger.info("  ┌─────────────────────────────────────────────────────┐");
-    api.logger.info("  │  Nemo Clawd registered                                │");
-    api.logger.info("  │                                                     │");
-    api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(40)}│`);
-    api.logger.info(`  │  Model:     ${bannerModel.padEnd(40)}│`);
-    api.logger.info(`  │  Trading:   ${bannerTrading.padEnd(40)}│`);
-    api.logger.info("  │  Commands:  nemoclawd nemoclawd <command>             │");
-    api.logger.info("  └─────────────────────────────────────────────────────┘");
+    api.logger.info("  ┌──────────────────────────────────────────────────────┐");
+    api.logger.info("  │   🦞  Nemo Clawd  —  nemoclawd nemoclawd <command>  🦞  │");
+    api.logger.info("  │                                                      │");
+    api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(42)}│`);
+    api.logger.info(`  │  Model:     ${bannerModel.padEnd(42)}│`);
+    api.logger.info(`  │  Trading:   ${bannerTrading.padEnd(42)}│`);
+    api.logger.info("  │                                                      │");
+    api.logger.info("  │  Solana × xAI  |  Agentic Trading Engine  |  $CLAWD    │");
+    api.logger.info("  └──────────────────────────────────────────────────────┘");
     api.logger.info("");
 }
 //# sourceMappingURL=index.js.map
