@@ -30,6 +30,7 @@ describe("CLI dispatch", () => {
     assert.ok(r.out.includes("Sandbox Management"), "missing Sandbox Management section");
     assert.ok(r.out.includes("Policy Presets"), "missing Policy Presets section");
     assert.ok(r.out.includes("doctor"), "missing doctor command");
+    assert.ok(r.out.includes("env status"), "missing env status command");
     assert.ok(r.out.includes("launch"), "missing launch command");
     assert.ok(r.out.includes("setup-orin-nano"), "missing Orin Nano setup command");
     assert.ok(r.out.includes("spinners"), "missing spinners command");
@@ -122,6 +123,47 @@ describe("CLI dispatch", () => {
 
     const updated = JSON.parse(fs.readFileSync(settings, "utf-8"));
     assert.deepEqual(updated, { existing: true });
+  });
+
+  it("env status loads local env file and masks secrets", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const envDir = path.join(home, ".nemoclawd");
+    fs.mkdirSync(envDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(envDir, ".env"),
+      [
+        "HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=test-secret-key",
+        "NOVITA_API_KEY=sk_test_secret",
+      ].join("\n"),
+    );
+
+    const out = execSync(`node "${CLI}" env status`, {
+      encoding: "utf-8",
+      timeout: 10000,
+      env: { ...process.env, HOME: home },
+    });
+
+    assert.ok(out.includes("HELIUS_RPC_URL"), out);
+    assert.ok(out.includes("api-key=****"), out);
+    assert.ok(!out.includes("test-secret-key"), out);
+    assert.ok(!out.includes("sk_test_secret"), out);
+  });
+
+  it("wallet status uses env worker RPC and masks URL credentials", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const envDir = path.join(home, ".nemoclawd");
+    fs.mkdirSync(envDir, { recursive: true });
+    fs.writeFileSync(path.join(envDir, ".env"), "HELIUS_RPC_URL=https://mainnet.helius-rpc.com/?api-key=test-secret-key\n");
+
+    const out = execSync(`node "${CLI}" wallet status`, {
+      encoding: "utf-8",
+      timeout: 10000,
+      env: { ...process.env, HOME: home },
+    });
+
+    assert.ok(out.includes("https://mainnet.helius-rpc.com/"), out);
+    assert.ok(out.includes("api-key=****"), out);
+    assert.ok(!out.includes("test-secret-key"), out);
   });
 
   it("solana overview prefers active gateway last sandbox over first registry entry", () => {

@@ -5,7 +5,9 @@
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
+const { envWorkerCommand, loadEnvWorker, maskValue } = require("./lib/env-worker");
 
+loadEnvWorker();
 const registry = require("./lib/registry");
 const { onboard } = require("./lib/onboard");
 const { ROOT, SCRIPTS, run } = require("./lib/runner");
@@ -24,6 +26,7 @@ Getting Started
   nemoclawd onboard              Configure and launch a Solana-native sandbox
   nemoclawd launch               Alias for onboard
   nemoclawd doctor [--fix]       Check local prerequisites
+  nemoclawd env status           Show masked local .env worker status
   nemoclawd setup-orin-nano      Prepare Jetson Orin Nano for OpenShell
   nemoclawd demo                 Print a quick demo command
   nemoclawd birth                Create a Blockchain Buddy placeholder
@@ -158,7 +161,7 @@ function solanaOverview() {
   }
 
   console.log(`Using sandbox: ${sandboxName}`);
-  console.log(`Solana RPC: ${solana.getSolanaRpcUrl()}`);
+  console.log(`Solana RPC: ${maskValue(solana.getSolanaRpcUrl())}`);
   console.log(`DFlow: ${dflow.describeDflowRouting()}`);
   const wallet = solana.getDefaultWallet();
   console.log(`Wallet: ${wallet ? wallet.address : "not configured"}`);
@@ -180,7 +183,7 @@ async function walletCommand(args) {
     const wallet = solana.getDefaultWallet();
     const privy = solana.loadPrivyConfig();
     console.log("Wallet status");
-    console.log(`  RPC:    ${solana.getSolanaRpcUrl()}`);
+    console.log(`  RPC:    ${maskValue(solana.getSolanaRpcUrl())}`);
     console.log(`  Privy:  ${privy && privy.appId ? "configured" : "not configured"}`);
     console.log(`  Wallet: ${wallet ? wallet.address : "not configured"}`);
     return;
@@ -266,6 +269,14 @@ async function main() {
   }
   if (cmd === "doctor") {
     doctor();
+    return;
+  }
+  if (cmd === "env" || cmd === "env-worker") {
+    try {
+      envWorkerCommand(args.slice(1));
+    } catch (err) {
+      fail(err && err.message ? err.message : String(err));
+    }
     return;
   }
   if (cmd === "list") {
