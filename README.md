@@ -1033,6 +1033,27 @@ Contact [support@x.ai](mailto:support@x.ai) with your team ID and CA certificate
 
 ---
 
+## AI Mode
+
+By default nemoclawd runs in **Trading Mode**: the magic router can grant wallet, signing,
+and DFlow trading tools whenever a message classifies as trading- or wallet-related.
+
+Switch to **AI Mode** to run nemoclawd as a pure conversational AI, coding, and research
+assistant with every wallet, signing, and trading tool hard-disabled — regardless of how a
+message classifies:
+
+```bash
+nemoclawd mode ai         # switch to AI Mode
+nemoclawd mode            # show the active mode
+nemoclawd mode trading    # switch back to Trading Mode (default)
+```
+
+`nemoclawd magic-router --mode ai <message>` previews how a message would route under AI
+Mode without changing the persisted mode. See [docs/reference/commands.md#ai-mode](docs/reference/commands.md#ai-mode)
+for the full design.
+
+---
+
 <h2 id="buddies">🧸 BLOCKCHAIN BUDDIES 🧸</h2>
 
 Every `nemoclawd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.

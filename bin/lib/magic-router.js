@@ -4,6 +4,7 @@
 /**
  * 🪄 NEMOCLAWD MAGIC ROUTER — compiled JS mirror of src/magic-router.ts
  */
+const { DEFAULT_AGENT_MODE, partitionToolsForMode } = require("./mode");
 
 const MAGIC_ROUTER_STRATEGY = "magic-router";
 const MAGIC_ROUTER_VERSION = "2.0.0";
@@ -120,24 +121,47 @@ function buildInferenceRoutes(env) {
   return { selected: ollama, advisor: openrouter.available ? openrouter : undefined, fallbacks: [openrouter, nvidia] };
 }
 
-function resolveMagicRouter(input, env = process.env) {
+function resolveMagicRouter(input, env = process.env, mode = DEFAULT_AGENT_MODE) {
   const { type: taskType, confidence } = classifyMagicRouterTaskWithConfidence(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || (routes.advisor && routes.advisor.provider === OPENROUTER_PROVIDER);
   const taskMeta = { type: taskType, ...TASK_METADATA[taskType], confidence };
+  const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
+  const { allowed: toolSet, blocked: blockedTools } = partitionToolsForMode(rawToolSet, mode);
+  const aiMode = mode === "ai";
+
+  const guardrails = [
+    "least-privilege-tools",
+    "read-only-before-signing",
+    "explicit-approval-before-wallet-actions",
+    "no-private-key-or-seed-phrase-handling",
+  ];
+  if (aiMode) guardrails.push("ai-mode-financial-tools-disabled");
+
   return {
-    strategy: MAGIC_ROUTER_STRATEGY, version: MAGIC_ROUTER_VERSION,
-    taskType, taskMeta,
-    inference: routes.selected, advisor: routes.advisor, fallbacks: routes.fallbacks,
-    toolSet: toolSetForTask(taskType, Boolean(openRouterAvailable)),
-    guardrails: ["least-privilege-tools", "read-only-before-signing", "explicit-approval-before-wallet-actions", "no-private-key-or-seed-phrase-handling"],
-    dflow: { spotTradingDefault: true, predictionMarketDefault: true, credentialEnv: "DFLOW_API_KEY" },
+    strategy: MAGIC_ROUTER_STRATEGY,
+    version: MAGIC_ROUTER_VERSION,
+    mode,
+    taskType,
+    taskMeta,
+    inference: routes.selected,
+    advisor: routes.advisor,
+    fallbacks: routes.fallbacks,
+    toolSet,
+    blockedTools,
+    guardrails,
+    dflow: {
+      spotTradingDefault: !aiMode,
+      predictionMarketDefault: !aiMode,
+      credentialEnv: "DFLOW_API_KEY",
+    },
   };
 }
 
 function describeMagicRouter(route) {
   const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-  return `${route.strategy} v${route.version}: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}`;
+  const blocked = route.blockedTools && route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
+  return `${route.strategy} v${route.version}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
 }
 
 function describeMagicRouterPretty(route) {
@@ -145,6 +169,8 @@ function describeMagicRouterPretty(route) {
   const lines = [];
   lines.push(`  🪄  Magic Router v${route.version} — Decision Trace`);
   lines.push(`  ${"─".repeat(48)}`);
+  lines.push("");
+  lines.push(`  Mode: ${route.mode}`);
   lines.push("");
   lines.push(`  ${meta.emoji}  Task Classification`);
   lines.push(`     Input type:    ${meta.label}`);
@@ -172,6 +198,11 @@ function describeMagicRouterPretty(route) {
   lines.push("");
   lines.push(`  🛠️  Tool Set (${route.toolSet.length})`);
   for (const tool of route.toolSet) lines.push(`     • ${tool}`);
+  if (route.blockedTools && route.blockedTools.length) {
+    lines.push("");
+    lines.push(`  🚫  Blocked by AI Mode (${route.blockedTools.length})`);
+    for (const tool of route.blockedTools) lines.push(`     • ${tool}`);
+  }
   lines.push("");
   lines.push(`  🛡️  Guardrails`);
   for (const g of route.guardrails) lines.push(`     ✓ ${g}`);

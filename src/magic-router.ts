@@ -13,6 +13,7 @@
  *   Task type → tool set mapping → guardrails → DFlow routing
  *   Inference → Ollama (default) → OpenRouter (advisor) → NVIDIA (fallback)
  */
+import { DEFAULT_AGENT_MODE, partitionToolsForMode, type AgentMode } from "./agent-mode.js";
 
 export const MAGIC_ROUTER_STRATEGY = "magic-router";
 export const MAGIC_ROUTER_VERSION = "2.0.0";
@@ -70,12 +71,14 @@ export interface MagicRouterInferenceRoute {
 export interface MagicRouterRoute {
   strategy: typeof MAGIC_ROUTER_STRATEGY;
   version: typeof MAGIC_ROUTER_VERSION;
+  mode: AgentMode;
   taskType: MagicRouterTaskType;
   taskMeta: MagicRouterTaskMetadata;
   inference: MagicRouterInferenceRoute;
   advisor?: MagicRouterInferenceRoute;
   fallbacks: MagicRouterInferenceRoute[];
   toolSet: string[];
+  blockedTools: string[];
   guardrails: string[];
   dflow: {
     spotTradingDefault: boolean;
@@ -403,7 +406,11 @@ function buildInferenceRoutes(env: EnvLike): { selected: MagicRouterInferenceRou
 }
 
 // ── Full route resolution ────────────────────────────────────────────
-export function resolveMagicRouter(input: string | string[] | undefined, env: EnvLike = process.env): MagicRouterRoute {
+export function resolveMagicRouter(
+  input: string | string[] | undefined,
+  env: EnvLike = process.env,
+  mode: AgentMode = DEFAULT_AGENT_MODE,
+): MagicRouterRoute {
   const { type: taskType, confidence } = classifyMagicRouterTaskWithConfidence(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || routes.advisor?.provider === OPENROUTER_PROVIDER;
@@ -412,25 +419,33 @@ export function resolveMagicRouter(input: string | string[] | undefined, env: En
     ...TASK_METADATA[taskType],
     confidence,
   };
+  const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
+  const { allowed: toolSet, blocked: blockedTools } = partitionToolsForMode(rawToolSet, mode);
+  const aiMode = mode === "ai";
+
+  const guardrails = [
+    "least-privilege-tools",
+    "read-only-before-signing",
+    "explicit-approval-before-wallet-actions",
+    "no-private-key-or-seed-phrase-handling",
+  ];
+  if (aiMode) guardrails.push("ai-mode-financial-tools-disabled");
 
   return {
     strategy: MAGIC_ROUTER_STRATEGY,
     version: MAGIC_ROUTER_VERSION,
+    mode,
     taskType,
     taskMeta,
     inference: routes.selected,
     advisor: routes.advisor,
     fallbacks: routes.fallbacks,
-    toolSet: toolSetForTask(taskType, Boolean(openRouterAvailable)),
-    guardrails: [
-      "least-privilege-tools",
-      "read-only-before-signing",
-      "explicit-approval-before-wallet-actions",
-      "no-private-key-or-seed-phrase-handling",
-    ],
+    toolSet,
+    blockedTools,
+    guardrails,
     dflow: {
-      spotTradingDefault: true,
-      predictionMarketDefault: true,
+      spotTradingDefault: !aiMode,
+      predictionMarketDefault: !aiMode,
       credentialEnv: "DFLOW_API_KEY",
     },
   };
@@ -439,7 +454,8 @@ export function resolveMagicRouter(input: string | string[] | undefined, env: En
 // ── Pretty-print — the signature feature ─────────────────────────────
 export function describeMagicRouter(route: MagicRouterRoute): string {
   const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-  return `${route.strategy} v${route.version}: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}`;
+  const blocked = route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
+  return `${route.strategy} v${route.version}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
 }
 
 export function describeMagicRouterPretty(route: MagicRouterRoute): string {
@@ -448,6 +464,8 @@ export function describeMagicRouterPretty(route: MagicRouterRoute): string {
 
   lines.push(`  🪄  Magic Router v${route.version} — Decision Trace`);
   lines.push(`  ${"─".repeat(48)}`);
+  lines.push(``);
+  lines.push(`  Mode: ${route.mode}`);
   lines.push(``);
   lines.push(`  ${meta.emoji}  Task Classification`);
   lines.push(`     Input type:    ${meta.label}`);
@@ -487,6 +505,13 @@ export function describeMagicRouterPretty(route: MagicRouterRoute): string {
   lines.push(`  🛠️  Tool Set (${route.toolSet.length})`);
   for (const tool of route.toolSet) {
     lines.push(`     • ${tool}`);
+  }
+  if (route.blockedTools.length) {
+    lines.push(``);
+    lines.push(`  🚫  Blocked by AI Mode (${route.blockedTools.length})`);
+    for (const tool of route.blockedTools) {
+      lines.push(`     • ${tool}`);
+    }
   }
   lines.push(``);
 

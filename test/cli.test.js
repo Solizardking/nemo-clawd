@@ -219,4 +219,46 @@ describe("CLI dispatch", () => {
     assert.ok(out.includes("Using sandbox: nemo"), out);
     assert.ok(!out.includes("Using sandbox: my-assistant"), out);
   });
+
+  it("mode defaults to trading and help lists the AI Mode section", () => {
+    const r = run("mode");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("Agent mode: trading"));
+
+    const help = run("help");
+    assert.ok(help.out.includes("AI Mode"), "missing AI Mode help section");
+    assert.ok(help.out.includes("nemoclawd mode ai"), "missing mode ai help line");
+  });
+
+  it("mode ai persists across invocations sharing the same HOME", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: home } };
+
+    const set = execSync(`node "${CLI}" mode ai`, opts);
+    assert.ok(set.includes("Agent mode set: ai"));
+
+    const get = execSync(`node "${CLI}" mode`, opts);
+    assert.ok(get.includes("Agent mode: ai"));
+  });
+
+  it("mode rejects an unknown target", () => {
+    const r = run("mode bogus");
+    assert.equal(r.code, 1);
+    assert.ok(r.out.includes("Unknown mode"));
+  });
+
+  it("magic-router --mode ai strips wallet tools for a wallet_ops task, --mode trading does not", () => {
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: "/tmp/nemoclawd-cli-test-" + Date.now(), ZAI_API_KEY: "zai-test" } };
+
+    const ai = execSync(`node "${CLI}" magic-router --mode ai check my wallet balance`, opts);
+    assert.ok(ai.includes("Mode:      ai"));
+    assert.ok(ai.includes("Task:      wallet_ops"));
+    assert.ok(ai.includes("Tools:     \n") || /Tools:\s*\n/.test(ai), ai);
+    assert.ok(ai.includes("Blocked:   openshell-private-wallet, solana-rpc, wallet-approval"), ai);
+
+    const trading = execSync(`node "${CLI}" magic-router --mode trading check my wallet balance`, opts);
+    assert.ok(trading.includes("Mode:      trading"));
+    assert.ok(trading.includes("solana-rpc"), trading);
+    assert.ok(!trading.includes("Blocked:"), trading);
+  });
 });
