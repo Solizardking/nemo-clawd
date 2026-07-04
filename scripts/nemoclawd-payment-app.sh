@@ -6,6 +6,34 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-payment-app.sh
+
+Start the bundled Pump-Fun tokenized agent payment app.
+
+Required environment:
+  AGENT_TOKEN_MINT_ADDRESS
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 APP_DIR="/opt/pump-fun/agent-app"
 PUMPFUN_ROOT="/opt/pump-fun"
 WORKSPACE_ROOT="${HOME:-/sandbox}/.nemoclawd/workspace"

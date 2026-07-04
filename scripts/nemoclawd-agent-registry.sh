@@ -6,6 +6,31 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-agent-registry.sh
+
+Start the bundled Pump-Fun agent registry heartbeat process.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 REGISTRY_DIR="/opt/pump-fun/agent-registry"
 
 # Fall back to local dev path if /opt doesn't exist

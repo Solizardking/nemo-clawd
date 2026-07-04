@@ -43,6 +43,34 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: walkthrough.sh
+
+Open a tmux split-screen walkthrough for Nemo Clawd agent approvals.
+
+Required environment:
+  ZAI_API_KEY or NVIDIA_API_KEY
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 if [ -n "${ZAI_API_KEY:-}" ]; then
   INFERENCE_KEY_NAME="ZAI_API_KEY"
   INFERENCE_KEY_VALUE="$ZAI_API_KEY"

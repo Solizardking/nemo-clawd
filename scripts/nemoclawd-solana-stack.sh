@@ -8,6 +8,31 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-solana-stack.sh
+
+Start the Nemo Clawd Solana service stack as background services.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 SERVICES_DIR="${HOME:-/sandbox}/.nemoclawd/services"
 LOG_DIR="${SERVICES_DIR}/logs"
 PID_DIR="${SERVICES_DIR}/pids"

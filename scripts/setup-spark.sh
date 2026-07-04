@@ -32,6 +32,31 @@ fail() { echo -e "${RED}>>>${NC} $1"; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+usage() {
+  cat <<'EOF'
+Usage: setup-spark.sh
+
+Configure Docker on DGX Spark Linux hosts for OpenShell's k3s-in-Docker
+gateway.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    fail "Unknown argument: $1"
+    ;;
+esac
+
 # ── Pre-flight checks ─────────────────────────────────────────────
 
 if [ "$(uname -s)" != "Linux" ]; then

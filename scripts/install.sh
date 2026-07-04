@@ -5,7 +5,7 @@
 # Nemo Clawd curl-pipe-bash installer.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/x402agent/Nemo Clawd/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/x402agent/nemo-clawd/main/scripts/install.sh | bash
 
 set -euo pipefail
 
@@ -17,6 +17,36 @@ NC='\033[0m'
 info()  { echo -e "${GREEN}[install]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[install]${NC} $1"; }
 fail()  { echo -e "${RED}[install]${NC} $1"; exit 1; }
+
+usage() {
+  cat <<'EOF'
+Usage: install.sh [--dry-run]
+
+Install Node.js, Docker/OpenShell prerequisites, then install the
+@mawdbotsonsolana/nemoclawd CLI globally.
+
+Options:
+  --dry-run, --smoke-test  Detect platform and print the installation plan.
+  -h, --help              Show this help.
+EOF
+}
+
+DRY_RUN=false
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --dry-run|--smoke-test)
+    DRY_RUN=true
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    fail "Unknown argument: $1"
+    ;;
+esac
 
 # Ensure nvm environment is loaded in the current shell.
 ensure_nvm_loaded() {
@@ -86,6 +116,11 @@ elif [ "$OS" = "Linux" ]; then
 fi
 
 info "Node.js manager: $NODE_MGR"
+
+if [ "$DRY_RUN" = true ]; then
+  info "Dry run: would ensure Node.js ${RECOMMENDED_NODE_MAJOR}, Docker, OpenShell, then install @mawdbotsonsolana/nemoclawd."
+  exit 0
+fi
 
 version_major() {
   printf '%s\n' "${1#v}" | cut -d. -f1

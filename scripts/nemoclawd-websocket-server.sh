@@ -6,6 +6,31 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-websocket-server.sh
+
+Start the bundled Pump-Fun WebSocket relay.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 APP_DIR="/opt/pump-fun/websocket-server"
 PUMPFUN_ROOT="/opt/pump-fun"
 WORKSPACE_ROOT="${HOME:-/sandbox}/.nemoclawd/workspace"

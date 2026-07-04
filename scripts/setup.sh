@@ -37,6 +37,43 @@ info() { echo -e "${GREEN}>>>${NC} $1"; }
 warn() { echo -e "${YELLOW}>>>${NC} $1"; }
 fail() { echo -e "${RED}>>>${NC} $1"; exit 1; }
 
+usage() {
+  cat <<'EOF'
+Usage: setup.sh [--dry-run]
+
+Set up the host OpenShell gateway, inference providers, and Nemo Clawd sandbox.
+
+Options:
+  --dry-run, --smoke-test  Print the setup plan without changing the host.
+  -h, --help              Show this help.
+EOF
+}
+
+DRY_RUN=false
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --dry-run|--smoke-test)
+    DRY_RUN=true
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    fail "Unknown argument: $1"
+    ;;
+esac
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [ "$DRY_RUN" = true ]; then
+  info "Dry run: would start OpenShell gateway, patch CoreDNS when needed, configure providers, build context, and create the nemoclawd sandbox from $REPO_DIR."
+  exit 0
+fi
+
 upsert_provider() {
   local name="$1"
   local type="$2"
@@ -92,9 +129,6 @@ if [ -z "${NVIDIA_API_KEY:-}" ]; then
 fi
 info "DFlow spot route: ${DFLOW_TRADE_API_URL}/order"
 info "DFlow prediction metadata: ${DFLOW_METADATA_API_URL}"
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # 1. Gateway — always start fresh to avoid stale state
 info "Starting OpenShell gateway..."

@@ -6,6 +6,34 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-solana-bridge.sh
+
+Start the Solana-to-Telegram wallet and trade narration bridge.
+
+Required environment:
+  TELEGRAM_BOT_TOKEN
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 APP_DIR="/opt/pump-fun/agent-app"
 SOLANA_RPC_URL="${SOLANA_RPC_URL:-https://rpc.solanatracker.io/public}"
 SOLANA_WS_URL="${SOLANA_WS_URL:-$SOLANA_RPC_URL}"

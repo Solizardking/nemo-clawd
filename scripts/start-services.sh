@@ -22,8 +22,26 @@ DASHBOARD_PORT="${DASHBOARD_PORT:-18789}"
 SANDBOX_NAME="${NEMOCLAWD_SANDBOX:-default}"
 ACTION="start"
 
+usage() {
+  cat <<'EOF'
+Usage: start-services.sh [--status|--stop] [--sandbox name]
+
+Start, stop, or inspect Nemo Clawd auxiliary services.
+
+Options:
+  --sandbox name  Target a specific sandbox service namespace.
+  --status        Print service status without changing anything.
+  --stop          Stop running auxiliary services.
+  -h, --help      Show this help.
+EOF
+}
+
 while [ $# -gt 0 ]; do
   case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
     --sandbox)
       SANDBOX_NAME="${2:?--sandbox requires a name}"
       shift 2
@@ -37,7 +55,9 @@ while [ $# -gt 0 ]; do
       shift
       ;;
     *)
-      shift
+      usage >&2
+      echo "Unknown argument: $1" >&2
+      exit 2
       ;;
   esac
 done

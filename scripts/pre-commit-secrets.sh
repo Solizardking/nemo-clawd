@@ -4,6 +4,32 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: pre-commit-secrets.sh
+
+Reject staged changes that contain obvious secrets or newly added secret-like
+filenames. Intended for use as a Git pre-commit hook.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 # Patterns that should NEVER appear in committed code
 PATTERNS=(
   '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'  # UUID (potential API keys)

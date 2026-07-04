@@ -18,7 +18,31 @@
  */
 
 const https = require("https");
-const { execSync, spawn } = require("child_process");
+const fs = require("fs");
+const { execFileSync, spawn } = require("child_process");
+
+function usage() {
+  console.log(`Usage: telegram-bridge.js [--smoke-test]
+
+Bridge Telegram messages to a Nemo Clawd agent running in an OpenShell sandbox.
+
+Options:
+  --smoke-test  Validate startup configuration without contacting Telegram.
+  -h, --help    Show this help.`);
+}
+
+const args = process.argv.slice(2);
+if (args.includes("-h") || args.includes("--help")) {
+  usage();
+  process.exit(0);
+}
+const SMOKE_TEST = args.includes("--smoke-test");
+const unknownArg = args.find((arg) => arg !== "--smoke-test");
+if (unknownArg) {
+  usage();
+  console.error(`Unknown argument: ${unknownArg}`);
+  process.exit(2);
+}
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const INFERENCE_KEY_NAME = process.env.ZAI_API_KEY ? "ZAI_API_KEY" : "NVIDIA_API_KEY";
@@ -28,6 +52,18 @@ const SANDBOX = process.env.SANDBOX_NAME || "nemoclawd";
 const ALLOWED_CHATS = process.env.ALLOWED_CHAT_IDS
   ? process.env.ALLOWED_CHAT_IDS.split(",").map((s) => s.trim())
   : null;
+
+if (SMOKE_TEST) {
+  console.log(JSON.stringify({
+    ok: true,
+    sandbox: SANDBOX,
+    model: MODEL,
+    telegramTokenConfigured: Boolean(TOKEN),
+    inferenceKeyName: API_KEY ? INFERENCE_KEY_NAME : null,
+    allowedChatsConfigured: Boolean(ALLOWED_CHATS),
+  }, null, 2));
+  process.exit(0);
+}
 
 if (!TOKEN) { console.error("TELEGRAM_BOT_TOKEN required"); process.exit(1); }
 if (!API_KEY) { console.error("ZAI_API_KEY or NVIDIA_API_KEY required"); process.exit(1); }
@@ -88,11 +124,12 @@ async function sendTyping(chatId) {
 
 function runAgentInSandbox(message, sessionId) {
   return new Promise((resolve) => {
-    const sshConfig = execSync(`openshell sandbox ssh-config ${SANDBOX}`, { encoding: "utf-8" });
+    const sshConfig = execFileSync("openshell", ["sandbox", "ssh-config", SANDBOX], { encoding: "utf-8" });
 
     // Write temp ssh config
-    const confPath = `/tmp/nemoclawd-tg-ssh-${sessionId}.conf`;
-    require("fs").writeFileSync(confPath, sshConfig);
+    const safeSessionId = String(sessionId).replace(/[^A-Za-z0-9_.-]/g, "_");
+    const confPath = `/tmp/nemoclawd-tg-ssh-${safeSessionId}.conf`;
+    fs.writeFileSync(confPath, sshConfig, { mode: 0o600 });
 
     const escaped = message.replace(/'/g, "'\\''");
     const escapedApiKey = API_KEY.replace(/'/g, "'\\''");
@@ -110,7 +147,7 @@ function runAgentInSandbox(message, sessionId) {
     proc.stderr.on("data", (d) => (stderr += d.toString()));
 
     proc.on("close", (code) => {
-      try { require("fs").unlinkSync(confPath); } catch {}
+      try { fs.unlinkSync(confPath); } catch {}
 
       // Extract the actual agent response — skip setup lines
       const lines = stdout.split("\n");
@@ -240,4 +277,7 @@ async function main() {
   poll();
 }
 
-main();
+main().catch((err) => {
+  console.error("Fatal:", err.message || err);
+  process.exit(1);
+});

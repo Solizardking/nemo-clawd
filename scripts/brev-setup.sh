@@ -27,6 +27,41 @@ warn() { echo -e "${YELLOW}[brev]${NC} $1"; }
 fail() { echo -e "${RED}[brev]${NC} $1"; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DRY_RUN=false
+
+usage() {
+  cat <<'EOF'
+Usage: brev-setup.sh [--dry-run]
+
+Bootstrap a fresh Brev VM for Nemo Clawd. This installs prerequisites,
+optionally starts local vLLM when a GPU is available, then runs setup.sh.
+
+Options:
+  --dry-run, --smoke-test  Print the planned actions without changing the host.
+  -h, --help              Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --dry-run|--smoke-test)
+    DRY_RUN=true
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    fail "Unknown argument: $1"
+    ;;
+esac
+
+if [ "$DRY_RUN" = true ]; then
+  info "Dry run: would install Node.js, Docker, NVIDIA Container Toolkit, openshell, cloudflared, optional vLLM, then run setup.sh."
+  exit 0
+fi
 
 if [ -z "${ZAI_API_KEY:-}" ] && [ -z "${NVIDIA_API_KEY:-}" ]; then
   fail "ZAI_API_KEY or NVIDIA_API_KEY not set"

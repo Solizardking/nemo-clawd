@@ -6,6 +6,34 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-telegram-bot.sh
+
+Start the bundled Pump-Fun Telegram bot.
+
+Required environment:
+  TELEGRAM_BOT_TOKEN
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 APP_DIR="/opt/pump-fun/telegram-bot"
 PUMPFUN_ROOT="/opt/pump-fun"
 WORKSPACE_ROOT="${HOME:-/sandbox}/.nemoclawd/workspace"

@@ -2,6 +2,31 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: public-release-audit.sh
+
+Scan tracked files and package metadata for public npm release blockers.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    echo "Unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 

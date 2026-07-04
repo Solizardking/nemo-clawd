@@ -7,6 +7,25 @@
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: nemoclawd-solana-agent.sh [bot|test-validator|status]
+
+Start the Pump-Fun Solana tracker bot, a local validator, or print Solana
+configuration status.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
 APP_DIR="/opt/pump-fun/agent-app"
 
 # ── Helpers ──────────────────────────────────────────────────────
@@ -117,11 +136,7 @@ case "$MODE" in
     ;;
 
   *)
-    echo "Usage: nemoclawd-solana-agent [bot|test-validator|status]"
-    echo ""
-    echo "  bot              Start the Pump-Fun tracker bot (default)"
-    echo "  test-validator   Start a local solana-test-validator with cloned Pump programs"
-    echo "  status           Show Solana and wallet configuration status"
+    usage
     exit 0
     ;;
 esac

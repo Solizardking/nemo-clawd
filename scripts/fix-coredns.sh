@@ -20,6 +20,25 @@ set -euo pipefail
 
 GATEWAY_NAME="${1:-}"
 
+usage() {
+  cat <<'EOF'
+Usage: fix-coredns.sh [gateway-name]
+
+Patch CoreDNS in a local OpenShell gateway container so pods forward DNS to a
+reachable upstream resolver.
+
+Options:
+  -h, --help  Show this help.
+EOF
+}
+
+case "$GATEWAY_NAME" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
 # Find Colima socket (legacy or XDG path)
 COLIMA_SOCKET=""
 for _sock in "$HOME/.colima/default/docker.sock" "$HOME/.config/colima/default/docker.sock"; do
@@ -35,7 +54,14 @@ if [ -z "${DOCKER_HOST:-}" ] && [ -n "$COLIMA_SOCKET" ]; then
 fi
 
 # Find the cluster container
-CLUSTER=$(docker ps --filter "name=openshell-cluster" --format '{{.Names}}' | head -1)
+if [ -n "$GATEWAY_NAME" ]; then
+  CLUSTER=$(docker ps --filter "name=${GATEWAY_NAME}" --format '{{.Names}}' | grep 'cluster' | head -1 || true)
+else
+  CLUSTER=$(docker ps --filter "name=openshell-cluster" --format '{{.Names}}' | head -1)
+fi
+if [ -z "$CLUSTER" ]; then
+  CLUSTER=$(docker ps --filter "name=openshell-cluster" --format '{{.Names}}' | head -1)
+fi
 if [ -z "$CLUSTER" ]; then
   echo "ERROR: No openshell cluster container found."
   exit 1
