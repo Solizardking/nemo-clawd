@@ -70,6 +70,7 @@
   "files": [
     "bin/",
     "SKILL.md",
+    "spinners/",
     "dist/",
     "nemoclawd.plugin.json",
     "nemo-clawd-mcp/",

@@ -66,6 +66,18 @@ nemoclawd demo
 ```
 <!-- end-quickstart-guide -->
 
+### Spinner Packs
+
+nemoclawd ships the bundled Clawd spinner verb packs from `spinners/` and can install them into your local Clawd settings:
+
+```bash
+nemoclawd spinners list
+nemoclawd spinners install developer
+nemoclawd spinners remove
+```
+
+The installer writes only the `spinnerVerbs` field in `~/.clawd/settings.json`, falling back to `~/.claude/settings.json` when that file already exists.
+
 ### Jetson Orin Nano
 
 For a single Jetson Orin Nano or Orin Nano Super Developer Kit, use the dedicated Orin path instead of `setup-spark`:

@@ -13,6 +13,7 @@ const policies = require("./lib/policies");
 const solana = require("./lib/solana");
 const dflow = require("./lib/dflow");
 const magicRouter = require("./lib/magic-router");
+const { spinnersCommand } = require("./lib/spinners");
 
 const pkg = require(path.join(ROOT, "package.json"));
 
@@ -26,6 +27,7 @@ Getting Started
   nemoclawd setup-orin-nano      Prepare Jetson Orin Nano for OpenShell
   nemoclawd demo                 Print a quick demo command
   nemoclawd birth                Create a Blockchain Buddy placeholder
+  nemoclawd spinners             List or install custom spinner verb packs
 
 DFlow Routing
   nemoclawd dflow status         Show spot and prediction-market routing
@@ -276,6 +278,14 @@ async function main() {
   }
   if (cmd === "birth") {
     console.log("Blockchain Buddy creation is handled by the agent runtime after onboarding.");
+    return;
+  }
+  if (cmd === "spinners" || cmd === "spinner") {
+    try {
+      spinnersCommand(args.slice(1));
+    } catch (err) {
+      fail(err && err.message ? err.message : String(err));
+    }
     return;
   }
   if (cmd === "dflow") {

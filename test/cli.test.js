@@ -32,6 +32,7 @@ describe("CLI dispatch", () => {
     assert.ok(r.out.includes("doctor"), "missing doctor command");
     assert.ok(r.out.includes("launch"), "missing launch command");
     assert.ok(r.out.includes("setup-orin-nano"), "missing Orin Nano setup command");
+    assert.ok(r.out.includes("spinners"), "missing spinners command");
     assert.ok(r.out.includes("solana-agent"), "missing Solana agent action");
     assert.ok(r.out.includes("solana-bridge"), "missing Solana bridge action");
     assert.ok(r.out.includes("solana start"), "missing Solana one-shot action");
@@ -78,6 +79,49 @@ describe("CLI dispatch", () => {
     const r = run("version");
     assert.equal(r.code, 0);
     assert.ok(r.out.includes(pkg.version), "missing CLI version");
+  });
+
+  it("spinners list shows bundled packs", () => {
+    const r = run("spinners list");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("developer"), r.out);
+    assert.ok(!r.out.includes("metadata.json"), r.out);
+  });
+
+  it("spinners install writes only spinnerVerbs into settings", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const settings = path.join(home, ".clawd", "settings.json");
+    fs.mkdirSync(path.dirname(settings), { recursive: true });
+    fs.writeFileSync(settings, JSON.stringify({ existing: true, spinnerVerbs: { verbs: ["old"] } }, null, 2));
+
+    const install = execSync(`node "${CLI}" spinners install developer --settings "${settings}"`, {
+      encoding: "utf-8",
+      timeout: 10000,
+      env: { ...process.env, HOME: home },
+    });
+    assert.ok(install.includes('Spinner pack "developer" installed successfully.'), install);
+
+    const updated = JSON.parse(fs.readFileSync(settings, "utf-8"));
+    assert.equal(updated.existing, true);
+    assert.equal(updated.spinnerVerbs.mode, "replace");
+    assert.ok(updated.spinnerVerbs.verbs.includes("Reading the docs for once"));
+  });
+
+  it("spinners remove deletes only spinnerVerbs", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const settings = path.join(home, ".clawd", "settings.json");
+    fs.mkdirSync(path.dirname(settings), { recursive: true });
+    fs.writeFileSync(settings, JSON.stringify({ existing: true, spinnerVerbs: { verbs: ["old"] } }, null, 2));
+
+    const removed = execSync(`node "${CLI}" spinners remove --settings "${settings}"`, {
+      encoding: "utf-8",
+      timeout: 10000,
+      env: { ...process.env, HOME: home },
+    });
+    assert.ok(removed.includes("Spinner pack removed."), removed);
+
+    const updated = JSON.parse(fs.readFileSync(settings, "utf-8"));
+    assert.deepEqual(updated, { existing: true });
   });
 
   it("solana overview prefers active gateway last sandbox over first registry entry", () => {
