@@ -99,8 +99,8 @@ describe("magic router", () => {
     const route = resolveMagicRouter("generate a meme about Solana", {});
     const pretty = describeMagicRouterPretty(route);
     assert.ok(pretty.includes("Magic Router v2.0.0"));
-    assert.ok(pretty.includes("✨"));
-    assert.ok(pretty.includes("Threadlatency"));
+    assert.ok(pretty.includes("🎨"));
+    assert.ok(pretty.includes("Task Classification"));
     assert.ok(pretty.includes("ollama-local"));
     assert.ok(pretty.includes("Guardrails"));
     assert.ok(pretty.includes("DFlow Routing"));

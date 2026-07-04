@@ -32,7 +32,7 @@ const TASK_METADATA = {
 };
 
 const CLASSIFIERS = [
-  { type: "nft_ops", patterns: [/\b(nft|collection|rarity|metadata|token uri|nft.*buy|nft.*sell|nft.*list)\b/i, /\b(candy machine|metaplex|nft.*price|floor price|nft.*hold|nft.*transfer)\b/i], weight: 0.92 },
+  { type: "nft_ops", patterns: [/\b(nft|collection|rarity|metadata|token uri|mint.*nft|nft.*mint|nft.*buy|nft.*sell|nft.*list)\b/i, /\b(candy machine|metaplex|nft.*price|floor price|nft.*hold|nft.*transfer)\b/i], weight: 0.92 },
   { type: "prediction_market", patterns: [/\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc|probability|bet on|resolve market)\b/i, /\b(buy yes|buy no|sell yes|sell no)\b/i], weight: 0.95 },
   { type: "zk_proof", patterns: [/\b(zk|zero[- ]knowledge|groth16|nullifier|attest|attestation|publish_attestation)\b/i, /\b(commit_encrypted_state|encrypted state|ciphertext commitment)\b/i, /\b(validity proof|compressed state|light protocol|proof|prove|verify proof)\b/i], weight: 0.93 },
   { type: "solana_trading", patterns: [/\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc)\b/i, /\b(token swap|limit order|market order|swap tokens|bridge|buy token|sell token)\b/i], weight: 0.90 },

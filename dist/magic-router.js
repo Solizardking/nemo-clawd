@@ -142,6 +142,14 @@ const TASK_METADATA = {
 // ── Classification with confidence scoring ───────────────────────────
 const CLASSIFIERS = [
     {
+        type: "nft_ops",
+        patterns: [
+            /\b(nft|collection|rarity|metadata|token uri|mint.*nft|nft.*mint|nft.*buy|nft.*sell|nft.*list)\b/i,
+            /\b(candy machine|metaplex|nft.*price|floor price|nft.*hold|nft.*transfer)\b/i,
+        ],
+        weight: 0.92,
+    },
+    {
         type: "prediction_market",
         patterns: [
             /\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc|probability|bet on|resolve market)\b/i,
@@ -161,7 +169,7 @@ const CLASSIFIERS = [
     {
         type: "solana_trading",
         patterns: [
-            /\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc|mint)\b/i,
+            /\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc)\b/i,
             /\b(token swap|limit order|market order|swap tokens|bridge|buy token|sell token)\b/i,
         ],
         weight: 0.90,
@@ -221,14 +229,6 @@ const CLASSIFIERS = [
             /\b(smart contract review|token check|verify.*contract|is.*safe|risk.*assess)\b/i,
         ],
         weight: 0.89,
-    },
-    {
-        type: "nft_ops",
-        patterns: [
-            /\b(nft|mint|collection|rarity|metadata|token uri|nft.*buy|nft.*sell|nft.*list)\b/i,
-            /\b(candy machine|metaplex|nft.*price|floor price|nft.*hold|nft.*transfer)\b/i,
-        ],
-        weight: 0.88,
     },
 ];
 /**
