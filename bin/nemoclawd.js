@@ -13,6 +13,7 @@ const policies = require("./lib/policies");
 const solana = require("./lib/solana");
 const dflow = require("./lib/dflow");
 const magicRouter = require("./lib/magic-router");
+const agentMode = require("./lib/mode");
 
 const pkg = require(path.join(ROOT, "package.json"));
 
@@ -32,6 +33,11 @@ DFlow Routing
 Magic Router
   nemoclawd magic-router <task>  Pick provider/model/tools for a task
   nemoclawd magic-router --json <task>
+
+AI Mode
+  nemoclawd mode                 Show the active agent mode
+  nemoclawd mode ai              Switch to AI Mode (wallet/trading tools disabled)
+  nemoclawd mode trading         Switch to Trading Mode (default)
 
 Solana
   nemoclawd solana               Show Solana runtime overview
@@ -116,14 +122,21 @@ function printDflowStatus(jsonOutput = false) {
 
 function printMagicRouter(args) {
   const jsonOutput = args.includes("--json");
-  const task = args.filter((arg) => arg !== "--json").join(" ").trim();
-  const route = magicRouter.resolveMagicRouter(task, process.env);
+  const modeFlagIndex = args.indexOf("--mode");
+  const modeOverride = modeFlagIndex !== -1 ? args[modeFlagIndex + 1] : undefined;
+  const mode = agentMode.isAgentMode(modeOverride) ? modeOverride : agentMode.getAgentMode();
+  const task = args
+    .filter((arg, i) => arg !== "--json" && (modeFlagIndex === -1 || (i !== modeFlagIndex && i !== modeFlagIndex + 1)))
+    .join(" ")
+    .trim();
+  const route = magicRouter.resolveMagicRouter(task, process.env, mode);
   if (jsonOutput) {
     console.log(JSON.stringify(route, null, 2));
     return;
   }
 
   console.log("Magic Router");
+  console.log(`  Mode:      ${route.mode}`);
   console.log(`  Task:      ${route.taskType}`);
   console.log(`  Inference: ${route.inference.provider} / ${route.inference.model}`);
   console.log(`  Key env:   ${route.inference.credentialEnv}${route.inference.available ? " (present)" : " (not set)"}`);
@@ -131,7 +144,26 @@ function printMagicRouter(args) {
     console.log(`  Advisor:   ${route.advisor.provider} / ${route.advisor.model}${route.advisor.available ? " (present)" : " (not set)"}`);
   }
   console.log(`  Tools:     ${route.toolSet.join(", ")}`);
+  if (route.blockedTools.length) {
+    console.log(`  Blocked:   ${route.blockedTools.join(", ")} (disabled by AI Mode)`);
+  }
   console.log(`  DFlow:     spot=${route.dflow.spotTradingDefault} predictions=${route.dflow.predictionMarketDefault}`);
+}
+
+function modeCommand(args) {
+  const requested = args[0];
+  if (!requested) {
+    const current = agentMode.getAgentMode();
+    console.log(`Agent mode: ${current}`);
+    console.log(agentMode.describeAgentMode(current));
+    return;
+  }
+  if (!agentMode.isAgentMode(requested)) {
+    fail(`Unknown mode "${requested}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
+  }
+  const mode = agentMode.setAgentMode(requested);
+  console.log(`Agent mode set: ${mode}`);
+  console.log(agentMode.describeAgentMode(mode));
 }
 
 function solanaOverview() {
@@ -271,6 +303,10 @@ async function main() {
   }
   if (cmd === "magic-router" || cmd === "magic") {
     printMagicRouter(args.slice(1));
+    return;
+  }
+  if (cmd === "mode") {
+    modeCommand(args.slice(1));
     return;
   }
   if (cmd === "solana") {

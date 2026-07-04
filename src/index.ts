@@ -16,6 +16,7 @@ import { registerCliCommands } from "./cli.js";
 import { handleSlashCommand } from "./commands/slash.js";
 import { loadOnboardConfig } from "./onboard/config.js";
 import { DFLOW_API_KEY_ENV, describeDflowRouting, resolveDflowRouteConfig } from "./dflow.js";
+import { getAgentMode } from "./agent-mode.js";
 
 // ---------------------------------------------------------------------------
 // Nemo Clawd Plugin SDK compatible types (mirrors nemoclawd/plugin-sdk)
@@ -326,11 +327,13 @@ export default function register(api: NemoclawdPluginApi): void {
   const bannerEndpoint = onboardCfg?.endpointType ?? "zai";
   const bannerModel = onboardCfg?.model ?? "zai/glm-5.2";
   const bannerTrading = `dflow ${dflowRoutes.mode}`;
+  const bannerMode = getAgentMode();
 
   api.logger.info("");
   api.logger.info("  ┌─────────────────────────────────────────────────────┐");
   api.logger.info("  │  Nemo Clawd registered                                │");
   api.logger.info("  │                                                     │");
+  api.logger.info(`  │  Mode:      ${bannerMode.padEnd(40)}│`);
   api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(40)}│`);
   api.logger.info(`  │  Model:     ${bannerModel.padEnd(40)}│`);
   api.logger.info(`  │  Trading:   ${bannerTrading.padEnd(40)}│`);

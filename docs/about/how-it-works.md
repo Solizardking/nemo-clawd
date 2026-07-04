@@ -143,6 +143,17 @@ That wallet becomes the financial identity of the agent.
 
 This matters because a financial agent should remain online when capital is low, but it should not silently continue operating as though nothing changed.
 
+## AI Mode
+
+Wallet protection handles a funded wallet running low. **AI Mode** handles the case where a
+wallet should not be reachable by the agent at all. Switching to AI Mode (`nemoclawd
+nemoclawd mode ai`) hard-disables every wallet, signing, and DFlow trading tool at the magic
+router level, regardless of how an individual message classifies — a defense-in-depth switch
+on top of the router's existing least-privilege guardrails. In AI Mode, Nemo Clawd behaves as
+a conversational AI, coding, and research assistant only. **Trading Mode** (`nemoclawd
+nemoclawd mode trading`) is the default and preserves the full financial runtime described
+above. See [Commands: AI Mode](../reference/commands.md#ai-mode) for details.
+
 ## Inference Routing
 
 Inference requests from the agent never leave the sandbox directly.

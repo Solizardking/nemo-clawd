@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+const { DEFAULT_AGENT_MODE, partitionToolsForMode } = require("./mode");
+
 const MAGIC_ROUTER_STRATEGY = "magic-router";
 const ZAI_DEFAULT_PROVIDER = "zai-glm";
 const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
@@ -83,26 +85,35 @@ function buildInferenceRoutes(env) {
   return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
 }
 
-function resolveMagicRouter(input, env = process.env) {
+function resolveMagicRouter(input, env = process.env, mode = DEFAULT_AGENT_MODE) {
   const taskType = classifyMagicRouterTask(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || (routes.advisor && routes.advisor.provider === OPENROUTER_PROVIDER);
+  const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
+  const { allowed: toolSet, blocked: blockedTools } = partitionToolsForMode(rawToolSet, mode);
+  const aiMode = mode === "ai";
+
+  const guardrails = [
+    "least-privilege-tools",
+    "read-only-before-signing",
+    "explicit-approval-before-wallet-actions",
+    "no-private-key-or-seed-phrase-handling",
+  ];
+  if (aiMode) guardrails.push("ai-mode-financial-tools-disabled");
+
   return {
     strategy: MAGIC_ROUTER_STRATEGY,
+    mode,
     taskType,
     inference: routes.selected,
     advisor: routes.advisor,
     fallbacks: routes.fallbacks,
-    toolSet: toolSetForTask(taskType, Boolean(openRouterAvailable)),
-    guardrails: [
-      "least-privilege-tools",
-      "read-only-before-signing",
-      "explicit-approval-before-wallet-actions",
-      "no-private-key-or-seed-phrase-handling",
-    ],
+    toolSet,
+    blockedTools,
+    guardrails,
     dflow: {
-      spotTradingDefault: true,
-      predictionMarketDefault: true,
+      spotTradingDefault: !aiMode,
+      predictionMarketDefault: !aiMode,
       credentialEnv: "DFLOW_API_KEY",
     },
   };
@@ -110,7 +121,8 @@ function resolveMagicRouter(input, env = process.env) {
 
 function describeMagicRouter(route) {
   const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-  return `${route.strategy}: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}`;
+  const blocked = route.blockedTools && route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
+  return `${route.strategy}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
 }
 
 module.exports = {

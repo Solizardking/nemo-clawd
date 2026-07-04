@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import { DEFAULT_AGENT_MODE, partitionToolsForMode, type AgentMode } from "./agent-mode.js";
+
 export const MAGIC_ROUTER_STRATEGY = "magic-router";
 export const ZAI_DEFAULT_PROVIDER = "zai-glm";
 export const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
@@ -32,11 +34,13 @@ export interface MagicRouterInferenceRoute {
 
 export interface MagicRouterRoute {
   strategy: typeof MAGIC_ROUTER_STRATEGY;
+  mode: AgentMode;
   taskType: MagicRouterTaskType;
   inference: MagicRouterInferenceRoute;
   advisor?: MagicRouterInferenceRoute;
   fallbacks: MagicRouterInferenceRoute[];
   toolSet: string[];
+  blockedTools: string[];
   guardrails: string[];
   dflow: {
     spotTradingDefault: boolean;
@@ -118,26 +122,39 @@ function buildInferenceRoutes(env: EnvLike): { selected: MagicRouterInferenceRou
   return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
 }
 
-export function resolveMagicRouter(input: string | string[] | undefined, env: EnvLike = process.env): MagicRouterRoute {
+export function resolveMagicRouter(
+  input: string | string[] | undefined,
+  env: EnvLike = process.env,
+  mode: AgentMode = DEFAULT_AGENT_MODE,
+): MagicRouterRoute {
   const taskType = classifyMagicRouterTask(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || routes.advisor?.provider === OPENROUTER_PROVIDER;
+  const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
+  const { allowed: toolSet, blocked: blockedTools } = partitionToolsForMode(rawToolSet, mode);
+  const aiMode = mode === "ai";
+
+  const guardrails = [
+    "least-privilege-tools",
+    "read-only-before-signing",
+    "explicit-approval-before-wallet-actions",
+    "no-private-key-or-seed-phrase-handling",
+  ];
+  if (aiMode) guardrails.push("ai-mode-financial-tools-disabled");
+
   return {
     strategy: MAGIC_ROUTER_STRATEGY,
+    mode,
     taskType,
     inference: routes.selected,
     advisor: routes.advisor,
     fallbacks: routes.fallbacks,
-    toolSet: toolSetForTask(taskType, Boolean(openRouterAvailable)),
-    guardrails: [
-      "least-privilege-tools",
-      "read-only-before-signing",
-      "explicit-approval-before-wallet-actions",
-      "no-private-key-or-seed-phrase-handling",
-    ],
+    toolSet,
+    blockedTools,
+    guardrails,
     dflow: {
-      spotTradingDefault: true,
-      predictionMarketDefault: true,
+      spotTradingDefault: !aiMode,
+      predictionMarketDefault: !aiMode,
       credentialEnv: "DFLOW_API_KEY",
     },
   };
@@ -145,5 +162,6 @@ export function resolveMagicRouter(input: string | string[] | undefined, env: En
 
 export function describeMagicRouter(route: MagicRouterRoute): string {
   const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-  return `${route.strategy}: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}`;
+  const blocked = route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
+  return `${route.strategy}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
 }
