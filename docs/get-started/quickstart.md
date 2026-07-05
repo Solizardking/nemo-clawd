@@ -103,17 +103,17 @@ During custom setup, choose or enter the following values:
 When onboarding completes, the CLI prints output similar to:
 
 ```text
-────────────────────────────────────────────────────────
+--------------------------------------------------------
 Sandbox      my-assistant (Landlock + seccomp + netns)
 Model        nvidia/nemotron-3-ultra-550b-a55b (NVIDIA Cloud API)
 Solana RPC   https://rpc.solanatracker.io/public
-────────────────────────────────────────────────────────
+--------------------------------------------------------
 Run:         nemoclawd my-assistant connect
 Solana Up:   nemoclawd solana start my-assistant
 Status:      nemoclawd my-assistant status
 Logs:        nemoclawd my-assistant logs --follow
 Solana:      nemoclawd my-assistant solana-agent
-────────────────────────────────────────────────────────
+--------------------------------------------------------
 ```
 
 :::{note}
@@ -176,7 +176,7 @@ Exit the sandbox shell:
 $ exit
 ```
 
-Start the Solana operator stack from the host:
+Start the Solana operator stack from the host after Telegram is configured:
 
 ```console
 $ nemoclawd solana start my-assistant
@@ -234,16 +234,16 @@ Apply the Telegram policy preset when it was not applied during onboarding:
 $ nemoclawd policies apply my-assistant telegram
 ```
 
-Start the sandbox Telegram bot runtime:
+Start the sandbox Telegram bot runtime and pass the token into the sandbox command:
 
 ```console
-$ nemoclawd my-assistant telegram-bot
+$ openshell sandbox exec my-assistant -- env TELEGRAM_BOT_TOKEN=<your-bot-token> nemoclawd-telegram-bot
 ```
 
-To start the broader Solana stack, including Telegram-aware services when the required environment is present, run:
+To start the broader Solana stack with Telegram-aware services, pass the same token to the stack script:
 
 ```console
-$ nemoclawd solana start my-assistant
+$ openshell sandbox exec my-assistant -- env TELEGRAM_BOT_TOKEN=<your-bot-token> nemoclawd-solana-stack
 ```
 
 Open Telegram, find your bot, and send a message.
