@@ -22,10 +22,10 @@ format-py:
 # --- Documentation ---
 
 docs:
-	uv run --group docs sphinx-build -b html docs docs/_build/html
+	uv run --group docs python -m sphinx -b html docs docs/_build/html
 
 docs-live:
-	uv run --group docs sphinx-autobuild docs docs/_build/html --open-browser
+	uv run --group docs python -m sphinx_autobuild docs docs/_build/html --open-browser
 
 docs-clean:
 	rm -rf docs/_build
