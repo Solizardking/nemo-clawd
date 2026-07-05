@@ -18,6 +18,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const { partitionByCategories } = require("./router-core");
 
 const AGENT_MODES = ["ai", "trading"];
 const DEFAULT_AGENT_MODE = "trading";
@@ -37,13 +38,9 @@ function isAgentMode(value) {
 }
 
 function partitionToolsForMode(toolSet, mode) {
-  if (mode !== "ai") return { allowed: [...toolSet], blocked: [] };
-  const allowed = [];
-  const blocked = [];
-  for (const tool of toolSet) {
-    (FINANCIAL_TOOLS.has(tool) ? blocked : allowed).push(tool);
-  }
-  return { allowed, blocked };
+  const blockedCategories = mode === "ai" ? ["financial"] : [];
+  const tools = toolSet.map((id) => ({ id, categories: FINANCIAL_TOOLS.has(id) ? ["financial"] : [] }));
+  return partitionByCategories(tools, blockedCategories);
 }
 
 function modeStateDir(env = process.env) {

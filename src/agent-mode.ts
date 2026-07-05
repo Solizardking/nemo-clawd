@@ -18,6 +18,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { partitionByCategories } from "./router/core.js";
 
 export type AgentMode = "ai" | "trading";
 
@@ -44,13 +45,9 @@ export function partitionToolsForMode(
   toolSet: readonly string[],
   mode: AgentMode,
 ): { allowed: string[]; blocked: string[] } {
-  if (mode !== "ai") return { allowed: [...toolSet], blocked: [] };
-  const allowed: string[] = [];
-  const blocked: string[] = [];
-  for (const tool of toolSet) {
-    (FINANCIAL_TOOLS.has(tool) ? blocked : allowed).push(tool);
-  }
-  return { allowed, blocked };
+  const blockedCategories = mode === "ai" ? ["financial"] : [];
+  const tools = toolSet.map((id) => ({ id, categories: FINANCIAL_TOOLS.has(id) ? ["financial"] : [] }));
+  return partitionByCategories(tools, blockedCategories);
 }
 
 function modeStateDir(env: Record<string, string | undefined> = process.env): string {

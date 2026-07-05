@@ -1,7 +1,17 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { DEFAULT_AGENT_MODE, partitionToolsForMode, type AgentMode } from "./agent-mode.js";
+import { DEFAULT_AGENT_MODE, FINANCIAL_TOOLS, type AgentMode } from "./agent-mode.js";
+import {
+  classifyTask,
+  createRouter,
+  type CategorizedTool,
+  type EnvLike,
+  type InferenceProviderConfig,
+  type InferenceRoute,
+  type RouterMode,
+  type TaskClassifier,
+} from "./router/core.js";
 
 export const MAGIC_ROUTER_STRATEGY = "magic-router";
 export const ZAI_DEFAULT_PROVIDER = "zai-glm";
@@ -12,8 +22,6 @@ export const OPENROUTER_PROVIDER = "openrouter";
 export const OPENROUTER_AUTO_MODEL = "openrouter/auto";
 export const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-type EnvLike = Record<string, string | undefined>;
-
 export type MagicRouterTaskType =
   | "coding"
   | "solana_trading"
@@ -22,15 +30,7 @@ export type MagicRouterTaskType =
   | "research"
   | "general";
 
-export interface MagicRouterInferenceRoute {
-  provider: string;
-  model: string;
-  credentialEnv: string;
-  available: boolean;
-  role: "selected" | "advisor" | "fallback";
-  endpoint?: string;
-  reason: string;
-}
+export type MagicRouterInferenceRoute = InferenceRoute;
 
 export interface MagicRouterRoute {
   strategy: typeof MAGIC_ROUTER_STRATEGY;
@@ -49,119 +49,138 @@ export interface MagicRouterRoute {
   };
 }
 
-function hasEnv(env: EnvLike, key: string): boolean {
-  return Boolean(env[key]?.trim());
-}
-
-function textFromInput(input: string | string[] | undefined): string {
-  if (Array.isArray(input)) return input.join(" ");
-  return input || "";
-}
+const TASK_CLASSIFIERS: TaskClassifier<MagicRouterTaskType>[] = [
+  {
+    taskType: "prediction_market",
+    test: (text) => /\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc|proof)\b/.test(text),
+  },
+  {
+    taskType: "solana_trading",
+    test: (text) => /\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc|mint)\b/.test(text),
+  },
+  {
+    taskType: "wallet_ops",
+    test: (text) => /\b(wallet|sign|signature|keypair|balance|airdrop|transfer|send sol|private wallet)\b/.test(text),
+  },
+  {
+    taskType: "coding",
+    test: (text) => /\b(code|build|test|debug|typescript|python|repo|script|compile|install)\b/.test(text),
+  },
+  {
+    taskType: "research",
+    test: (text) => /\b(research|search|docs|summarize|latest|compare|benchmark)\b/.test(text),
+  },
+];
+const DEFAULT_TASK_TYPE: MagicRouterTaskType = "general";
 
 export function classifyMagicRouterTask(input: string | string[] | undefined): MagicRouterTaskType {
-  const text = textFromInput(input).toLowerCase();
-  if (/\b(prediction|kalshi|outcome token|yes token|no token|market odds|kyc|proof)\b/.test(text)) return "prediction_market";
-  if (/\b(swap|trade|route|quote|slippage|jupiter|dflow|sol\/usdc|usdc|mint)\b/.test(text)) return "solana_trading";
-  if (/\b(wallet|sign|signature|keypair|balance|airdrop|transfer|send sol|private wallet)\b/.test(text)) return "wallet_ops";
-  if (/\b(code|build|test|debug|typescript|python|repo|script|compile|install)\b/.test(text)) return "coding";
-  if (/\b(research|search|docs|summarize|latest|compare|benchmark)\b/.test(text)) return "research";
-  return "general";
+  return classifyTask(input, TASK_CLASSIFIERS, DEFAULT_TASK_TYPE);
 }
 
-function toolSetForTask(taskType: MagicRouterTaskType, openRouterAvailable: boolean): string[] {
-  const openRouterTool = openRouterAvailable ? ["openrouter-auto-router"] : [];
-  switch (taskType) {
-    case "prediction_market":
-      return ["dflow-prediction-metadata", "dflow-order", "proof-kyc-check", "solana-rpc", "wallet-approval", ...openRouterTool];
-    case "solana_trading":
-      return ["dflow-order", "dflow-book-stream", "solana-rpc", "wallet-approval", ...openRouterTool];
-    case "wallet_ops":
-      return ["openshell-private-wallet", "solana-rpc", "wallet-approval"];
-    case "coding":
-      return ["filesystem", "shell", "git", "test-runner", ...openRouterTool];
-    case "research":
-      return ["docs-fetch", "web-search", ...openRouterTool];
-    case "general":
-    default:
-      return ["chat", ...openRouterTool];
-  }
+const OPENROUTER_AUTO_ROUTER_TOOL = "openrouter-auto-router";
+
+function tagCategories(id: string): CategorizedTool {
+  return { id, categories: FINANCIAL_TOOLS.has(id) ? ["financial"] : [] };
 }
 
-function buildInferenceRoutes(env: EnvLike): { selected: MagicRouterInferenceRoute; advisor?: MagicRouterInferenceRoute; fallbacks: MagicRouterInferenceRoute[] } {
-  const zai: MagicRouterInferenceRoute = {
-    provider: ZAI_DEFAULT_PROVIDER,
-    model: ZAI_DEFAULT_MODEL,
-    credentialEnv: "ZAI_API_KEY",
-    available: hasEnv(env, "ZAI_API_KEY"),
-    role: "selected",
-    reason: "Default Nemo Clawd inference route for GLM 5.2.",
-  };
+function toolsForTask(
+  taskType: MagicRouterTaskType,
+  ctx: { env: EnvLike; inference: { selected: InferenceRoute; advisor?: InferenceRoute } },
+): CategorizedTool[] {
+  const openRouterAvailable =
+    ctx.inference.selected.provider === OPENROUTER_PROVIDER || ctx.inference.advisor?.provider === OPENROUTER_PROVIDER;
+  const openRouterTool = openRouterAvailable ? [OPENROUTER_AUTO_ROUTER_TOOL] : [];
 
-  const openrouter: MagicRouterInferenceRoute = {
-    provider: OPENROUTER_PROVIDER,
-    model: env.OPENROUTER_MODEL?.trim() || OPENROUTER_AUTO_MODEL,
-    credentialEnv: "OPENROUTER_API_KEY",
-    available: hasEnv(env, "OPENROUTER_API_KEY"),
-    role: "advisor",
-    endpoint: OPENROUTER_API_URL,
-    reason: "OpenRouter Auto Router can select the best model for the prompt when enabled.",
-  };
+  const ids: string[] = (() => {
+    switch (taskType) {
+      case "prediction_market":
+        return ["dflow-prediction-metadata", "dflow-order", "proof-kyc-check", "solana-rpc", "wallet-approval", ...openRouterTool];
+      case "solana_trading":
+        return ["dflow-order", "dflow-book-stream", "solana-rpc", "wallet-approval", ...openRouterTool];
+      case "wallet_ops":
+        return ["openshell-private-wallet", "solana-rpc", "wallet-approval"];
+      case "coding":
+        return ["filesystem", "shell", "git", "test-runner", ...openRouterTool];
+      case "research":
+        return ["docs-fetch", "web-search", ...openRouterTool];
+      case "general":
+      default:
+        return ["chat", ...openRouterTool];
+    }
+  })();
 
-  const nvidia: MagicRouterInferenceRoute = {
-    provider: NVIDIA_FALLBACK_PROVIDER,
-    model: NVIDIA_FALLBACK_MODEL,
-    credentialEnv: "NVIDIA_API_KEY",
-    available: hasEnv(env, "NVIDIA_API_KEY"),
-    role: "fallback",
-    reason: "NVIDIA NIM fallback for NVIDIA-hosted inference.",
-  };
-
-  if (zai.available) return { selected: zai, advisor: openrouter.available ? openrouter : undefined, fallbacks: [openrouter, nvidia].filter((r) => r.provider !== zai.provider) };
-  if (openrouter.available) return { selected: { ...openrouter, role: "selected" }, advisor: undefined, fallbacks: [zai, nvidia] };
-  if (nvidia.available) return { selected: { ...nvidia, role: "selected" }, advisor: openrouter, fallbacks: [zai, openrouter] };
-  return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
+  return ids.map(tagCategories);
 }
+
+function inferenceProviders(env: EnvLike): InferenceProviderConfig[] {
+  return [
+    {
+      provider: ZAI_DEFAULT_PROVIDER,
+      model: ZAI_DEFAULT_MODEL,
+      credentialEnv: "ZAI_API_KEY",
+      role: "selected",
+      reason: "Default Nemo Clawd inference route for GLM 5.2.",
+      priority: 0,
+    },
+    {
+      provider: OPENROUTER_PROVIDER,
+      model: env.OPENROUTER_MODEL?.trim() || OPENROUTER_AUTO_MODEL,
+      credentialEnv: "OPENROUTER_API_KEY",
+      role: "advisor",
+      endpoint: OPENROUTER_API_URL,
+      reason: "OpenRouter Auto Router can select the best model for the prompt when enabled.",
+      priority: 1,
+    },
+    {
+      provider: NVIDIA_FALLBACK_PROVIDER,
+      model: NVIDIA_FALLBACK_MODEL,
+      credentialEnv: "NVIDIA_API_KEY",
+      role: "fallback",
+      reason: "NVIDIA NIM fallback for NVIDIA-hosted inference.",
+      priority: 2,
+    },
+  ];
+}
+
+const MAGIC_ROUTER_MODES: RouterMode<AgentMode>[] = [
+  { id: "trading", blockedCategories: [] },
+  { id: "ai", blockedCategories: ["financial"], extraGuardrails: ["ai-mode-financial-tools-disabled"] },
+];
+
+const BASE_GUARDRAILS = [
+  "least-privilege-tools",
+  "read-only-before-signing",
+  "explicit-approval-before-wallet-actions",
+  "no-private-key-or-seed-phrase-handling",
+];
+
+const router = createRouter<MagicRouterTaskType, AgentMode>({
+  strategy: MAGIC_ROUTER_STRATEGY,
+  classifiers: TASK_CLASSIFIERS,
+  defaultTaskType: DEFAULT_TASK_TYPE,
+  toolsForTask,
+  inferenceProviders,
+  modes: MAGIC_ROUTER_MODES,
+  defaultMode: DEFAULT_AGENT_MODE,
+  baseGuardrails: BASE_GUARDRAILS,
+  extend: ({ mode }) => ({
+    dflow: {
+      spotTradingDefault: mode !== "ai",
+      predictionMarketDefault: mode !== "ai",
+      credentialEnv: "DFLOW_API_KEY" as const,
+    },
+  }),
+});
 
 export function resolveMagicRouter(
   input: string | string[] | undefined,
   env: EnvLike = process.env,
   mode: AgentMode = DEFAULT_AGENT_MODE,
 ): MagicRouterRoute {
-  const taskType = classifyMagicRouterTask(input);
-  const routes = buildInferenceRoutes(env);
-  const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || routes.advisor?.provider === OPENROUTER_PROVIDER;
-  const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
-  const { allowed: toolSet, blocked: blockedTools } = partitionToolsForMode(rawToolSet, mode);
-  const aiMode = mode === "ai";
-
-  const guardrails = [
-    "least-privilege-tools",
-    "read-only-before-signing",
-    "explicit-approval-before-wallet-actions",
-    "no-private-key-or-seed-phrase-handling",
-  ];
-  if (aiMode) guardrails.push("ai-mode-financial-tools-disabled");
-
-  return {
-    strategy: MAGIC_ROUTER_STRATEGY,
-    mode,
-    taskType,
-    inference: routes.selected,
-    advisor: routes.advisor,
-    fallbacks: routes.fallbacks,
-    toolSet,
-    blockedTools,
-    guardrails,
-    dflow: {
-      spotTradingDefault: !aiMode,
-      predictionMarketDefault: !aiMode,
-      credentialEnv: "DFLOW_API_KEY",
-    },
-  };
+  const { extensions, ...route } = router.resolve(input, env, mode);
+  return { ...route, dflow: extensions.dflow as MagicRouterRoute["dflow"] } as MagicRouterRoute;
 }
 
 export function describeMagicRouter(route: MagicRouterRoute): string {
-  const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-  const blocked = route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
-  return `${route.strategy}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
+  return router.describe(route);
 }

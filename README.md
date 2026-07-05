@@ -163,6 +163,11 @@ sandbox, local development, or anywhere a funded wallet shouldn't be reachable a
 | `trading` (default) | Available when a message classifies as `wallet_ops`, `solana_trading`, or `prediction_market` | Enabled | Existing least-privilege guardrails |
 | `ai` | Never available, regardless of classification | Disabled | Adds `ai-mode-financial-tools-disabled` |
 
+The classify → pick-tools → pick-inference → gate-by-mode logic itself lives in a generic,
+Solana-agnostic routing engine (`src/router/core.ts`); `src/magic-router.ts` is nemoclawd's own
+configuration of that engine. See [docs/reference/commands.md](docs/reference/commands.md#ai-mode)
+for details.
+
 ### Switching modes
 
 ```bash

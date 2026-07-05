@@ -181,6 +181,14 @@ the same override for inspecting how a given message would route under either mo
 | `trading` (default) | Available when a message classifies as `wallet_ops`, `solana_trading`, or `prediction_market` | Enabled | Existing least-privilege guardrails |
 | `ai` | Never available, regardless of classification | Disabled | Adds `ai-mode-financial-tools-disabled` |
 
+Nemo Clawd's task taxonomy, tool sets, inference providers, and mode/category gating are all
+data passed into a generic routing engine (`src/router/core.ts`, mirrored for the standalone
+CLI at `bin/lib/router-core.js`) — the classify → pick-tools → pick-inference → gate-by-mode
+resolution logic itself has no Solana or DFlow knowledge. `src/magic-router.ts` is Nemo
+Clawd's own configuration of that engine (its six task types, DFlow/wallet tool sets tagged
+`financial`, and the `trading`/`ai` modes above); a different agent can define its own task
+types, tool categories, and modes against the same engine without touching this file.
+
 ## Standalone Host Commands
 
 ### Magic Router
