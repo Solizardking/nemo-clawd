@@ -35,6 +35,11 @@ exports.FINANCIAL_TOOLS = new Set([
     "solana-rpc",
     "wallet-approval",
     "openshell-private-wallet",
+    "keypair-gen",
+    "instruction-builder",
+    "nft-mint",
+    "magic-eden-api",
+    "tensor-api",
 ]);
 function isAgentMode(value) {
     return value === "ai" || value === "trading";
@@ -61,8 +66,13 @@ function modeStatePath(env = process.env) {
  * state file, then the default (Trading Mode, preserving prior behavior).
  */
 function getAgentMode(env = process.env) {
-    if (isAgentMode(env.NEMOCLAWD_MODE))
-        return env.NEMOCLAWD_MODE;
+    const envOverride = env.NEMOCLAWD_MODE?.trim();
+    if (envOverride) {
+        if (!isAgentMode(envOverride)) {
+            throw new Error(`Invalid NEMOCLAWD_MODE "${envOverride}". Expected one of: ${exports.AGENT_MODES.join(", ")}`);
+        }
+        return envOverride;
+    }
     const statePath = modeStatePath(env);
     if (!(0, node_fs_1.existsSync)(statePath))
         return exports.DEFAULT_AGENT_MODE;

@@ -125,12 +125,16 @@ function slashOnboard(): PluginCommandResult {
 }
 
 function slashMode(target: string | undefined, isAuthorizedSender: boolean): PluginCommandResult {
+  const envOverride = process.env.NEMOCLAWD_MODE?.trim();
+  const hasActiveOverride = isAgentMode(envOverride);
+
   if (target === undefined) {
     const mode = getAgentMode();
+    const overrideNote = hasActiveOverride ? `\n\n_(forced by NEMOCLAWD_MODE=${envOverride}; unset it to use the persisted mode)_` : "";
     return {
       text: [`**Agent Mode**: \`${mode}\``, "", describeAgentMode(mode), "", "Switch with `/nemoclawd mode ai` or `/nemoclawd mode trading`."].join(
         "\n",
-      ),
+      ) + overrideNote,
     };
   }
 
@@ -147,6 +151,13 @@ function slashMode(target: string | undefined, isAuthorizedSender: boolean): Plu
   }
 
   const mode = setAgentMode(target);
+
+  if (hasActiveOverride && envOverride !== mode) {
+    return {
+      text: `Persisted mode set to \`${mode}\`, but \`NEMOCLAWD_MODE=${envOverride}\` is active in this environment and overrides it. Unset NEMOCLAWD_MODE for the persisted mode to take effect.`,
+    };
+  }
+
   return { text: [`**Agent mode set**: \`${mode}\``, "", describeAgentMode(mode)].join("\n") };
 }
 

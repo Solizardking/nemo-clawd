@@ -33,6 +33,11 @@ export const FINANCIAL_TOOLS: ReadonlySet<string> = new Set([
   "solana-rpc",
   "wallet-approval",
   "openshell-private-wallet",
+  "keypair-gen",
+  "instruction-builder",
+  "nft-mint",
+  "magic-eden-api",
+  "tensor-api",
 ]);
 
 export function isAgentMode(value: unknown): value is AgentMode {
@@ -71,7 +76,13 @@ interface ModeState {
  * state file, then the default (Trading Mode, preserving prior behavior).
  */
 export function getAgentMode(env: Record<string, string | undefined> = process.env): AgentMode {
-  if (isAgentMode(env.NEMOCLAWD_MODE)) return env.NEMOCLAWD_MODE;
+  const envOverride = env.NEMOCLAWD_MODE?.trim();
+  if (envOverride) {
+    if (!isAgentMode(envOverride)) {
+      throw new Error(`Invalid NEMOCLAWD_MODE "${envOverride}". Expected one of: ${AGENT_MODES.join(", ")}`);
+    }
+    return envOverride;
+  }
 
   const statePath = modeStatePath(env);
   if (!existsSync(statePath)) return DEFAULT_AGENT_MODE;

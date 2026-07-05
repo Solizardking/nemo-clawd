@@ -143,17 +143,28 @@ function printDflowStatus(jsonOutput = false) {
 
 function printMagicRouter(args) {
   const jsonOutput = args.includes("--json");
-  const modeFlagIndex = args.indexOf("--mode");
   let mode = agentMode.getAgentMode();
-  if (modeFlagIndex !== -1) {
-    const modeOverride = args[modeFlagIndex + 1];
-    if (!agentMode.isAgentMode(modeOverride)) {
-      fail(`Unknown --mode "${modeOverride || ""}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
+  let modeFlagIndex = -1;
+  let modeValueIndex = -1;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "--mode") {
+      modeFlagIndex = i;
+      modeValueIndex = i + 1;
+      mode = args[modeValueIndex];
+      break;
     }
-    mode = modeOverride;
+    if (arg.startsWith("--mode=")) {
+      modeFlagIndex = i;
+      mode = arg.slice("--mode=".length);
+      break;
+    }
+  }
+  if (modeFlagIndex !== -1 && !agentMode.isAgentMode(mode)) {
+    fail(`Unknown --mode "${mode || ""}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
   }
   const task = args
-    .filter((arg, i) => arg !== "--json" && (modeFlagIndex === -1 || (i !== modeFlagIndex && i !== modeFlagIndex + 1)))
+    .filter((arg, i) => arg !== "--json" && i !== modeFlagIndex && i !== modeValueIndex)
     .join(" ")
     .trim();
   const route = magicRouter.resolveMagicRouter(task, process.env, mode);
@@ -168,16 +179,27 @@ function printMagicRouter(args) {
 
 function modeCommand(args) {
   const requested = args[0];
+  const envOverride = process.env.NEMOCLAWD_MODE && String(process.env.NEMOCLAWD_MODE).trim();
+  const hasActiveOverride = agentMode.isAgentMode(envOverride);
+
   if (!requested) {
     const current = agentMode.getAgentMode();
     console.log(`Agent mode: ${current}`);
     console.log(agentMode.describeAgentMode(current));
+    if (hasActiveOverride) {
+      console.log(`(forced by NEMOCLAWD_MODE=${envOverride}; unset it to use the persisted mode)`);
+    }
     return;
   }
   if (!agentMode.isAgentMode(requested)) {
     fail(`Unknown mode "${requested}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
   }
   const mode = agentMode.setAgentMode(requested);
+
+  if (hasActiveOverride && envOverride !== mode) {
+    fail(`Persisted mode set to "${mode}", but NEMOCLAWD_MODE="${envOverride}" is active in this environment and overrides it. Unset NEMOCLAWD_MODE for the persisted mode to take effect.`);
+  }
+
   console.log(`Agent mode set: ${mode}`);
   console.log(agentMode.describeAgentMode(mode));
 }

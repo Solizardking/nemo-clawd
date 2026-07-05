@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { PluginCommandContext } from "../index.js";
 
 vi.mock("../blueprint/state.js", () => ({
@@ -73,5 +73,31 @@ describe("handleSlashCommand mode gating", () => {
     const result = handleSlashCommand(ctx("mode bogus", true), {} as never);
     expect(result.text).toMatch(/Unknown mode/);
     expect(currentMode).toBe("trading");
+  });
+
+  describe("with an active NEMOCLAWD_MODE override", () => {
+    const originalEnv = process.env.NEMOCLAWD_MODE;
+
+    beforeEach(() => {
+      process.env.NEMOCLAWD_MODE = "trading";
+    });
+
+    afterEach(() => {
+      if (originalEnv === undefined) delete process.env.NEMOCLAWD_MODE;
+      else process.env.NEMOCLAWD_MODE = originalEnv;
+    });
+
+    it("notes the override when reading the current mode", () => {
+      const result = handleSlashCommand(ctx("mode", false), {} as never);
+      expect(result.text).toMatch(/forced by NEMOCLAWD_MODE/);
+    });
+
+    it("reports that persisting a new mode won't take effect while the override is active", () => {
+      const result = handleSlashCommand(ctx("mode ai", true), {} as never);
+      expect(result.text).toMatch(/NEMOCLAWD_MODE=trading.*overrides it/);
+      expect(result.text).not.toContain("Agent mode set");
+      // The persisted state is still written so it takes effect once the override is removed.
+      expect(currentMode).toBe("ai");
+    });
   });
 });

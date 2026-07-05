@@ -104,10 +104,13 @@ function slashOnboard() {
     };
 }
 function slashMode(target, isAuthorizedSender) {
+    const envOverride = process.env.NEMOCLAWD_MODE?.trim();
+    const hasActiveOverride = (0, agent_mode_js_1.isAgentMode)(envOverride);
     if (target === undefined) {
         const mode = (0, agent_mode_js_1.getAgentMode)();
+        const overrideNote = hasActiveOverride ? `\n\n_(forced by NEMOCLAWD_MODE=${envOverride}; unset it to use the persisted mode)_` : "";
         return {
-            text: [`**Agent Mode**: \`${mode}\``, "", (0, agent_mode_js_1.describeAgentMode)(mode), "", "Switch with `/nemoclawd mode ai` or `/nemoclawd mode trading`."].join("\n"),
+            text: [`**Agent Mode**: \`${mode}\``, "", (0, agent_mode_js_1.describeAgentMode)(mode), "", "Switch with `/nemoclawd mode ai` or `/nemoclawd mode trading`."].join("\n") + overrideNote,
         };
     }
     // Mode is a security boundary (it gates wallet/trading tool access), so only an
@@ -121,6 +124,11 @@ function slashMode(target, isAuthorizedSender) {
         return { text: `Unknown mode "${target}". Expected one of: ${agent_mode_js_1.AGENT_MODES.join(", ")}` };
     }
     const mode = (0, agent_mode_js_1.setAgentMode)(target);
+    if (hasActiveOverride && envOverride !== mode) {
+        return {
+            text: `Persisted mode set to \`${mode}\`, but \`NEMOCLAWD_MODE=${envOverride}\` is active in this environment and overrides it. Unset NEMOCLAWD_MODE for the persisted mode to take effect.`,
+        };
+    }
     return { text: [`**Agent mode set**: \`${mode}\``, "", (0, agent_mode_js_1.describeAgentMode)(mode)].join("\n") };
 }
 function slashEject() {

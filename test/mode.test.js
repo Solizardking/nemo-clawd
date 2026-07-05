@@ -41,6 +41,15 @@ describe("agent mode", () => {
     assert.equal(mode.getAgentMode({ HOME: home, NEMOCLAWD_MODE: "ai" }), "ai");
   });
 
+  it("fails closed on an invalid NEMOCLAWD_MODE instead of silently falling back to trading", () => {
+    assert.throws(() => mode.getAgentMode({ HOME: home, NEMOCLAWD_MODE: "AI" }), /Invalid NEMOCLAWD_MODE/);
+    assert.throws(() => mode.getAgentMode({ HOME: home, NEMOCLAWD_MODE: "degen" }), /Invalid NEMOCLAWD_MODE/);
+  });
+
+  it("ignores an empty NEMOCLAWD_MODE and falls back to persisted/default", () => {
+    assert.equal(mode.getAgentMode({ HOME: home, NEMOCLAWD_MODE: "" }), "trading");
+  });
+
   it("partitionToolsForMode strips financial tools only in ai mode", () => {
     const toolSet = ["chat", "dflow-order", "solana-rpc", "filesystem"];
     const trading = mode.partitionToolsForMode(toolSet, "trading");
@@ -50,5 +59,12 @@ describe("agent mode", () => {
     const ai = mode.partitionToolsForMode(toolSet, "ai");
     assert.deepEqual(ai.allowed, ["chat", "filesystem"]);
     assert.deepEqual(ai.blocked.sort(), ["dflow-order", "solana-rpc"].sort());
+  });
+
+  it("blocks wallet-capable tools beyond the DFlow/RPC set (keypair generation, on-chain instruction building, NFT minting and marketplaces)", () => {
+    const toolSet = ["keypair-gen", "instruction-builder", "nft-mint", "magic-eden-api", "tensor-api", "chat"];
+    const { allowed, blocked } = mode.partitionToolsForMode(toolSet, "ai");
+    assert.deepEqual(allowed, ["chat"]);
+    assert.deepEqual(blocked.sort(), ["instruction-builder", "keypair-gen", "magic-eden-api", "nft-mint", "tensor-api"].sort());
   });
 });

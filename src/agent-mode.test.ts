@@ -55,6 +55,13 @@ describe("partitionToolsForMode", () => {
       expect(blocked).toEqual([tool]);
     }
   });
+
+  it("blocks wallet-capable tools beyond the DFlow/RPC set (keypair generation, on-chain instruction building, NFT minting and marketplaces)", () => {
+    const wideToolSet = ["keypair-gen", "instruction-builder", "nft-mint", "magic-eden-api", "tensor-api", "chat"];
+    const { allowed, blocked } = partitionToolsForMode(wideToolSet, "ai");
+    expect(allowed).toEqual(["chat"]);
+    expect(blocked.sort()).toEqual(["instruction-builder", "keypair-gen", "magic-eden-api", "nft-mint", "tensor-api"].sort());
+  });
 });
 
 describe("getAgentMode / setAgentMode", () => {
@@ -78,6 +85,15 @@ describe("getAgentMode / setAgentMode", () => {
   it("prefers NEMOCLAWD_MODE env override over persisted state", () => {
     setAgentMode("trading", { HOME: home });
     expect(getAgentMode({ HOME: home, NEMOCLAWD_MODE: "ai" })).toBe("ai");
+  });
+
+  it("fails closed on an invalid NEMOCLAWD_MODE instead of silently falling back to trading", () => {
+    expect(() => getAgentMode({ HOME: home, NEMOCLAWD_MODE: "AI" })).toThrow(/Invalid NEMOCLAWD_MODE/);
+    expect(() => getAgentMode({ HOME: home, NEMOCLAWD_MODE: "degen" })).toThrow(/Invalid NEMOCLAWD_MODE/);
+  });
+
+  it("ignores an empty NEMOCLAWD_MODE and falls back to persisted/default", () => {
+    expect(getAgentMode({ HOME: home, NEMOCLAWD_MODE: "" })).toBe(DEFAULT_AGENT_MODE);
   });
 
   it("falls back to the default when the state file is corrupt", () => {
