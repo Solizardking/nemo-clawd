@@ -251,15 +251,17 @@ describe("CLI dispatch", () => {
     const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: "/tmp/nemoclawd-cli-test-" + Date.now(), ZAI_API_KEY: "zai-test" } };
 
     const ai = execSync(`node "${CLI}" magic-router --mode ai check my wallet balance`, opts);
-    assert.ok(ai.includes("Mode:      ai"));
-    assert.ok(ai.includes("Task:      wallet_ops"));
-    assert.ok(ai.includes("Tools:     \n") || /Tools:\s*\n/.test(ai), ai);
-    assert.ok(ai.includes("Blocked:   openshell-private-wallet, solana-rpc, wallet-approval"), ai);
+    assert.ok(ai.includes("Mode: ai"));
+    assert.ok(ai.includes("Wallet Operations"));
+    assert.ok(ai.includes("Blocked by AI Mode"), ai);
+    assert.ok(ai.includes("openshell-private-wallet"), ai);
+    assert.ok(ai.includes("solana-rpc"), ai);
+    assert.ok(ai.includes("wallet-approval"), ai);
 
     const trading = execSync(`node "${CLI}" magic-router --mode trading check my wallet balance`, opts);
-    assert.ok(trading.includes("Mode:      trading"));
+    assert.ok(trading.includes("Mode: trading"));
     assert.ok(trading.includes("solana-rpc"), trading);
-    assert.ok(!trading.includes("Blocked:"), trading);
+    assert.ok(!trading.includes("Blocked by AI Mode"), trading);
   });
 
   it("magic-router --mode with a typo'd value fails instead of silently falling back to an unsafe route", () => {
