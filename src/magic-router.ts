@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { DEFAULT_AGENT_MODE, partitionToolsForMode, type AgentMode } from "./agent-mode.js";
+import { getAgentMode, partitionToolsForMode, type AgentMode } from "./agent-mode.js";
 
 export const MAGIC_ROUTER_STRATEGY = "magic-router";
 export const ZAI_DEFAULT_PROVIDER = "zai-glm";
@@ -125,7 +125,7 @@ function buildInferenceRoutes(env: EnvLike): { selected: MagicRouterInferenceRou
 export function resolveMagicRouter(
   input: string | string[] | undefined,
   env: EnvLike = process.env,
-  mode: AgentMode = DEFAULT_AGENT_MODE,
+  mode: AgentMode = getAgentMode(env),
 ): MagicRouterRoute {
   const taskType = classifyMagicRouterTask(input);
   const routes = buildInferenceRoutes(env);

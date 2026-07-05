@@ -143,4 +143,17 @@ describe("CLI dispatch", () => {
     assert.ok(trading.includes("solana-rpc"), trading);
     assert.ok(!trading.includes("Blocked:"), trading);
   });
+
+  it("magic-router --mode with a typo'd value fails instead of silently falling back to an unsafe route", () => {
+    const r = run(`magic-router --mode aii check my wallet balance`);
+    assert.equal(r.code, 1);
+    assert.ok(/Unknown --mode/.test(r.out), r.out);
+    assert.ok(!r.out.includes("solana-rpc"), r.out);
+  });
+
+  it("magic-router --mode with no value after it fails instead of falling back", () => {
+    const r = run(`magic-router --mode`);
+    assert.equal(r.code, 1);
+    assert.ok(/Unknown --mode/.test(r.out), r.out);
+  });
 });

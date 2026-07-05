@@ -3,7 +3,16 @@
 
 const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const { resolveMagicRouter, classifyMagicRouterTask } = require("../bin/lib/magic-router");
+
+// resolveMagicRouter's mode argument now defaults to the persisted agent mode
+// (see agent-mode.js getAgentMode). Point every env fixture that omits an
+// explicit mode at an isolated, empty HOME so "no mode.json" -> "trading" is
+// deterministic and independent of the real machine's ~/.nemoclawd state.
+const ISOLATED_HOME = fs.mkdtempSync(path.join(os.tmpdir(), "nemoclawd-magic-router-test-"));
 
 describe("magic router", () => {
   it("classifies prediction-market tasks before generic trading", () => {
@@ -12,6 +21,7 @@ describe("magic router", () => {
 
   it("keeps ZAI GLM 5.2 as the default when configured", () => {
     const route = resolveMagicRouter("debug this TypeScript repo", {
+      HOME: ISOLATED_HOME,
       ZAI_API_KEY: "zai-test",
       OPENROUTER_API_KEY: "or-test",
       NVIDIA_API_KEY: "nv-test",
@@ -25,6 +35,7 @@ describe("magic router", () => {
 
   it("uses OpenRouter auto when ZAI is unavailable and OpenRouter is configured", () => {
     const route = resolveMagicRouter("research latest model benchmarks", {
+      HOME: ISOLATED_HOME,
       OPENROUTER_API_KEY: "or-test",
     });
     assert.equal(route.inference.provider, "openrouter");
@@ -34,6 +45,7 @@ describe("magic router", () => {
 
   it("selects DFlow plus Proof/KYC tools for prediction markets", () => {
     const route = resolveMagicRouter("buy a prediction market outcome token", {
+      HOME: ISOLATED_HOME,
       ZAI_API_KEY: "zai-test",
     });
     assert.equal(route.taskType, "prediction_market");
@@ -43,7 +55,7 @@ describe("magic router", () => {
   });
 
   it("defaults to trading mode when no mode argument is passed", () => {
-    const route = resolveMagicRouter("check my wallet balance", { ZAI_API_KEY: "zai-test" });
+    const route = resolveMagicRouter("check my wallet balance", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" });
     assert.equal(route.mode, "trading");
     assert.ok(route.toolSet.includes("solana-rpc"));
     assert.deepEqual(route.blockedTools, []);
@@ -69,9 +81,20 @@ describe("magic router", () => {
   });
 
   it("ai mode leaves non-financial tool sets (coding) unchanged", () => {
-    const trading = resolveMagicRouter("debug this TypeScript repo", { ZAI_API_KEY: "zai-test" }, "trading");
-    const ai = resolveMagicRouter("debug this TypeScript repo", { ZAI_API_KEY: "zai-test" }, "ai");
+    const trading = resolveMagicRouter("debug this TypeScript repo", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" }, "trading");
+    const ai = resolveMagicRouter("debug this TypeScript repo", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" }, "ai");
     assert.deepEqual(ai.toolSet, trading.toolSet);
     assert.deepEqual(ai.blockedTools, []);
+  });
+
+  it("resolves the persisted mode when the mode argument is omitted, so old call sites can't bypass AI Mode", () => {
+    const { setAgentMode } = require("../bin/lib/mode");
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "nemoclawd-magic-router-persisted-"));
+    setAgentMode("ai", { HOME: home });
+
+    const route = resolveMagicRouter("check my wallet balance", { HOME: home, ZAI_API_KEY: "zai-test" });
+    assert.equal(route.mode, "ai");
+    assert.ok(!route.toolSet.includes("solana-rpc"));
+    assert.ok(route.blockedTools.includes("solana-rpc"));
   });
 });

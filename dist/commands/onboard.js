@@ -7,14 +7,19 @@ const node_child_process_1 = require("node:child_process");
 const config_js_1 = require("../onboard/config.js");
 const prompt_js_1 = require("../onboard/prompt.js");
 const validate_js_1 = require("../onboard/validate.js");
-const ENDPOINT_TYPES = ["build", "ncp", "nim-local", "vllm", "ollama", "custom"];
-const SUPPORTED_ENDPOINT_TYPES = ["build", "ncp"];
+const ENDPOINT_TYPES = ["zai", "build", "ncp", "nim-local", "vllm", "ollama", "custom"];
+const SUPPORTED_ENDPOINT_TYPES = ["zai", "build", "ncp"];
 function isExperimentalEnabled() {
     return process.env.NEMOCLAWD_EXPERIMENTAL === "1";
 }
+const ZAI_ENDPOINT_URL = "https://api.z.ai/api/paas/v4";
+const ZAI_DEFAULT_MODEL = "zai/glm-5.2";
 const BUILD_ENDPOINT_URL = "https://integrate.api.nvidia.com/v1";
 const HOST_GATEWAY_URL = "http://host.openshell.internal";
-const DEFAULT_MODELS = [
+const ZAI_MODELS = [
+    { id: ZAI_DEFAULT_MODEL, label: "GLM 5.2" },
+];
+const NVIDIA_MODELS = [
     { id: "nvidia/nemotron-3-super-120b-a12b", label: "Nemotron 3 Super 120B" },
     { id: "nvidia/llama-3.1-nemotron-ultra-253b-v1", label: "Nemotron Ultra 253B" },
     { id: "nvidia/llama-3.3-nemotron-super-49b-v1.5", label: "Nemotron Super 49B v1.5" },
@@ -22,6 +27,8 @@ const DEFAULT_MODELS = [
 ];
 function resolveProfile(endpointType) {
     switch (endpointType) {
+        case "zai":
+            return "zai";
         case "build":
             return "default";
         case "ncp":
@@ -37,6 +44,8 @@ function resolveProfile(endpointType) {
 }
 function resolveProviderName(endpointType) {
     switch (endpointType) {
+        case "zai":
+            return "zai-glm";
         case "build":
             return "nvidia-nim";
         case "ncp":
@@ -52,6 +61,8 @@ function resolveProviderName(endpointType) {
 }
 function resolveCredentialEnv(endpointType) {
     switch (endpointType) {
+        case "zai":
+            return "ZAI_API_KEY";
         case "build":
         case "ncp":
         case "custom":
@@ -76,7 +87,8 @@ function isNonInteractive(opts) {
     return true;
 }
 function endpointRequiresApiKey(endpointType) {
-    return (endpointType === "build" ||
+    return (endpointType === "zai" ||
+        endpointType === "build" ||
         endpointType === "ncp" ||
         endpointType === "nim-local" ||
         endpointType === "custom");
@@ -118,9 +130,14 @@ function showConfig(config, logger) {
 async function promptEndpoint(ollama) {
     const options = [
         {
+            label: "ZAI GLM 5.2",
+            value: "zai",
+            hint: "recommended default — ZAI_API_KEY",
+        },
+        {
             label: "NVIDIA Build (build.nvidia.com)",
             value: "build",
-            hint: "recommended — zero infra, free credits",
+            hint: "NVIDIA fallback / Nemotron",
         },
         {
             label: "NVIDIA Cloud Partner (NCP)",
@@ -198,6 +215,9 @@ async function cliOnboard(opts) {
     let endpointUrl;
     let ncpPartner = null;
     switch (endpointType) {
+        case "zai":
+            endpointUrl = opts.endpointUrl ?? ZAI_ENDPOINT_URL;
+            break;
         case "build":
             endpointUrl = BUILD_ENDPOINT_URL;
             break;
@@ -235,15 +255,20 @@ async function cliOnboard(opts) {
             apiKey = opts.apiKey;
         }
         else {
-            const envKey = process.env.NVIDIA_API_KEY;
+            const envKey = process.env[credentialEnv];
             if (envKey) {
-                logger.info(`Detected NVIDIA_API_KEY in environment (${(0, validate_js_1.maskApiKey)(envKey)})`);
+                logger.info(`Detected ${credentialEnv} in environment (${(0, validate_js_1.maskApiKey)(envKey)})`);
                 const useEnv = nonInteractive ? true : await (0, prompt_js_1.promptConfirm)("Use this key?");
-                apiKey = useEnv ? envKey : await (0, prompt_js_1.promptInput)("Enter your NVIDIA API key");
+                apiKey = useEnv ? envKey : await (0, prompt_js_1.promptInput)(`Enter your ${credentialEnv} value`);
             }
             else {
-                logger.info("Get an API key from: https://build.nvidia.com/settings/api-keys");
-                apiKey = await (0, prompt_js_1.promptInput)("Enter your NVIDIA API key");
+                if (credentialEnv === "ZAI_API_KEY") {
+                    logger.info("Set ZAI_API_KEY for GLM 5.2 access.");
+                }
+                else {
+                    logger.info("Get an API key from: https://build.nvidia.com/settings/api-keys");
+                }
+                apiKey = await (0, prompt_js_1.promptInput)(`Enter your ${credentialEnv} value`);
             }
         }
     }
@@ -267,7 +292,9 @@ async function cliOnboard(opts) {
         }
         else {
             logger.error(`API key validation failed: ${validation.error ?? "unknown error"}`);
-            logger.info("Check your key at https://build.nvidia.com/settings/api-keys");
+            if (credentialEnv === "NVIDIA_API_KEY") {
+                logger.info("Check your key at https://build.nvidia.com/settings/api-keys");
+            }
             return;
         }
     }
@@ -281,10 +308,10 @@ async function cliOnboard(opts) {
     }
     else {
         // Build model options: prefer Nemotron models from the endpoint, fall back to defaults
-        const nemotronModels = validation.models.filter((m) => m.includes("nemotron"));
-        const modelOptions = nemotronModels.length > 0
-            ? nemotronModels.map((id) => ({ label: id, value: id }))
-            : DEFAULT_MODELS.map((m) => ({ label: `${m.label} (${m.id})`, value: m.id }));
+        const preferredModels = validation.models.filter((m) => endpointType === "zai" ? m.toLowerCase().includes("glm") : m.includes("nemotron"));
+        const modelOptions = preferredModels.length > 0
+            ? preferredModels.map((id) => ({ label: id, value: id }))
+            : (endpointType === "zai" ? ZAI_MODELS : NVIDIA_MODELS).map((m) => ({ label: `${m.label} (${m.id})`, value: m.id }));
         model = await (0, prompt_js_1.promptSelect)("Select your primary model:", modelOptions);
     }
     // Step 6: Resolve profile

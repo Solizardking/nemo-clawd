@@ -11,6 +11,7 @@ const connect_js_1 = require("./commands/connect.js");
 const eject_js_1 = require("./commands/eject.js");
 const logs_js_1 = require("./commands/logs.js");
 const onboard_js_1 = require("./commands/onboard.js");
+const mode_js_1 = require("./commands/mode.js");
 function registerCliCommands(ctx, api) {
     const { program, logger } = ctx;
     const pluginConfig = (0, index_js_1.getPluginConfig)(api);
@@ -90,6 +91,13 @@ function registerCliCommands(ctx, api) {
             logger,
             pluginConfig,
         });
+    });
+    // nemoclawd nemoclawd mode
+    nemoclawd
+        .command("mode [target]")
+        .description("Show or set the agent mode: 'ai' (chat/coding/research only) or 'trading' (default, full Solana tools)")
+        .action(async (target) => {
+        await (0, mode_js_1.cliMode)({ set: target, logger });
     });
     // nemoclawd nemoclawd onboard
     nemoclawd

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const { DEFAULT_AGENT_MODE, partitionToolsForMode } = require("./mode");
+const { getAgentMode, partitionToolsForMode } = require("./mode");
 
 const MAGIC_ROUTER_STRATEGY = "magic-router";
 const ZAI_DEFAULT_PROVIDER = "zai-glm";
@@ -85,7 +85,7 @@ function buildInferenceRoutes(env) {
   return { selected: zai, advisor: openrouter, fallbacks: [openrouter, nvidia] };
 }
 
-function resolveMagicRouter(input, env = process.env, mode = DEFAULT_AGENT_MODE) {
+function resolveMagicRouter(input, env = process.env, mode = getAgentMode(env)) {
   const taskType = classifyMagicRouterTask(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || (routes.advisor && routes.advisor.provider === OPENROUTER_PROVIDER);

@@ -2,10 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, it, expect } from "vitest";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { resolveMagicRouter } from "./magic-router.js";
-import { FINANCIAL_TOOLS } from "./agent-mode.js";
+import { FINANCIAL_TOOLS, setAgentMode } from "./agent-mode.js";
 
-const env = { ZAI_API_KEY: "zai-test" };
+// resolveMagicRouter's mode argument now defaults to the persisted agent mode
+// (see agent-mode.ts getAgentMode). Point env fixtures that omit an explicit
+// mode at an isolated, empty HOME so "no mode.json" -> "trading" is
+// deterministic and independent of the real machine's ~/.nemoclawd state.
+const isolatedHome = mkdtempSync(join(tmpdir(), "nemoclawd-magic-router-test-"));
+const env = { HOME: isolatedHome, ZAI_API_KEY: "zai-test" };
 
 describe("resolveMagicRouter mode gating", () => {
   it("defaults to trading mode and grants wallet tools for wallet_ops", () => {
@@ -13,6 +21,16 @@ describe("resolveMagicRouter mode gating", () => {
     expect(route.mode).toBe("trading");
     expect(route.toolSet).toContain("solana-rpc");
     expect(route.blockedTools).toEqual([]);
+  });
+
+  it("resolves the persisted mode when the mode argument is omitted, so old call sites can't bypass AI Mode", () => {
+    const home = mkdtempSync(join(tmpdir(), "nemoclawd-magic-router-persisted-"));
+    setAgentMode("ai", { HOME: home });
+
+    const route = resolveMagicRouter("check my wallet balance", { HOME: home, ZAI_API_KEY: "zai-test" });
+    expect(route.mode).toBe("ai");
+    expect(route.toolSet).not.toContain("solana-rpc");
+    expect(route.blockedTools).toContain("solana-rpc");
   });
 
   it("in ai mode, strips every financial tool from a wallet_ops request", () => {

@@ -30,7 +30,7 @@ export function handleSlashCommand(
     case "onboard":
       return slashOnboard();
     case "mode":
-      return slashMode(args[1]);
+      return slashMode(args[1], ctx.isAuthorizedSender);
     default:
       return slashHelp();
   }
@@ -124,13 +124,21 @@ function slashOnboard(): PluginCommandResult {
   };
 }
 
-function slashMode(target?: string): PluginCommandResult {
+function slashMode(target: string | undefined, isAuthorizedSender: boolean): PluginCommandResult {
   if (target === undefined) {
     const mode = getAgentMode();
     return {
       text: [`**Agent Mode**: \`${mode}\``, "", describeAgentMode(mode), "", "Switch with `/nemoclawd mode ai` or `/nemoclawd mode trading`."].join(
         "\n",
       ),
+    };
+  }
+
+  // Mode is a security boundary (it gates wallet/trading tool access), so only an
+  // authorized sender may change it. Reading the current mode stays open to anyone.
+  if (!isAuthorizedSender) {
+    return {
+      text: "Switching agent mode requires an authorized sender. Use `nemoclawd nemoclawd mode <ai|trading>` from the host CLI instead.",
     };
   }
 
