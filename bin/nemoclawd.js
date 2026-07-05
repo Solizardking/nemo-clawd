@@ -144,8 +144,14 @@ function printDflowStatus(jsonOutput = false) {
 function printMagicRouter(args) {
   const jsonOutput = args.includes("--json");
   const modeFlagIndex = args.indexOf("--mode");
-  const modeOverride = modeFlagIndex !== -1 ? args[modeFlagIndex + 1] : undefined;
-  const mode = agentMode.isAgentMode(modeOverride) ? modeOverride : agentMode.getAgentMode();
+  let mode = agentMode.getAgentMode();
+  if (modeFlagIndex !== -1) {
+    const modeOverride = args[modeFlagIndex + 1];
+    if (!agentMode.isAgentMode(modeOverride)) {
+      fail(`Unknown --mode "${modeOverride || ""}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
+    }
+    mode = modeOverride;
+  }
   const task = args
     .filter((arg, i) => arg !== "--json" && (modeFlagIndex === -1 || (i !== modeFlagIndex && i !== modeFlagIndex + 1)))
     .join(" ")

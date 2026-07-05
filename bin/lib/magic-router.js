@@ -4,7 +4,7 @@
 /**
  * 🪄 NEMOCLAWD MAGIC ROUTER — compiled JS mirror of src/magic-router.ts
  */
-const { DEFAULT_AGENT_MODE, partitionToolsForMode } = require("./mode");
+const { getAgentMode, partitionToolsForMode } = require("./mode");
 
 const MAGIC_ROUTER_STRATEGY = "magic-router";
 const MAGIC_ROUTER_VERSION = "2.0.0";
@@ -121,7 +121,7 @@ function buildInferenceRoutes(env) {
   return { selected: ollama, advisor: openrouter.available ? openrouter : undefined, fallbacks: [openrouter, nvidia] };
 }
 
-function resolveMagicRouter(input, env = process.env, mode = DEFAULT_AGENT_MODE) {
+function resolveMagicRouter(input, env = process.env, mode = getAgentMode(env)) {
   const { type: taskType, confidence } = classifyMagicRouterTaskWithConfidence(input);
   const routes = buildInferenceRoutes(env);
   const openRouterAvailable = routes.selected.provider === OPENROUTER_PROVIDER || (routes.advisor && routes.advisor.provider === OPENROUTER_PROVIDER);
