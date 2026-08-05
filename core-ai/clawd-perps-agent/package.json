@@ -9,14 +9,18 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/cli.js status",
+    "start": "node dist/server.js",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@openclawdsolana/clawd-perps": "file:../../openclawd-framework/packages/clawd-perps",
-    "dotenv": "^17.3.1"
+    "@ellipsis-labs/rise": "^0.4.64",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.9.1",
     "typescript": "^5.9.3"
   }

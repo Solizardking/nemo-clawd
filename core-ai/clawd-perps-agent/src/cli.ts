@@ -128,6 +128,7 @@ Usage:
   clawd-agents-perps frontend
   clawd-agents-perps telegram "/perps"
   clawd-agents-perps vulcan
+  clawd-agents-perps rise <subcommand> [options]   (see "rise help")
   clawd-agents-perps paper-long SOL --notional 100
   clawd-agents-perps paper-short SOL --notional 100
   clawd-agents-perps live-long SOL --notional 100 --leverage 2
@@ -172,6 +173,38 @@ Environment:
 `);
 }
 
+function printRiseHelp(): void {
+  console.log(`clawd-agents-perps rise
+
+Rise SDK commands use @ellipsis-labs/rise to build unsigned Solana instructions.
+Sign + submit via your wallet/signer service.
+
+Market Data:
+  clawd-agents-perps rise orderbook <symbol> [--depth 20]
+  clawd-agents-perps rise candles <symbol> [--interval 1h] [--limit 20]
+  clawd-agents-perps rise funding <symbol>
+  clawd-agents-perps rise bbo <symbol>
+  clawd-agents-perps rise stats <symbol>
+
+Order Building (returns unsigned instructions):
+  clawd-agents-perps rise market-buy <symbol> --notional 100 [--slippage-bps 50]
+  clawd-agents-perps rise market-sell <symbol> --notional 100 [--slippage-bps 50]
+  clawd-agents-perps rise limit-buy <symbol> --price 200 --tokens 0.5
+  clawd-agents-perps rise limit-sell <symbol> --price 200 --tokens 0.5
+  clawd-agents-perps rise stop-loss <symbol> --trigger-price 140 [--slippage-bps 100]
+  clawd-agents-perps rise cancel <symbol> [--order-ids id1,id2]
+  clawd-agents-perps rise cancel-all <symbol>
+  clawd-agents-perps rise deposit --amount 500
+  clawd-agents-perps rise withdraw --amount 500
+
+Risk & Margin:
+  clawd-agents-perps rise margin [--authority <pubkey>]
+  clawd-agents-perps rise margin-status
+
+Preflight gates: LIVE_TRADING=true, OPERATOR_CONFIRMED=true, PERPS_SIM_ONLY=false.
+`);
+}
+
 function printOnchainMmHelp(): void {
   console.log(`clawd-agents-perps onchain-mm
 
@@ -203,7 +236,11 @@ async function main() {
     return;
   }
 
-  const createRuntime = () => new ClawdPerpsRuntime(undefined, repoRoot());
+  const createRuntime = () => {
+    const runtime = new ClawdPerpsRuntime(undefined, repoRoot());
+    runtime.init().catch(() => {});
+    return runtime;
+  };
 
   if (parsed.command === "onchain-mm") {
     const subcommand = parsed.rest[0] || "status";
@@ -289,6 +326,105 @@ async function main() {
       default:
         console.error(`Unknown twamm command: ${subcommand}`);
         printTwammHelp();
+        process.exitCode = 1;
+        return;
+    }
+  }
+
+  // ── Rise SDK command group ──
+  if (parsed.command === "rise") {
+    const subcommand = parsed.rest[0] || "help";
+    const symbol = parsed.rest[1]?.toUpperCase() || "SOL";
+
+    if (subcommand === "help" || subcommand === "--help" || subcommand === "-h") {
+      printRiseHelp();
+      return;
+    }
+
+    const runtime = createRuntime();
+    await runtime.init();
+
+    switch (subcommand) {
+      case "orderbook":
+      case "book": {
+        printJson(await runtime.getOrderbook(symbol, asNumber(parsed.options.depth, 20)));
+        return;
+      }
+      case "candles": {
+        printJson(await runtime.getCandles(symbol, String(parsed.options.interval || "1h"), asNumber(parsed.options.limit, 20)));
+        return;
+      }
+      case "funding": {
+        printJson(await runtime.getFundingRates(symbol));
+        return;
+      }
+      case "bbo": {
+        printJson(await runtime.getBbo(symbol));
+        return;
+      }
+      case "stats":
+      case "market-stats": {
+        printJson(await runtime.getMarketStats(symbol));
+        return;
+      }
+      case "market-buy":
+      case "market-sell":
+      case "market-order": {
+        const side = subcommand === "market-sell" ? "sell" : "buy";
+        printJson(await runtime.executeMarketOrder({
+          symbol,
+          side: side as "buy" | "sell",
+          notionalUsd: asNumber(parsed.options.notional, 100),
+          slippageBps: asNumber(parsed.options["slippage-bps"], 50),
+        }));
+        return;
+      }
+      case "limit-buy":
+      case "limit-sell":
+      case "limit-order": {
+        const side = subcommand === "limit-sell" ? "sell" : "buy";
+        printJson(await runtime.executeLimitOrder({
+          symbol,
+          side: side as "buy" | "sell",
+          priceUsd: asNumber(parsed.options.price, 0),
+          tokens: asNumber(parsed.options.tokens, 0),
+        }));
+        return;
+      }
+      case "stop-loss":
+      case "sl": {
+        printJson(await runtime.executeStopLoss({
+          symbol,
+          triggerPrice: asNumber(parsed.options["trigger-price"], asNumber(parsed.options.trigger, 0)),
+          slippageBps: asNumber(parsed.options["slippage-bps"], 100),
+        }));
+        return;
+      }
+      case "cancel": {
+        const orderIds = typeof parsed.options["order-ids"] === "string" ? parsed.options["order-ids"].split(",") : undefined;
+        printJson(await runtime.executeCancel({ symbol, orderIds }));
+        return;
+      }
+      case "cancel-all": {
+        printJson(await runtime.executeCancel({ symbol }));
+        return;
+      }
+      case "deposit": {
+        printJson(await runtime.executeDeposit({ amountUsd: asNumber(parsed.options.amount, 100) }));
+        return;
+      }
+      case "withdraw": {
+        printJson(await runtime.executeWithdraw({ amountUsd: asNumber(parsed.options.amount, 100) }));
+        return;
+      }
+      case "margin":
+      case "margin-status": {
+        printJson(await runtime.getMarginStatus(parsed.options.authority as string || undefined));
+        return;
+      }
+      default:
+        console.error(`Unknown rise subcommand: ${subcommand}`);
+        printRiseHelp();
         process.exitCode = 1;
         return;
     }

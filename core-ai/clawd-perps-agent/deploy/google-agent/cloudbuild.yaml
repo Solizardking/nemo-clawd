@@ -1,0 +1,57 @@
+# Google Cloud Build — Deploy Perps Agent to Cloud Run
+#
+# Usage:
+#   gcloud builds submit --config deploy/google-agent/cloudbuild.yaml
+#
+# Or for Google Agent Runtime:
+#   gcloud alpha agent-runtime deploy --region=us-central1
+
+steps:
+  # Step 1: Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/clawd-perps-agent:${SHORT_SHA}"
+      - "-f"
+      - "deploy/google-agent/Dockerfile"
+      - "."
+    dir: "/workspace"
+
+  # Step 2: Push to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/clawd-perps-agent:${SHORT_SHA}"
+
+  # Step 3: Deploy to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "clawd-perps-agent"
+      - "--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/clawd-perps-agent:${SHORT_SHA}"
+      - "--region=${_REGION}"
+      - "--platform=managed"
+      - "--allow-unauthenticated"
+      - "--min-instances=0"
+      - "--max-instances=5"
+      - "--concurrency=80"
+      - "--cpu=2"
+      - "--memory=1Gi"
+      - "--timeout=300"
+      - "--set-env-vars=PERPS_SIM_ONLY=true,NODE_ENV=production"
+      - "--set-secrets=SOLANA_RPC_URL=SOLANA_RPC_URL:latest,HELIUS_API_KEY=HELIUS_API_KEY:latest"
+      - "--labels=agent=perps,source=clawd"
+
+substitutions:
+  _REGION: us-central1
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: "E2_HIGHCPU_8"
+  env:
+    - "DOCKER_BUILDKIT=1"
+
+timeout: 1200s

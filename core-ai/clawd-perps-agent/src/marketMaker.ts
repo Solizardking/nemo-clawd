@@ -5,7 +5,8 @@ import {
   type PerpsRuntimeConfig,
   type PreflightReport,
 } from "./config.js";
-import { createPhoenixRiseAdapter, type PhoenixRiseAdapter } from "./adapters/phoenixRise.js";
+import { createPhoenixRiseAdapter, type PhoenixRiseAdapter, type PhoenixOrderbookSnapshot, type PhoenixCandle, type PhoenixMarginStatus, type PhoenixFundingRateView, type PhoenixMarketStats, type PhoenixTraderSnapshot } from "./adapters/phoenixRise.js";
+import { createRiseOrderExecutor, type RiseOrderExecutor, type RiseExecutionPlan, type RiseMarketOrderRequest, type RiseLimitOrderRequest, type RiseStopLossRequest, type RiseCancelRequest, type RiseCollateralRequest } from "./adapters/riseOrderExecutor.js";
 import {
   buildVulcanExecutionPlan,
   type VulcanExecutionIntent,
@@ -44,12 +45,27 @@ export interface TraderActionPreview {
 
 export class ClawdPerpsRuntime {
   readonly rise: PhoenixRiseAdapter;
+  readonly executor: RiseOrderExecutor;
 
   constructor(
     readonly config: PerpsRuntimeConfig = loadPerpsRuntimeConfig(),
     readonly repoRoot = resolveClawdRepoRoot(process.cwd(), import.meta.url),
   ) {
     this.rise = createPhoenixRiseAdapter(config);
+    this.executor = createRiseOrderExecutor(config);
+  }
+
+  async init(): Promise<void> {
+    try {
+      await this.rise.connect();
+    } catch {
+      // Rise SDK init is best-effort; Vulcan fallback will be used
+    }
+    try {
+      await this.executor.connect();
+    } catch {
+      // Executor init is best-effort; used on demand
+    }
   }
 
   createStatus(intent: MarketMakerIntent): MarketMakerStatus {
@@ -60,11 +76,14 @@ export class ClawdPerpsRuntime {
       symbol: intent.symbol.toUpperCase(),
       notes: [
         "Rise SDK is the source of truth for market reads and unsigned instruction building.",
+        "Hawkeye RPC provides authoritative on-chain margin, liquidation, and BBO views.",
         "Vulcan remains available for paper execution and CLI compatibility.",
         "Live routes are blocked unless preflight, operator confirmation, and non-sim mode all pass.",
       ],
     };
   }
+
+  // ── Market Data ──
 
   async listMarkets() {
     return this.rise.listMarkets();
@@ -74,13 +93,106 @@ export class ClawdPerpsRuntime {
     return this.rise.getTicker(symbol);
   }
 
+  async getOrderbook(symbol: string, depth = 20): Promise<PhoenixOrderbookSnapshot> {
+    return this.rise.getOrderbook(symbol, depth);
+  }
+
+  async getCandles(symbol: string, interval = "1h", limit = 20): Promise<PhoenixCandle[]> {
+    return this.rise.getCandles(symbol, interval, limit);
+  }
+
+  async getMarketStats(symbol: string): Promise<PhoenixMarketStats> {
+    return this.rise.getMarketStats(symbol);
+  }
+
+  async getFundingRates(symbol?: string): Promise<PhoenixFundingRateView[]> {
+    return this.rise.getFundingRates(symbol);
+  }
+
+  async getBbo(symbol: string): Promise<{ bid: number | null; ask: number | null; mark: number | null }> {
+    return this.rise.getBbo(symbol);
+  }
+
+  // ── Trader Data ──
+
   async getPositions(authority?: string) {
     return this.rise.getPositions(authority);
   }
 
-  async getPortfolio(authority?: string) {
+  async getPortfolio(authority?: string): Promise<PhoenixTraderSnapshot> {
     return this.rise.getTraderSnapshot(authority);
   }
+
+  // ── Margin & Risk ──
+
+  async getMarginStatus(authority?: string, subaccountIndex = 0): Promise<PhoenixMarginStatus> {
+    const auth = authority || this.config.wallet || "unknown";
+    return this.rise.getMarginStatus(auth, subaccountIndex);
+  }
+
+  async getLiquidationPrice(symbol: string, authority?: string, subaccountIndex = 0): Promise<number | null> {
+    const auth = authority || this.config.wallet || "";
+    if (!auth) return null;
+    return this.rise.getLiquidationPrice(auth, symbol, subaccountIndex);
+  }
+
+  // ── Rise SDK Order Execution ──
+
+  async executeMarketOrder(req: RiseMarketOrderRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue; executor will fail if not connected
+    }
+    return this.executor.buildMarketOrder(req);
+  }
+
+  async executeLimitOrder(req: RiseLimitOrderRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue
+    }
+    return this.executor.buildLimitOrder(req);
+  }
+
+  async executeStopLoss(req: RiseStopLossRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue
+    }
+    return this.executor.buildStopLoss(req);
+  }
+
+  async executeCancel(req: RiseCancelRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue
+    }
+    return this.executor.buildCancel(req);
+  }
+
+  async executeDeposit(req: RiseCollateralRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue
+    }
+    return this.executor.buildDepositCollateral(req);
+  }
+
+  async executeWithdraw(req: RiseCollateralRequest): Promise<RiseExecutionPlan> {
+    try {
+      await this.executor.connect();
+    } catch {
+      // Continue
+    }
+    return this.executor.buildWithdrawCollateral(req);
+  }
+
+  // ── Health & Status ──
 
   async getRuntimeHealth() {
     const [healthResult, marketsResult, vulcanResult] = await Promise.allSettled([
@@ -116,6 +228,8 @@ export class ClawdPerpsRuntime {
   async getVulcanCatalogSummary() {
     return summarizeVulcanCatalog(this.repoRoot);
   }
+
+  // ── Preview Methods (legacy) ──
 
   previewObserve(symbol: string, expectedSpreadBps?: number): TraderActionPreview {
     const preflight = buildPreflightReport(this.config, {
