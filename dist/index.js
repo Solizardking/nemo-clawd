@@ -8,6 +8,7 @@ const cli_js_1 = require("./cli.js");
 const slash_js_1 = require("./commands/slash.js");
 const config_js_1 = require("./onboard/config.js");
 const dflow_js_1 = require("./dflow.js");
+const agent_mode_js_1 = require("./agent-mode.js");
 const DEFAULT_PLUGIN_CONFIG = {
     blueprintVersion: "latest",
     blueprintRegistry: "ghcr.io/nvidia/nemoclawd-blueprint",
@@ -170,10 +171,12 @@ function register(api) {
     const bannerEndpoint = onboardCfg?.endpointType ?? "zai";
     const bannerModel = onboardCfg?.model ?? "zai/glm-5.2";
     const bannerTrading = `dflow ${dflowRoutes.mode}`;
+    const bannerMode = (0, agent_mode_js_1.getAgentMode)();
     api.logger.info("");
     api.logger.info("  ┌──────────────────────────────────────────────────────┐");
     api.logger.info("  │   🦞  Nemo Clawd  —  nemoclawd nemoclawd <command>  🦞  │");
     api.logger.info("  │                                                      │");
+    api.logger.info(`  │  Mode:      ${bannerMode.padEnd(42)}│`);
     api.logger.info(`  │  Endpoint:  ${bannerEndpoint.padEnd(42)}│`);
     api.logger.info(`  │  Model:     ${bannerModel.padEnd(42)}│`);
     api.logger.info(`  │  Trading:   ${bannerTrading.padEnd(42)}│`);

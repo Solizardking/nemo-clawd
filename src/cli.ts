@@ -18,6 +18,7 @@ import { cliConnect } from "./commands/connect.js";
 import { cliEject } from "./commands/eject.js";
 import { cliLogs } from "./commands/logs.js";
 import { cliOnboard } from "./commands/onboard.js";
+import { cliMode } from "./commands/mode.js";
 
 function runBundledScript(scriptName: string, scriptArgs: string[] = []): void {
   const scriptPath = path.resolve(__dirname, "..", "scripts", scriptName);
@@ -110,6 +111,14 @@ export function registerCliCommands(ctx: PluginCliContext, api: NemoclawdPluginA
         logger,
         pluginConfig,
       });
+    });
+
+  // nemoclawd nemoclawd mode
+  nemoclawd
+    .command("mode [target]")
+    .description("Show or set the agent mode: 'ai' (chat/coding/research only) or 'trading' (default, full Solana tools)")
+    .action(async (target?: string) => {
+      await cliMode({ set: target, logger });
     });
 
   // nemoclawd nemoclawd onboard

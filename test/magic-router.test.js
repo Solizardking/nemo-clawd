@@ -3,6 +3,9 @@
 
 const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const {
   resolveMagicRouter,
   classifyMagicRouterTask,
@@ -10,6 +13,12 @@ const {
   describeMagicRouterPretty,
   getTaskCatalog,
 } = require("../bin/lib/magic-router");
+
+// resolveMagicRouter's mode argument now defaults to the persisted agent mode
+// (see agent-mode.js getAgentMode). Point every env fixture that omits an
+// explicit mode at an isolated, empty HOME so "no mode.json" -> "trading" is
+// deterministic and independent of the real machine's ~/.nemoclawd state.
+const ISOLATED_HOME = fs.mkdtempSync(path.join(os.tmpdir(), "nemoclawd-magic-router-test-"));
 
 describe("magic router", () => {
   it("classifies prediction-market tasks before generic trading", () => {
@@ -119,7 +128,7 @@ describe("magic router", () => {
   });
 
   it("selects DFlow plus Proof/KYC tools for prediction markets", () => {
-    const route = resolveMagicRouter("buy a prediction market outcome token", {});
+    const route = resolveMagicRouter("buy a prediction market outcome token", { HOME: ISOLATED_HOME });
     assert.equal(route.taskType, "prediction_market");
     assert.ok(route.toolSet.includes("dflow-prediction-metadata"));
     assert.ok(route.toolSet.includes("proof-kyc-check"));
@@ -139,5 +148,49 @@ describe("magic router", () => {
     assert.equal(route.taskType, "security_audit");
     assert.ok(route.toolSet.includes("rug-detection"));
     assert.ok(route.toolSet.includes("contract-read"));
+  });
+
+  it("defaults to trading mode when no mode argument is passed", () => {
+    const route = resolveMagicRouter("check my wallet balance", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" });
+    assert.equal(route.mode, "trading");
+    assert.ok(route.toolSet.includes("solana-rpc"));
+    assert.deepEqual(route.blockedTools, []);
+  });
+
+  it("ai mode strips financial tools even for wallet_ops requests", () => {
+    const route = resolveMagicRouter("check my wallet balance", { ZAI_API_KEY: "zai-test" }, "ai");
+    assert.equal(route.mode, "ai");
+    assert.equal(route.taskType, "wallet_ops");
+    assert.ok(!route.toolSet.includes("solana-rpc"));
+    assert.ok(!route.toolSet.includes("wallet-approval"));
+    assert.ok(!route.toolSet.includes("openshell-private-wallet"));
+    assert.ok(route.blockedTools.includes("solana-rpc"));
+    assert.ok(route.guardrails.includes("ai-mode-financial-tools-disabled"));
+  });
+
+  it("ai mode strips DFlow and KYC tools for prediction markets and flips dflow defaults off", () => {
+    const route = resolveMagicRouter("quote a Kalshi prediction market YES token", { ZAI_API_KEY: "zai-test" }, "ai");
+    assert.ok(!route.toolSet.includes("dflow-prediction-metadata"));
+    assert.ok(!route.toolSet.includes("proof-kyc-check"));
+    assert.equal(route.dflow.predictionMarketDefault, false);
+    assert.equal(route.dflow.spotTradingDefault, false);
+  });
+
+  it("ai mode leaves non-financial tool sets (coding) unchanged", () => {
+    const trading = resolveMagicRouter("debug this TypeScript repo", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" }, "trading");
+    const ai = resolveMagicRouter("debug this TypeScript repo", { HOME: ISOLATED_HOME, ZAI_API_KEY: "zai-test" }, "ai");
+    assert.deepEqual(ai.toolSet, trading.toolSet);
+    assert.deepEqual(ai.blockedTools, []);
+  });
+
+  it("resolves the persisted mode when the mode argument is omitted, so old call sites can't bypass AI Mode", () => {
+    const { setAgentMode } = require("../bin/lib/mode");
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "nemoclawd-magic-router-persisted-"));
+    setAgentMode("ai", { HOME: home });
+
+    const route = resolveMagicRouter("check my wallet balance", { HOME: home, ZAI_API_KEY: "zai-test" });
+    assert.equal(route.mode, "ai");
+    assert.ok(!route.toolSet.includes("solana-rpc"));
+    assert.ok(route.blockedTools.includes("solana-rpc"));
   });
 });

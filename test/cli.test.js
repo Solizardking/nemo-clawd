@@ -219,4 +219,97 @@ describe("CLI dispatch", () => {
     assert.ok(out.includes("Using sandbox: nemo"), out);
     assert.ok(!out.includes("Using sandbox: my-assistant"), out);
   });
+
+  it("mode defaults to trading and help lists the AI Mode section", () => {
+    const r = run("mode");
+    assert.equal(r.code, 0);
+    assert.ok(r.out.includes("Agent mode: trading"));
+
+    const help = run("help");
+    assert.ok(help.out.includes("AI Mode"), "missing AI Mode help section");
+    assert.ok(help.out.includes("nemoclawd mode ai"), "missing mode ai help line");
+  });
+
+  it("mode ai persists across invocations sharing the same HOME", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: home } };
+
+    const set = execSync(`node "${CLI}" mode ai`, opts);
+    assert.ok(set.includes("Agent mode set: ai"));
+
+    const get = execSync(`node "${CLI}" mode`, opts);
+    assert.ok(get.includes("Agent mode: ai"));
+  });
+
+  it("mode rejects an unknown target", () => {
+    const r = run("mode bogus");
+    assert.equal(r.code, 1);
+    assert.ok(r.out.includes("Unknown mode"));
+  });
+
+  it("magic-router --mode ai strips wallet tools for a wallet_ops task, --mode trading does not", () => {
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: "/tmp/nemoclawd-cli-test-" + Date.now(), ZAI_API_KEY: "zai-test" } };
+
+    const ai = execSync(`node "${CLI}" magic-router --mode ai check my wallet balance`, opts);
+    assert.ok(ai.includes("Mode: ai"));
+    assert.ok(ai.includes("Wallet Operations"));
+    assert.ok(ai.includes("Blocked by AI Mode"), ai);
+    assert.ok(ai.includes("openshell-private-wallet"), ai);
+    assert.ok(ai.includes("solana-rpc"), ai);
+    assert.ok(ai.includes("wallet-approval"), ai);
+
+    const trading = execSync(`node "${CLI}" magic-router --mode trading check my wallet balance`, opts);
+    assert.ok(trading.includes("Mode: trading"));
+    assert.ok(trading.includes("solana-rpc"), trading);
+    assert.ok(!trading.includes("Blocked by AI Mode"), trading);
+  });
+
+  it("magic-router --mode with a typo'd value fails instead of silently falling back to an unsafe route", () => {
+    const r = run(`magic-router --mode aii check my wallet balance`);
+    assert.equal(r.code, 1);
+    assert.ok(/Unknown --mode/.test(r.out), r.out);
+    assert.ok(!r.out.includes("solana-rpc"), r.out);
+  });
+
+  it("magic-router --mode with no value after it fails instead of falling back", () => {
+    const r = run(`magic-router --mode`);
+    assert.equal(r.code, 1);
+    assert.ok(/Unknown --mode/.test(r.out), r.out);
+  });
+
+  it("magic-router accepts the --mode=value form, not just a separate token", () => {
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: "/tmp/nemoclawd-cli-test-" + Date.now(), ZAI_API_KEY: "zai-test" } };
+
+    const ai = execSync(`node "${CLI}" magic-router --mode=ai check my wallet balance`, opts);
+    assert.ok(ai.includes("Mode: ai"), ai);
+    assert.ok(ai.includes("Blocked by AI Mode"), ai);
+
+    const r = run(`magic-router --mode=aii check my wallet balance`);
+    assert.equal(r.code, 1);
+    assert.ok(/Unknown --mode/.test(r.out), r.out);
+  });
+
+  it("mode set warns and exits non-zero when NEMOCLAWD_MODE is masking the persisted mode", () => {
+    const home = "/tmp/nemoclawd-cli-test-" + Date.now();
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: home, NEMOCLAWD_MODE: "trading" } };
+
+    let out = "";
+    let code = 0;
+    try {
+      out = execSync(`node "${CLI}" mode ai`, opts);
+    } catch (err) {
+      code = err.status;
+      out = (err.stdout || "") + (err.stderr || "");
+    }
+    assert.equal(code, 1);
+    assert.ok(/NEMOCLAWD_MODE/.test(out), out);
+    assert.ok(!out.includes("Agent mode set: ai"), out);
+  });
+
+  it("mode display notes an active NEMOCLAWD_MODE override", () => {
+    const opts = { encoding: "utf-8", timeout: 10000, env: { ...process.env, HOME: "/tmp/nemoclawd-cli-test-" + Date.now(), NEMOCLAWD_MODE: "ai" } };
+    const out = execSync(`node "${CLI}" mode`, opts);
+    assert.ok(out.includes("Agent mode: ai"));
+    assert.ok(/forced by NEMOCLAWD_MODE/.test(out), out);
+  });
 });

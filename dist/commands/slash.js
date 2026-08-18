@@ -5,8 +5,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleSlashCommand = handleSlashCommand;
 const state_js_1 = require("../blueprint/state.js");
 const config_js_1 = require("../onboard/config.js");
+const agent_mode_js_1 = require("../agent-mode.js");
 function handleSlashCommand(ctx, _api) {
-    const subcommand = ctx.args?.trim().split(/\s+/)[0] ?? "";
+    const args = ctx.args?.trim().split(/\s+/) ?? [];
+    const subcommand = args[0] ?? "";
     switch (subcommand) {
         case "status":
             return slashStatus();
@@ -14,6 +16,8 @@ function handleSlashCommand(ctx, _api) {
             return slashEject();
         case "onboard":
             return slashOnboard();
+        case "mode":
+            return slashMode(args[1], ctx.isAuthorizedSender);
         default:
             return slashHelp();
     }
@@ -26,15 +30,17 @@ function slashHelp() {
             "Usage: `/nemoclawd <subcommand>`",
             "",
             "Subcommands:",
-            "  `status`  - Show sandbox, blueprint, and inference state",
-            "  `eject`   - Show rollback instructions",
-            "  `onboard` - Show onboarding status and instructions",
+            "  `status`     - Show sandbox, blueprint, and inference state",
+            "  `eject`      - Show rollback instructions",
+            "  `onboard`    - Show onboarding status and instructions",
+            "  `mode [ai|trading]` - Show or switch the agent mode",
             "",
             "For full management use the CLI:",
             "  `nemoclawd nemoclawd status `",
             "  `nemoclawd nemoclawd migrate `",
             "  `nemoclawd nemoclawd launch `",
             "  `nemoclawd nemoclawd connect `",
+            "  `nemoclawd nemoclawd mode [ai|trading]`",
             "  `nemoclawd nemoclawd eject --confirm`",
         ].join("\n"),
     };
@@ -96,6 +102,34 @@ function slashOnboard() {
             "```",
         ].join("\n"),
     };
+}
+function slashMode(target, isAuthorizedSender) {
+    const envOverride = process.env.NEMOCLAWD_MODE?.trim();
+    const hasActiveOverride = (0, agent_mode_js_1.isAgentMode)(envOverride);
+    if (target === undefined) {
+        const mode = (0, agent_mode_js_1.getAgentMode)();
+        const overrideNote = hasActiveOverride ? `\n\n_(forced by NEMOCLAWD_MODE=${envOverride}; unset it to use the persisted mode)_` : "";
+        return {
+            text: [`**Agent Mode**: \`${mode}\``, "", (0, agent_mode_js_1.describeAgentMode)(mode), "", "Switch with `/nemoclawd mode ai` or `/nemoclawd mode trading`."].join("\n") + overrideNote,
+        };
+    }
+    // Mode is a security boundary (it gates wallet/trading tool access), so only an
+    // authorized sender may change it. Reading the current mode stays open to anyone.
+    if (!isAuthorizedSender) {
+        return {
+            text: "Switching agent mode requires an authorized sender. Use `nemoclawd nemoclawd mode <ai|trading>` from the host CLI instead.",
+        };
+    }
+    if (!(0, agent_mode_js_1.isAgentMode)(target)) {
+        return { text: `Unknown mode "${target}". Expected one of: ${agent_mode_js_1.AGENT_MODES.join(", ")}` };
+    }
+    const mode = (0, agent_mode_js_1.setAgentMode)(target);
+    if (hasActiveOverride && envOverride !== mode) {
+        return {
+            text: `Persisted mode set to \`${mode}\`, but \`NEMOCLAWD_MODE=${envOverride}\` is active in this environment and overrides it. Unset NEMOCLAWD_MODE for the persisted mode to take effect.`,
+        };
+    }
+    return { text: [`**Agent mode set**: \`${mode}\``, "", (0, agent_mode_js_1.describeAgentMode)(mode)].join("\n") };
 }
 function slashEject() {
     const state = (0, state_js_1.loadState)();
