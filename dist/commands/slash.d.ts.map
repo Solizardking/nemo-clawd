@@ -1,1 +1,1 @@
-{"version":3,"file":"slash.d.ts","sourceRoot":"","sources":["../../src/commands/slash.ts"],"names":[],"mappings":"AAGA;;;;;;;GAOG;AAEH,OAAO,KAAK,EAAE,oBAAoB,EAAE,mBAAmB,EAAE,kBAAkB,EAAE,MAAM,aAAa,CAAC;AAIjG,wBAAgB,kBAAkB,CAChC,GAAG,EAAE,oBAAoB,EACzB,IAAI,EAAE,kBAAkB,GACvB,mBAAmB,CAarB"}
+{"version":3,"file":"slash.d.ts","sourceRoot":"","sources":["../../src/commands/slash.ts"],"names":[],"mappings":"AAGA;;;;;;;GAOG;AAEH,OAAO,KAAK,EAAE,oBAAoB,EAAE,mBAAmB,EAAE,kBAAkB,EAAE,MAAM,aAAa,CAAC;AAKjG,wBAAgB,kBAAkB,CAChC,GAAG,EAAE,oBAAoB,EACzB,IAAI,EAAE,kBAAkB,GACvB,mBAAmB,CAgBrB"}

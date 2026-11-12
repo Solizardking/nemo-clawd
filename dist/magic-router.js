@@ -21,6 +21,7 @@ exports.getTaskCatalog = getTaskCatalog;
  *   Task type → tool set mapping → guardrails → DFlow routing
  *   Inference → Ollama (default) → OpenRouter (advisor) → NVIDIA (fallback)
  */
+const agent_mode_js_1 = require("./agent-mode.js");
 exports.MAGIC_ROUTER_STRATEGY = "magic-router";
 exports.MAGIC_ROUTER_VERSION = "2.0.0";
 // ── Inference providers ──────────────────────────────────────────────
@@ -333,7 +334,7 @@ function buildInferenceRoutes(env) {
     };
 }
 // ── Full route resolution ────────────────────────────────────────────
-function resolveMagicRouter(input, env = process.env) {
+function resolveMagicRouter(input, env = process.env, mode = (0, agent_mode_js_1.getAgentMode)(env)) {
     const { type: taskType, confidence } = classifyMagicRouterTaskWithConfidence(input);
     const routes = buildInferenceRoutes(env);
     const openRouterAvailable = routes.selected.provider === exports.OPENROUTER_PROVIDER || routes.advisor?.provider === exports.OPENROUTER_PROVIDER;
@@ -342,24 +343,32 @@ function resolveMagicRouter(input, env = process.env) {
         ...TASK_METADATA[taskType],
         confidence,
     };
+    const rawToolSet = toolSetForTask(taskType, Boolean(openRouterAvailable));
+    const { allowed: toolSet, blocked: blockedTools } = (0, agent_mode_js_1.partitionToolsForMode)(rawToolSet, mode);
+    const aiMode = mode === "ai";
+    const guardrails = [
+        "least-privilege-tools",
+        "read-only-before-signing",
+        "explicit-approval-before-wallet-actions",
+        "no-private-key-or-seed-phrase-handling",
+    ];
+    if (aiMode)
+        guardrails.push("ai-mode-financial-tools-disabled");
     return {
         strategy: exports.MAGIC_ROUTER_STRATEGY,
         version: exports.MAGIC_ROUTER_VERSION,
+        mode,
         taskType,
         taskMeta,
         inference: routes.selected,
         advisor: routes.advisor,
         fallbacks: routes.fallbacks,
-        toolSet: toolSetForTask(taskType, Boolean(openRouterAvailable)),
-        guardrails: [
-            "least-privilege-tools",
-            "read-only-before-signing",
-            "explicit-approval-before-wallet-actions",
-            "no-private-key-or-seed-phrase-handling",
-        ],
+        toolSet,
+        blockedTools,
+        guardrails,
         dflow: {
-            spotTradingDefault: true,
-            predictionMarketDefault: true,
+            spotTradingDefault: !aiMode,
+            predictionMarketDefault: !aiMode,
             credentialEnv: "DFLOW_API_KEY",
         },
     };
@@ -367,13 +376,16 @@ function resolveMagicRouter(input, env = process.env) {
 // ── Pretty-print — the signature feature ─────────────────────────────
 function describeMagicRouter(route) {
     const advisor = route.advisor ? `; advisor ${route.advisor.provider}/${route.advisor.model}` : "";
-    return `${route.strategy} v${route.version}: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}`;
+    const blocked = route.blockedTools.length ? `; blocked=${route.blockedTools.join(",")}` : "";
+    return `${route.strategy} v${route.version}[${route.mode}]: ${route.taskType} -> ${route.inference.provider}/${route.inference.model}${advisor}; tools=${route.toolSet.join(",")}${blocked}`;
 }
 function describeMagicRouterPretty(route) {
     const meta = route.taskMeta;
     const lines = [];
     lines.push(`  🪄  Magic Router v${route.version} — Decision Trace`);
     lines.push(`  ${"─".repeat(48)}`);
+    lines.push(``);
+    lines.push(`  Mode: ${route.mode}`);
     lines.push(``);
     lines.push(`  ${meta.emoji}  Task Classification`);
     lines.push(`     Input type:    ${meta.label}`);
@@ -408,6 +420,13 @@ function describeMagicRouterPretty(route) {
     lines.push(`  🛠️  Tool Set (${route.toolSet.length})`);
     for (const tool of route.toolSet) {
         lines.push(`     • ${tool}`);
+    }
+    if (route.blockedTools.length) {
+        lines.push(``);
+        lines.push(`  🚫  Blocked by AI Mode (${route.blockedTools.length})`);
+        for (const tool of route.blockedTools) {
+            lines.push(`     • ${tool}`);
+        }
     }
     lines.push(``);
     // Guardrails

@@ -18,6 +18,7 @@ const dflow = require("./lib/dflow");
 const magicRouter = require("./lib/magic-router");
 const { spinnersCommand } = require("./lib/spinners");
 const { coreAiCommand } = require("./lib/core-ai");
+const agentMode = require("./lib/mode");
 
 const pkg = require(path.join(ROOT, "package.json"));
 
@@ -41,6 +42,11 @@ DFlow Routing
 Magic Router
   nemoclawd magic-router <task>  Pick provider/model/tools for a task
   nemoclawd magic-router --json <task>
+
+AI Mode
+  nemoclawd mode                 Show the active agent mode
+  nemoclawd mode ai              Switch to AI Mode (wallet/trading tools disabled)
+  nemoclawd mode trading         Switch to Trading Mode (default)
 
 Solana
   nemoclawd solana               Show Solana runtime overview
@@ -137,8 +143,31 @@ function printDflowStatus(jsonOutput = false) {
 
 function printMagicRouter(args) {
   const jsonOutput = args.includes("--json");
-  const task = args.filter((arg) => arg !== "--json").join(" ").trim();
-  const route = magicRouter.resolveMagicRouter(task, process.env);
+  let mode = agentMode.getAgentMode();
+  let modeFlagIndex = -1;
+  let modeValueIndex = -1;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "--mode") {
+      modeFlagIndex = i;
+      modeValueIndex = i + 1;
+      mode = args[modeValueIndex];
+      break;
+    }
+    if (arg.startsWith("--mode=")) {
+      modeFlagIndex = i;
+      mode = arg.slice("--mode=".length);
+      break;
+    }
+  }
+  if (modeFlagIndex !== -1 && !agentMode.isAgentMode(mode)) {
+    fail(`Unknown --mode "${mode || ""}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
+  }
+  const task = args
+    .filter((arg, i) => arg !== "--json" && i !== modeFlagIndex && i !== modeValueIndex)
+    .join(" ")
+    .trim();
+  const route = magicRouter.resolveMagicRouter(task, process.env, mode);
   if (jsonOutput) {
     console.log(JSON.stringify(route, null, 2));
     return;
@@ -146,6 +175,33 @@ function printMagicRouter(args) {
 
   const pretty = magicRouter.describeMagicRouterPretty(route);
   console.log(pretty);
+}
+
+function modeCommand(args) {
+  const requested = args[0];
+  const envOverride = process.env.NEMOCLAWD_MODE && String(process.env.NEMOCLAWD_MODE).trim();
+  const hasActiveOverride = agentMode.isAgentMode(envOverride);
+
+  if (!requested) {
+    const current = agentMode.getAgentMode();
+    console.log(`Agent mode: ${current}`);
+    console.log(agentMode.describeAgentMode(current));
+    if (hasActiveOverride) {
+      console.log(`(forced by NEMOCLAWD_MODE=${envOverride}; unset it to use the persisted mode)`);
+    }
+    return;
+  }
+  if (!agentMode.isAgentMode(requested)) {
+    fail(`Unknown mode "${requested}". Expected one of: ${agentMode.AGENT_MODES.join(", ")}`);
+  }
+  const mode = agentMode.setAgentMode(requested);
+
+  if (hasActiveOverride && envOverride !== mode) {
+    fail(`Persisted mode set to "${mode}", but NEMOCLAWD_MODE="${envOverride}" is active in this environment and overrides it. Unset NEMOCLAWD_MODE for the persisted mode to take effect.`);
+  }
+
+  console.log(`Agent mode set: ${mode}`);
+  console.log(agentMode.describeAgentMode(mode));
 }
 
 function solanaOverview() {
@@ -360,6 +416,10 @@ async function main() {
   }
   if (cmd === "magic-router" || cmd === "magic") {
     printMagicRouter(args.slice(1));
+    return;
+  }
+  if (cmd === "mode") {
+    modeCommand(args.slice(1));
     return;
   }
   if (cmd === "solana") {

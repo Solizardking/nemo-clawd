@@ -1033,6 +1033,80 @@ Contact [support@x.ai](mailto:support@x.ai) with your team ID and CA certificate
 
 ---
 
+## AI Mode
+
+nemoclawd's magic router classifies every message (`coding`, `research`, `solana_trading`,
+`prediction_market`, `wallet_ops`, `general`) and grants tools per request. By default, in
+**Trading Mode**, a message that classifies as `wallet_ops`, `solana_trading`, or
+`prediction_market` can reach wallet, signing, and DFlow trading tools.
+
+**AI Mode** is a persistent, explicit switch that hard-disables every financial tool at the
+router level — regardless of how an individual message classifies. This is defense in depth
+on top of per-message classification: a misclassified or adversarial prompt can't reach a
+financial tool while AI Mode is active, because the tools are removed from the route before
+the agent ever sees them. In AI Mode, nemoclawd behaves as a plain conversational AI, coding,
+and research assistant with no path to wallet or trading actions — useful for a shared
+sandbox, local development, or anywhere a funded wallet shouldn't be reachable at all.
+
+### Tools disabled in AI Mode
+
+`solana-rpc` · `wallet-approval` · `openshell-private-wallet` · `dflow-order` ·
+`dflow-book-stream` · `dflow-prediction-metadata` · `proof-kyc-check`
+
+| Mode | Wallet / signing tools | DFlow spot & prediction defaults | Guardrails |
+|---|---|---|---|
+| `trading` (default) | Available when a message classifies as `wallet_ops`, `solana_trading`, or `prediction_market` | Enabled | Existing least-privilege guardrails |
+| `ai` | Never available, regardless of classification | Disabled | Adds `ai-mode-financial-tools-disabled` |
+
+### Switching modes
+
+```bash
+# Plugin CLI (nemoclawd nemoclawd <subcommand>)
+nemoclawd nemoclawd mode              # show the active mode
+nemoclawd nemoclawd mode ai           # switch to AI Mode
+nemoclawd nemoclawd mode trading      # switch back to Trading Mode (default)
+
+# Standalone CLI
+nemoclawd mode
+nemoclawd mode ai
+nemoclawd mode trading
+
+# Slash command (chat interface)
+/nemoclawd mode
+/nemoclawd mode ai
+/nemoclawd mode trading
+```
+
+The active mode persists to `~/.nemoclawd/mode.json` and can be overridden per-invocation
+with the `NEMOCLAWD_MODE` environment variable (handy for CI or one-off scripted calls
+without touching persisted state).
+
+Preview how a message would route under either mode without changing the persisted mode:
+
+```bash
+nemoclawd magic-router --mode ai "check my wallet balance"
+nemoclawd magic-router --mode trading "check my wallet balance"
+```
+
+### Where it lives in the code
+
+| Concern | Plugin (TypeScript) | Standalone CLI (JavaScript) |
+|---|---|---|
+| Mode state + tool gating | `src/agent-mode.ts` | `bin/lib/mode.js` |
+| Router integration | `src/magic-router.ts` | `bin/lib/magic-router.js` |
+| CLI subcommand | `src/cli.ts` → `src/commands/mode.ts` | `bin/nemoclawd.js` (`mode` command) |
+| Slash command | `src/commands/slash.ts` | — |
+| Startup banner | `src/index.ts` | — |
+
+Tests: `src/agent-mode.test.ts`, `src/magic-router.test.ts` (vitest) and
+`test/mode.test.js`, `test/magic-router.test.js`, `test/cli.test.js` (`node:test`).
+
+See [docs/reference/commands.md#ai-mode](docs/reference/commands.md#ai-mode) for the full
+reference and [docs/about/how-it-works.md](docs/about/how-it-works.md#ai-mode) for how it
+relates to wallet protection mode.
+
+---
+
 <h2 id="buddies">🧸 BLOCKCHAIN BUDDIES 🧸</h2>
 
 Every `nemoclawd` user gets a companion — a procedurally generated Blockchain Buddy with its own wallet, trading personality, stats, and animated ASCII sprite.

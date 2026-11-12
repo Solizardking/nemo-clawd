@@ -121,13 +121,80 @@ Stream blueprint execution and sandbox logs.
 $ nemoclawd logs [-f] [-n <count>] [--run-id <id>]
 ```
 
+### `nemoclawd mode `
+
+Show or switch the agent's operating mode. See [AI Mode](#ai-mode) below.
+
+```console
+$ nemoclawd nemoclawd mode              # show the active mode
+$ nemoclawd nemoclawd mode ai           # switch to AI Mode
+$ nemoclawd nemoclawd mode trading      # switch back to Trading Mode (default)
+```
+
 ### `/nemoclawd` Slash Command
 
 | Subcommand | Description |
 |---|---|
 | `/nemoclawd status ` | Show sandbox and inference state |
+| `/nemoclawd mode [ai\|trading]` | Show or switch the agent mode |
+
+## AI Mode
+
+Nemo Clawd's [magic router](#magic-router) picks tools and an inference route per request by
+classifying the message (`coding`, `research`, `solana_trading`, `prediction_market`,
+`wallet_ops`, `general`). By default, in **Trading Mode**, a message that classifies as
+`wallet_ops` or `prediction_market` can reach wallet, signing, and DFlow trading tools.
+
+**AI Mode** is a persistent, explicit switch that hard-disables every financial tool —
+`solana-rpc`, `wallet-approval`, `openshell-private-wallet`, `dflow-order`,
+`dflow-book-stream`, `dflow-prediction-metadata`, `proof-kyc-check` — at the router level,
+regardless of how an individual message classifies. This is defense in depth on top of
+per-message classification: a misclassified or adversarial prompt cannot reach a financial
+tool while AI Mode is active, because the tools are removed from the route before the agent
+ever sees them.
+
+Use AI Mode when you want Nemo Clawd to behave as a plain conversational AI, coding, and
+research assistant — with no path to wallet or trading actions — for example on a shared
+sandbox, during development, or whenever a funded wallet should not be reachable at all.
+
+```console
+$ nemoclawd nemoclawd mode ai
+Agent mode set: ai
+AI Mode: conversational AI, coding, and research only — wallet, signing, and trading tools are disabled.
+
+$ nemoclawd nemoclawd mode
+Agent mode: ai
+AI Mode: conversational AI, coding, and research only — wallet, signing, and trading tools are disabled.
+
+$ nemoclawd nemoclawd mode trading
+Agent mode set: trading
+Trading Mode: full Solana trading, wallet, and prediction-market tools available (default).
+```
+
+The active mode is stored in `~/.nemoclawd/mode.json` and can be overridden per-invocation
+with the `NEMOCLAWD_MODE` environment variable (useful for CI or one-off scripted calls
+without touching persisted state). `nemoclawd magic-router --mode <ai|trading> <task>` accepts
+the same override for inspecting how a given message would route under either mode.
+
+| Mode | Wallet / signing tools | DFlow spot & prediction defaults | Guardrails |
+|---|---|---|---|
+| `trading` (default) | Available when a message classifies as `wallet_ops`, `solana_trading`, or `prediction_market` | Enabled | Existing least-privilege guardrails |
+| `ai` | Never available, regardless of classification | Disabled | Adds `ai-mode-financial-tools-disabled` |
 
 ## Standalone Host Commands
+
+### Magic Router
+
+Show which inference route, tools, and guardrails a given message would receive.
+
+```console
+$ nemoclawd magic-router "check my wallet balance"
+$ nemoclawd magic-router --json "swap SOL for USDC"
+$ nemoclawd magic-router --mode ai "check my wallet balance"
+```
+
+`--mode <ai|trading>` inspects routing under either mode without changing the persisted mode
+(see [AI Mode](#ai-mode)). Without `--mode`, the active persisted mode is used.
 
 ### Solana Quick Start
 

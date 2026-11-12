@@ -10,6 +10,7 @@
  *   Task type → tool set mapping → guardrails → DFlow routing
  *   Inference → Ollama (default) → OpenRouter (advisor) → NVIDIA (fallback)
  */
+import { type AgentMode } from "./agent-mode.js";
 export declare const MAGIC_ROUTER_STRATEGY = "magic-router";
 export declare const MAGIC_ROUTER_VERSION = "2.0.0";
 export declare const OLLAMA_DEFAULT_PROVIDER = "ollama-local";
@@ -43,12 +44,14 @@ export interface MagicRouterInferenceRoute {
 export interface MagicRouterRoute {
     strategy: typeof MAGIC_ROUTER_STRATEGY;
     version: typeof MAGIC_ROUTER_VERSION;
+    mode: AgentMode;
     taskType: MagicRouterTaskType;
     taskMeta: MagicRouterTaskMetadata;
     inference: MagicRouterInferenceRoute;
     advisor?: MagicRouterInferenceRoute;
     fallbacks: MagicRouterInferenceRoute[];
     toolSet: string[];
+    blockedTools: string[];
     guardrails: string[];
     dflow: {
         spotTradingDefault: boolean;
@@ -65,7 +68,7 @@ export declare function classifyMagicRouterTaskWithConfidence(input: string | st
     type: MagicRouterTaskType;
     confidence: number;
 };
-export declare function resolveMagicRouter(input: string | string[] | undefined, env?: EnvLike): MagicRouterRoute;
+export declare function resolveMagicRouter(input: string | string[] | undefined, env?: EnvLike, mode?: AgentMode): MagicRouterRoute;
 export declare function describeMagicRouter(route: MagicRouterRoute): string;
 export declare function describeMagicRouterPretty(route: MagicRouterRoute): string;
 /**
